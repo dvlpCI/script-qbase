@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-07-11 16:37:58
+ # @LastEditTime: 2023-07-11 16:49:31
  # @Description: 
 ### 
 
@@ -14,7 +14,7 @@ function local_test() {
     echo "$qbaseScriptDir_Absolute"
 }
 
-function getCurretnVersionDirPath() {
+function getCurretnVersionDirAbsPath() {
   # 指定目录
   dir_path="$1"
 
@@ -61,12 +61,12 @@ function getqscriptCurrentVersionHomeDir_abspath() {
     fi
     homebrew_Cellar_dir=${homebrew_Cellar_dir}/Cellar
 
-    qtoolCurrentVersionHomeDir_relpath=$(getCurretnVersionDirPath "${homebrew_Cellar_dir}/qtool")
-    if [[ "${qtoolCurrentVersionHomeDir_relpath}" == /?* ]]; then
-        qtoolCurrentVersionHomeDir_relpath="${qtoolCurrentVersionHomeDir_relpath:1}"
+    qscriptCurrentVersionHomeDir_abspath=$(getCurretnVersionDirAbsPath "${homebrew_Cellar_dir}/qtool")
+    if [[ $qscriptCurrentVersionHomeDir_abspath =~ ^~.* ]]; then
+        # 如果 $qscriptCurrentVersionHomeDir_abspath 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
+        qscriptCurrentVersionHomeDir_abspath="${HOME}${qscriptCurrentVersionHomeDir_abspath:1}"
     fi
-    qbaseScriptDir_Absolute="${homebrew_Cellar_dir}/${qtoolCurrentVersionHomeDir_relpath}"
-    echo "$qbaseScriptDir_Absolute"
+    echo "$qscriptCurrentVersionHomeDir_abspath"
 }
 
 
@@ -74,7 +74,7 @@ function getqscriptCurrentVersionHomeDir_abspath() {
 if [ -n "$1" ] && [ "$1" == "test" ] ; then
     qtool_version_homedir_relpath=$(local_test) # 本地测试
 else
-    qtool_version_homedir_relpath=$(getqscriptCurrentVersionHomeDir_abspath "qbase")
+    qtool_version_homedir_relpath=$(getqscriptCurrentVersionHomeDir_abspath "qtool")
     if [ $? != 0 ]; then
         exit 1
     fi
