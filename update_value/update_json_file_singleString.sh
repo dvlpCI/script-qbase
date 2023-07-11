@@ -15,7 +15,7 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}/..
 bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 #echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
-
+sed_text_script_file_path=${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh
 
 # 定义颜色常量
 NC='\033[0m' # No Color
@@ -52,14 +52,14 @@ function UpdateJsonFileKeyWithValue() {
         return 1
     fi
 
-    #echo "正在执行命令(替换文本):sh ${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\""
-    sh ${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
+    #echo "正在执行命令(替换文本):sh $sed_text_script_file_path -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\""
+    sh $sed_text_script_file_path -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
    scriptResultCode=$?
    if [ ${scriptResultCode} != 0 ]; then
    echo "=============${scriptResultCode}"
-        echo "执行命令(替换文本)发生错误:《 sh ${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" 》"
+        echo "执行命令(替换文本)发生错误:《 sh $sed_text_script_file_path -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" 》"
         UpdateJsonKeyValue="错误信息输出失败，请查看打包日志"
-        sh ${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
+        sh $sed_text_script_file_path -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
        
        return ${scriptResultCode}
    fi
