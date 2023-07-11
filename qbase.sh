@@ -32,10 +32,14 @@ function getCurretnVersionDirAbsPath() {
   latest_version=$(echo "${versions[@]}" | tr ' ' '\n' | sort -r | head -n 1)
 
   # 输出最新版本的路径
-  build_tools_home_dir="$dir_path/$latest_version"
-  echo "$build_tools_home_dir"
+  curretnVersionDir_abspath="$dir_path/$latest_version/bin" # 放在bin目录下
+  if [[ $curretnVersionDir_abspath =~ ^~.* ]]; then
+    # 如果 $curretnVersionDir_abspath 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
+    curretnVersionDir_abspath="${HOME}${curretnVersionDir_abspath:1}"
+fi
+  echo "$curretnVersionDir_abspath"
 
-  if [ ! -d "${build_tools_home_dir}" ]; then
+  if [ ! -d "${curretnVersionDir_abspath}" ]; then
     return 1
   fi
 }
@@ -61,11 +65,7 @@ function getqscriptCurrentVersionHomeDir_abspath() {
     fi
     homebrew_Cellar_dir=${homebrew_Cellar_dir}/Cellar
 
-    qscriptCurrentVersionHomeDir_abspath=$(getCurretnVersionDirAbsPath "${homebrew_Cellar_dir}/qtool")
-    if [[ $qscriptCurrentVersionHomeDir_abspath =~ ^~.* ]]; then
-        # 如果 $qscriptCurrentVersionHomeDir_abspath 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
-        qscriptCurrentVersionHomeDir_abspath="${HOME}${qscriptCurrentVersionHomeDir_abspath:1}"
-    fi
+    qscriptCurrentVersionHomeDir_abspath=$(getCurretnVersionDirAbsPath "${homebrew_Cellar_dir}/$requstQScript")
     echo "$qscriptCurrentVersionHomeDir_abspath"
 }
 
@@ -74,7 +74,7 @@ function getqscriptCurrentVersionHomeDir_abspath() {
 if [ -n "$1" ] && [ "$1" == "test" ] ; then
     qtool_version_homedir_relpath=$(local_test) # 本地测试
 else
-    qtool_version_homedir_relpath=$(getqscriptCurrentVersionHomeDir_abspath "qtool")
+    qtool_version_homedir_relpath=$(getqscriptCurrentVersionHomeDir_abspath "qbase")
     if [ $? != 0 ]; then
         exit 1
     fi
