@@ -15,7 +15,7 @@
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
+# echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
 CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
 CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 
