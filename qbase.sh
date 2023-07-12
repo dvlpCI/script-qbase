@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-07-12 14:53:54
+# @LastEditors: dvlproad
+# @LastEditTime: 2023-07-12 15:00:46
 # @Description:
 ###
 
@@ -76,10 +76,8 @@ function getqscript_allVersionHomeDir_abspath() {
     echo "${qscript_allVersion_homedir}"
 }
 
-
 qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "qbase")
 qtargetScript_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
-
 
 versionCmdStrings=("--version" "-version" "-v" "version")
 
@@ -87,7 +85,7 @@ versionCmdStrings=("--version" "-version" "-v" "version")
 argCount=$#
 if [ $argCount -ge 1 ]; then
     last_index=$((argCount))
-    last_arg=${!last_index}   # 获取倒数第一个参数
+    last_arg=${!last_index} # 获取倒数第一个参数
     if [ $argCount -ge 2 ]; then
         second_last_index=$((argCount - 1))
         second_last_arg=${!second_last_index} # 获取倒数第二个参数
@@ -116,7 +114,8 @@ fi
 
 # 如果是获取版本号
 if echo "${versionCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
-    echo "${qtargetScript_latest_version}" 
+    echo "${qtargetScript_latest_version}"
+    exit
 fi
 
 # 如果是测试脚本中
@@ -129,6 +128,3 @@ else
     fi
 fi
 echo "${qtargetScript_curVersion_homedir_abspath}"
-
-
-
