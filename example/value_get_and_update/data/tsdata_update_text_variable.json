@@ -1,0 +1,28 @@
+{
+  "data1": "111",
+  "data2": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行",
+  "data3": "unknow data3",
+  "branch_info_result": {
+    "current": {
+      "data3": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行"
+    }
+  },
+  "test_result": {
+    "data3": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行\n结束",
+    "data2": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行"
+  },
+  "data_string": "这是未替换前的字符串",
+  "data_array": [
+    "这是未替换前的数组"
+  ],
+  "data_result": {
+    "local_backup_dir": "这是未替换前的备份路径"
+  },
+  "data_string_1": "这是未替换前的字符串1",
+  "data_string_2": "这是未替换前的字符串2",
+  "data_string_3": "这是未替换前的字符串3",
+  "data_string_4": "这是未替换前的字符串4",
+  "data_string_5": "这是未替换前的字符串5",
+  "data_string_6": "这是未替换前的字符串6",
+  "data_string_file_path": "~/Project/a.txt"
+}

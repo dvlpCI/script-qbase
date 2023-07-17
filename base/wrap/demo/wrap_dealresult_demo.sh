@@ -9,9 +9,9 @@ sh ./wrap_dealresult_demo.sh
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}/..
-bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-#echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
+#Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
+Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
+#echo "Base_HomeDir_Absolute=${Base_HomeDir_Absolute}"
 
 
 Wrap_FILE_PATH="${CurrentDIR_Script_Absolute}/wrap_demo.json"

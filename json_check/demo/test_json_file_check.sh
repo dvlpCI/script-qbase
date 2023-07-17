@@ -9,15 +9,15 @@
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}/..
-bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-#echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
+#Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
+Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
+#echo "Base_HomeDir_Absolute=${Base_HomeDir_Absolute}"
 
 #echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
 #CommonFun_HomeDir_Absolute3=${CurrentDIR_Script_Absolute}/..
 #CommonFun_HomeDir_Absolute3=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 #CommonFun_HomeDir_Absolute2=${CommonFun_HomeDir_Absolute3%/*}
-#CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
+#Base_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
 
 echo "---------------------------------------------1"
 #'{"data1": "第1行\n第2行"}'

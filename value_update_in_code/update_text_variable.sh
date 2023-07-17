@@ -12,7 +12,7 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
 #CommonFun_HomeDir_Absolute2=${CurrentDIR_Script_Absolute}/..
 CommonFun_HomeDir_Absolute2=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
+Base_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
 
 # shell 参数具名化
 show_usage="args: [-willUpdateText, -specialCharType, -onlyEscapeFirst]\
@@ -22,7 +22,7 @@ while [ -n "$1" ]
 do
     case "$1" in
         -willUpdateText|--will-update-text) WillUpdateText=$2; shift 2;;
-        -specialCharType|--special-character-type) SpecialCharacterType=$2; shift 2;;
+        -specialCharType|--special-character-type) SpecialCharacterType=$2; shift 2;; # NewlineCharacter / EscapeCharacter
         -onlyEscapeFirst|--only-escape-first) OnlyEscapeFirst=$2; shift 2;;
         --) break ;;
         *) echo $1,$2,$show_usage; break ;;
@@ -65,7 +65,7 @@ function escapeNewlineCharacter() {
 
 # 测试修改JSON文件中的值
 function tsFun_updateJsonFileValue() {
-    TEST_JSON_FILE_PATH=${CommonFun_HomeDir_Absolute}/test/tsdata_update_text_variable.json
+    TEST_JSON_FILE_PATH=${Base_HomeDir_Absolute}/test/data/tsdata_update_text_variable.json
 
     # 注意📢1：使用jquery取值的时候，不要使用 jq -r 属性，否则会导致以下问题：
     # 导致的问题①：取出来的数值换行符\n会直接换行，导致要echo输出的时候，无法转义成功
@@ -83,7 +83,7 @@ function tsFun_updateJsonFileValue() {
     
     fileValue_origin_noDoubleQuote+="\n结束"
     BRANCH_OUTLINES_LOG_JSON="{\"data3\": \"${fileValue_origin_noDoubleQuote}\"}"
-    sh "${CommonFun_HomeDir_Absolute}/update_json_file.sh" -f "${TEST_JSON_FILE_PATH}" -k "test_result" -v "${BRANCH_OUTLINES_LOG_JSON}" --skip-value-check "true"
+    sh "${Base_HomeDir_Absolute}/update_json_file.sh" -f "${TEST_JSON_FILE_PATH}" -k "test_result" -v "${BRANCH_OUTLINES_LOG_JSON}" --skip-value-check "true"
     # 注意📢4：使用jquery取值的时候，不要使用 jq -r 属性
     cat ${TEST_JSON_FILE_PATH} | jq '.test_result' | jq '.data3'
 

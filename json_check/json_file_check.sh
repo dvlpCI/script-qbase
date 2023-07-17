@@ -16,8 +16,8 @@
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 # echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
-CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
+Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
+Base_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 
 
 
@@ -53,11 +53,11 @@ function updatePackageErrorCodeAndMessage() {
     fi
 
     if [ ! -f "${SCRIPT_RESULT_JSON_FILE}" ]; then   # 指定文件，不存在，使用默认的
-        SCRIPT_RESULT_JSON_FILE="${CommonFun_HomeDir_Absolute}/json/common_script_result.json"
+        SCRIPT_RESULT_JSON_FILE="${Base_HomeDir_Absolute}/json/common_script_result.json"
     fi
-    sh "${CommonFun_HomeDir_Absolute}/base/error_code_message/update_code_message.sh" -codeMessageJsonF "${SCRIPT_RESULT_JSON_FILE}" -code "$1" -message "$2"
+    sh "${Base_HomeDir_Absolute}/base/error_code_message/update_code_message.sh" -codeMessageJsonF "${SCRIPT_RESULT_JSON_FILE}" -code "$1" -message "$2"
     if [ $? != 0 ]; then
-        echo "❌Error:执行以下更新命令时候失败，请检查《sh \"${CommonFun_HomeDir_Absolute}/base/error_code_message/update_code_message.sh\" -codeMessageJsonF \"${SCRIPT_RESULT_JSON_FILE}\" -code \"$1\" -message \"$2\"》"
+        echo "❌Error:执行以下更新命令时候失败，请检查《sh \"${Base_HomeDir_Absolute}/base/error_code_message/update_code_message.sh\" -codeMessageJsonF \"${SCRIPT_RESULT_JSON_FILE}\" -code \"$1\" -message \"$2\"》"
         exit 1
     fi
 }

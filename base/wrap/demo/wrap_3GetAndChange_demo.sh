@@ -12,7 +12,7 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #CommonFun_HomeDir_Absolute3=${CurrentDIR_Script_Absolute}/..
 CommonFun_HomeDir_Absolute3=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 CommonFun_HomeDir_Absolute2=${CommonFun_HomeDir_Absolute3%/*}
-CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
+Base_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
 
 
 echo "---------------------------------------------3对json文件添加新【常量值含换行符】"
@@ -86,7 +86,7 @@ echo "\n\n\n"
 echo "---------------------------------------------5对json文件添加新【数组+变量值+含换行符】"
 categoryBranchsLogArray=("a" "b" "c")
 categoryBranchsLogArrayString=${categoryBranchsLogArray[*]}
-source "${CommonFun_HomeDir_Absolute}/a_function_jsonstring.sh"
+source "${Base_HomeDir_Absolute}/a_function_jsonstring.sh"
 CATEGORY_BRANCHS_LOG_ARRAY_VALUE=$(getJsonStringWithEscapeFromArrayString "${categoryBranchsLogArrayString}" "true")
 CATEGORY_BRANCHS_LOG_JSON="{\"other\": ${CATEGORY_BRANCHS_LOG_ARRAY_VALUE}}"
 
