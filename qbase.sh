@@ -111,11 +111,13 @@ function getqscript_allVersionHomeDir_abspath() {
     echo "${qscript_allVersion_homedir}"
 }
 
-qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "qbase")
-qbase_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
+
 if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
-    qbase_homedir_abspath=$(local_test) # 本地测试
+    qbase_latest_version="local_qbase"
+    qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 else
+    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "qbase")
+    qbase_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
     qbase_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qbase_latest_version}")
     if [ $? != 0 ]; then
         exit 1

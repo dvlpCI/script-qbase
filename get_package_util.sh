@@ -77,12 +77,12 @@ function getqscript_allVersionHomeDir_abspath() {
 }
 
 function get_packageName_info() {
-    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "$1")
-    qtargetScript_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
-    
     if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
+        qtargetScript_latest_version="local_$1"
         qtargetScript_curVersion_homedir_abspath=$(local_test) # 本地测试
     else
+        qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "$1")
+        qtargetScript_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
         qtargetScript_curVersion_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qtargetScript_latest_version}")
         if [ $? != 0 ]; then
             exit 1
