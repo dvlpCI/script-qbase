@@ -127,4 +127,26 @@ else
         exit 1
     fi
 fi
-echo "${qtargetScript_curVersion_homedir_abspath}"
+qbase_homedir_abspath=${qtargetScript_curVersion_homedir_abspath}
+function get_path() {
+    if [ "$1" == "home" ]; then
+        echo "$qbase_homedir_abspath"
+    elif [ "$1" == "sedtext" ]; then
+        echo "$qbase_homedir_abspath/update_value/sed_text.sh"
+    elif [ "$1" == "update_json_file_singleString" ]; then
+        echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
+    elif [ "$1" == "json_file_check" ]; then
+        echo "$qbase_homedir_abspath/json_check/json_file_check.sh"
+    else
+        echo "$qbase_homedir_abspath"
+    fi
+}
+
+if [ "$1" == "-path" ]; then
+    get_path "$2"
+else
+    echo "${qtargetScript_latest_version}"
+fi
+
+
+
