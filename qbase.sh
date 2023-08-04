@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-05 00:35:33
+ # @LastEditTime: 2023-08-05 02:19:23
 # @Description:
 ###
 
@@ -132,17 +132,26 @@ fi
 function get_path() {
     if [ "$1" == "home" ]; then
         echo "$qbase_homedir_abspath"
-        
+
+    # env_var:环境变量
+    elif [ "$1" == "env_var_effective" ]; then
+        echo "$qbase_homedir_abspath/env_variables/env_var_effective.sh"
+    elif [ "$1" == "env_var_add_or_update" ]; then
+        echo "$qbase_homedir_abspath/env_variables/env_var_add_or_update.sh"
+
+    # package:脚本包
     elif [ "$1" == "get_package_util" ]; then
         echo "$qbase_homedir_abspath/package/get_package_info.sh"
     elif [ "$1" == "install_package" ]; then
         echo "$qbase_homedir_abspath/package/install_package.sh"
 
+    # value_update:内容值更新(文本或文件中)
     elif [ "$1" == "sedtext" ]; then
         echo "$qbase_homedir_abspath/update_value/sed_text.sh"
     elif [ "$1" == "update_json_file_singleString" ]; then
         echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
         
+    # json_check:json检查(文件中)
     elif [ "$1" == "json_file_check" ]; then
         echo "$qbase_homedir_abspath/json_check/json_file_check.sh"
     else
