@@ -135,6 +135,8 @@ function get_path() {
         
     elif [ "$1" == "get_package_util" ]; then
         echo "$qbase_homedir_abspath/package/get_package_info.sh"
+    elif [ "$1" == "install_package" ]; then
+        echo "$qbase_homedir_abspath/package/install_package.sh"
 
     elif [ "$1" == "sedtext" ]; then
         echo "$qbase_homedir_abspath/update_value/sed_text.sh"
