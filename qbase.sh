@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-05 02:19:23
+ # @LastEditTime: 2023-08-05 04:30:46
 # @Description:
 ###
 
@@ -134,8 +134,8 @@ function get_path() {
         echo "$qbase_homedir_abspath"
 
     # env_var:环境变量
-    elif [ "$1" == "env_var_effective" ]; then
-        echo "$qbase_homedir_abspath/env_variables/env_var_effective.sh"
+    elif [ "$1" == "env_var_effective_or_open" ]; then
+        echo "$qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh"
     elif [ "$1" == "env_var_add_or_update" ]; then
         echo "$qbase_homedir_abspath/env_variables/env_var_add_or_update.sh"
 
@@ -150,6 +150,12 @@ function get_path() {
         echo "$qbase_homedir_abspath/update_value/sed_text.sh"
     elif [ "$1" == "update_json_file_singleString" ]; then
         echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
+
+    # path:路径
+    elif [ "$1" == "join_paths" ]; then
+        echo "$qbase_homedir_abspath/path_util/join_paths.sh"
+    elif [ "$1" == "get_dirpath_by_relpath" ]; then
+        echo "$qbase_homedir_abspath/path_util/get_dirpath_by_relpath.sh"
         
     # json_check:json检查(文件中)
     elif [ "$1" == "json_file_check" ]; then
