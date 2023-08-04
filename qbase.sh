@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-03 20:40:48
+ # @LastEditTime: 2023-08-05 00:35:33
 # @Description:
 ###
 
@@ -47,16 +47,17 @@ if [ "${isTestingScript}" == true ]; then
     args+=("test")
 fi
 
-# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_util.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
-# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_util.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
-# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_util.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
+# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
+# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
+# 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
 # qbaseScriptDir_Absolute="$(cd "$(dirname "$0")" && pwd)"
-# echo "正在执行命令(获取脚本包的版本号):《 sh ${qbaseScriptDir_Absolute}/get_package_util.sh -package \"qbase\" -param \"version\" \"${args[@]}\" 》"
-# qbase_latest_version=$(sh ${qbaseScriptDir_Absolute}/get_package_util.sh -package "qbase" -param "version" "${args[@]}")
+# get_package_info_script_path=${qbaseScriptDir_Absolute}/package/get_package_info.sh
+# echo "正在执行命令(获取脚本包的版本号):《 sh ${get_package_info_script_path} -package \"qbase\" -param \"version\" \"${args[@]}\" 》"
+# qbase_latest_version=$(sh ${get_package_info_script_path} -package "qbase" -param "version" "${args[@]}")
 # # echo "✅✅✅✅ qbase_latest_version=${qbase_latest_version}"
 
-# # echo "正在执行命令(获取脚本包的根路径):《 sh ${qbaseScriptDir_Absolute}/get_package_util.sh -package \"qbase\" -param \"homedir_abspath\" \"${args[@]}\" 》"
-# qbase_homedir_abspath=$(sh ${qbaseScriptDir_Absolute}/get_package_util.sh -package "qbase" -param "homedir_abspath" "${args[@]}")
+# # echo "正在执行命令(获取脚本包的根路径):《 sh ${get_package_info_script_path} -package \"qbase\" -param \"homedir_abspath\" \"${args[@]}\" 》"
+# qbase_homedir_abspath=$(sh ${get_package_info_script_path} -package "qbase" -param "homedir_abspath" "${args[@]}")
 # # echo "✅✅✅✅ qbase_homedir_abspath=${qbase_homedir_abspath}"
 
 function getMaxVersionNumber_byDir() {
@@ -131,12 +132,15 @@ fi
 function get_path() {
     if [ "$1" == "home" ]; then
         echo "$qbase_homedir_abspath"
+        
     elif [ "$1" == "get_package_util" ]; then
-        echo "$qbase_homedir_abspath/get_package_util.sh"
+        echo "$qbase_homedir_abspath/package/get_package_info.sh"
+
     elif [ "$1" == "sedtext" ]; then
         echo "$qbase_homedir_abspath/update_value/sed_text.sh"
     elif [ "$1" == "update_json_file_singleString" ]; then
         echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
+        
     elif [ "$1" == "json_file_check" ]; then
         echo "$qbase_homedir_abspath/json_check/json_file_check.sh"
     else
