@@ -136,6 +136,30 @@ if [ $? != 0 ]; then
     exit_script
 fi
 
-echo '{"sourceBranchNames":"'"$branchArrayForFisrtCommit"'","firstCommitId":"'"$firstCommitId"'","firstCommitDes":"'"$firstCommitDes"'"}'
+# 如果$firstCommitDes变量中包含特殊字符（例如双引号），你需要在将其嵌入JSON字符串之前进行转义。这样可以确保生成的JSON字符串是有效的。
+escapedFirstCommitDes=$(echo "$firstCommitDes" | sed 's/"/\\\"/g')
+# echo '{"sourceBranchNames":"'"$branchArrayForFisrtCommit"'","firstCommitId":"'"$firstCommitId"'","firstCommitDes":"'"$escapedFirstCommitDes"'"}'
+
+resultJsonString='{"sourceBranchNames":"'"$branchArrayForFisrtCommit"'","firstCommitId":"'"$firstCommitId"'","firstCommitDes":"'"$escapedFirstCommitDes"'"}'
+function is_valid_json() {
+    echo "$1" | jq -e . >/dev/null 2>&1
+    return $?
+}
+
+function is_invalid_json() {
+    if is_valid_json "$1"; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+if is_invalid_json "$resultJsonString"; then
+    echo "${RED}您最后的结果${BLUE}${resultJsonString}${RED}不是标准json格式的字符串，请检查"
+    exit 1
+else
+    echo "${resultJsonString}"
+fi
+
 
 # echo "${GREEN}============ 恭喜:获得在指定日期${BLUE}${searchFromDateString}${GREEN}后的第一条提交记录【 ${BLUE}${firstCommitId}${GREEN}: ${BLUE}${firstCommitDes}${GREEN} 】的所属所有分支名sourceBranchsNameForFisrtCommit=${BLUE}${branchArrayForFisrtCommit}"
