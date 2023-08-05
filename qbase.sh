@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-05 04:30:46
+ # @LastEditTime: 2023-08-05 21:07:57
 # @Description:
 ###
 
@@ -156,10 +156,24 @@ function get_path() {
         echo "$qbase_homedir_abspath/path_util/join_paths.sh"
     elif [ "$1" == "get_dirpath_by_relpath" ]; then
         echo "$qbase_homedir_abspath/path_util/get_dirpath_by_relpath.sh"
+
+    # date:日期
+    elif [ "$1" == "days_cur_to_MdDate" ]; then
+        echo "$qbase_homedir_abspath/date/days_cur_to_MdDate.sh"
+    elif [ "$1" == "calculate_newdate" ]; then
+        echo "$qbase_homedir_abspath/date/calculate_newdate.sh"
         
     # json_check:json检查(文件中)
     elif [ "$1" == "json_file_check" ]; then
         echo "$qbase_homedir_abspath/json_check/json_file_check.sh"
+
+    # branch:分支
+    elif [ "$1" == "rebasebranch_last_commit_date" ]; then
+        echo "$qbase_homedir_abspath/branch/rebasebranch_last_commit_date.sh"
+    elif [ "$1" == "first_commit_info_after_date" ]; then
+        echo "$qbase_homedir_abspath/branch/first_commit_info_after_date.sh"
+    
+    # 其他
     else
         echo "$qbase_homedir_abspath"
     fi
