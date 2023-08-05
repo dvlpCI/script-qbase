@@ -1,6 +1,6 @@
 #!/bin/bash
 :<<!
-获取指定分支在指定日期后的第一条提交记录及其所属的所有分支
+获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支
 !
 #responseResult=$(git log --graph --pretty=format:'%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --after "10-12-2022" --merges )
 #responseResult=$(git log --pretty=format:'%s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --after "10-12-2022" --merges)
@@ -15,7 +15,6 @@ while [ -n "$1" ]
 do
         case "$1" in
                 -date|--searchFromDateString) searchFromDateString=$2; shift 2;;
-                -curBranch|--currentBranch) currentBranch=$2; shift 2;;
                 --) break ;;
                 *) break ;;
         esac
@@ -139,4 +138,4 @@ fi
 
 echo '{"sourceBranchNames":"'"$branchArrayForFisrtCommit"'","firstCommitId":"'"$firstCommitId"'","firstCommitDes":"'"$firstCommitDes"'"}'
 
-# echo "${GREEN}============ 恭喜:获得 ${BLUE}${currentBranch} ${GREEN}分支在指定日期${BLUE}${searchFromDateString}${GREEN}后的第一条提交记录【 ${BLUE}${firstCommitId}${GREEN}: ${BLUE}${firstCommitDes}${GREEN} 】的所属所有分支名sourceBranchsNameForFisrtCommit=${BLUE}${branchArrayForFisrtCommit}"
+# echo "${GREEN}============ 恭喜:获得在指定日期${BLUE}${searchFromDateString}${GREEN}后的第一条提交记录【 ${BLUE}${firstCommitId}${GREEN}: ${BLUE}${firstCommitDes}${GREEN} 】的所属所有分支名sourceBranchsNameForFisrtCommit=${BLUE}${branchArrayForFisrtCommit}"

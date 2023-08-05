@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-05 21:07:57
+ # @LastEditTime: 2023-08-05 23:59:08
 # @Description:
 ###
 
@@ -172,6 +172,8 @@ function get_path() {
         echo "$qbase_homedir_abspath/branch/rebasebranch_last_commit_date.sh"
     elif [ "$1" == "first_commit_info_after_date" ]; then
         echo "$qbase_homedir_abspath/branch/first_commit_info_after_date.sh"
+    elif [ "$1" == "get_merger_recods_after_date" ]; then
+        echo "$qbase_homedir_abspath/branch/get_merger_recods_after_date.sh"
     
     # 其他
     else
