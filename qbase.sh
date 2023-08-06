@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-05 23:59:08
+ # @LastEditTime: 2023-08-06 18:03:04
 # @Description:
 ###
 
@@ -150,6 +150,8 @@ function get_path() {
         echo "$qbase_homedir_abspath/update_value/sed_text.sh"
     elif [ "$1" == "update_json_file_singleString" ]; then
         echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
+    elif [ "$1" == "py_update_json_file" ]; then
+        echo "$qbase_homedir_abspath/update_value/update_json_file.py"
 
     # path:路径
     elif [ "$1" == "join_paths" ]; then
