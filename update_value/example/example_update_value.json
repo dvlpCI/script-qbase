@@ -3,7 +3,8 @@
     "branch_info_result": {
         "Notification": {
             "current": {
-                "slice": []
+                "slice": [
+                ]
             },
             "lastOnline": {
                 "slice": []

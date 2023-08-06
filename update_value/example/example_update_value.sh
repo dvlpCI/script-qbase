@@ -36,6 +36,9 @@ function add_json_value() {
 
     echo "${YELLOW}正在执行(添加操作)：《 ${BLUE}python3 ${CategoryFun_HomeDir_Absolute}/update_json_file.py -jsonF $json_file -k \"$update_key\" -v \"${update_value}\" ${YELLOW}》${NC}"
     python3 ${CategoryFun_HomeDir_Absolute}/update_json_file.py -jsonF $json_file -k "$update_key" -v "${update_value}" #-change-type "cover"
+    if [ $? != 0 ]; then
+        return 1
+    fi
     echo "${GREEN}恭喜:《 ${PURPLE}cat ${json_file} | jq \".${update_key}\" | jq '.' ${GREEN}》如下:${NC}"
     cat ${json_file} | jq ".${update_key}" | jq '.'
 }
@@ -62,10 +65,10 @@ key2="branch_info_result.Notification.lastOnline.slice"
 keyall=branch_info_result.Notification.all.slice
 
 log_title "1.1.添加"
-add_json_value "${key1}" "123456" 
+add_json_value "${key1}" "这是添加的字符串" 
 
-log_title "1.2.覆盖"
-cover_json_value "${key2}" "123456" "cover"
+log_title "1.2.覆盖（TODO:暂未实现）"
+cover_json_value "${key2}" "这是覆盖的字符串" "cover"
 
 log_title "2.往不存在的key中添加"
 add_json_value "${keyall}" "12345"

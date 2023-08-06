@@ -91,19 +91,20 @@ def add_value_to_nested_array(json_data, nested_key, new_value, changeType="add"
     # for key in keys[:-1]:遍历了 keys 列表中除了最后一个元素之外的所有元素。也就是说，它遍历了嵌套键名的每个层级。
     for key in keys[:-1]:
         # isinstance(current[key], dict) 检查 current[key] 对应的值是否是一个字典。isinstance() 函数用于检查一个对象是否属于指定的类型或类的子类。如果值是字典类型，则条件为真；如果不是字典类型，则条件为假。
-        if key in current and isinstance(current[key], dict):
-            current = current[key]
-        else:
-            print(f"{RED}出错了1,在{BLUE}{current}{RED}中不存在{BLUE}{key}{RED}的值，请检查.{NC}")
-            return None
+        if key not in current or not isinstance(current[key], dict):
+            current[key] = {} # 不是最后一个key，都是{}
+            # print(f"{RED}出错了1,在{BLUE}{current}{RED}中不存在{BLUE}{key}{RED}的值，请检查.{NC}")
+            # return None
+        current = current[key]
     
     last_key = keys[-1]
     if last_key not in current:
-        print(f"{RED}出错了2,在{BLUE}{current}{RED}中不存在{BLUE}{last_key}{RED}的值，请检查.{NC}")
-        return None
-    
+        # print(f"{RED}出错了2,在{BLUE}{current}{RED}中不存在最后的key值{BLUE}{last_key}{RED}的值，请检查.{NC}")
+        # return None
+        current[last_key]=[]    # 是最后一个key，因为是数组，固定是[]
+        
     update_json=current[last_key]
-    if changeType == "cover":   # 覆盖
+    if changeType == "cover":   # 覆盖 TODO:暂未实现
         update_json = [new_value]
         return json_data
     else:                       # 添加
@@ -114,26 +115,19 @@ def add_value_to_nested_array(json_data, nested_key, new_value, changeType="add"
 
         return json_data
 
-def update_json(json_file, key_name, value):
-    json_data=get_json_data(json_file)
-    
-    # print(f"哈哈哈1:{json_data[key_name]}")
-    # 调用添加新值的函数
-    # json_data[key_name]=value
-    new_json_data = add_value_to_nested_array(json_data, key_name, value, changeType)
-    # print(f"哈哈哈2:{json_data[key_name]}")
 
-    # 如果修改失败的话
-    if new_json_data == None:
-        return json_data
-    
-     # 如果修改成功的话
-    update_json_file_with_json_data(json_file, new_json_data)
-    return new_json_data
+# def main():
+json_data=get_json_data(json_file)
 
+# print(f"哈哈哈1:{json_data[key_name]}")
+# 调用添加新值的函数
+# json_data[key_name]=value
+new_json_data = add_value_to_nested_array(json_data, key_name, value, changeType)
+# print(f"哈哈哈2:{json_data[key_name]}")
 
+# 如果修改失败的话
+if new_json_data == None:
+    exit(1)
 
-
-
-# 调用更新函数
-updated_json = update_json(json_file, key_name, value)
+# 如果修改成功的话
+update_json_file_with_json_data(json_file, new_json_data)
