@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-08-06 00:11:22
  # @Description: 获取指定日期之后的所有合入记录(已去除 HEAD -> 等)
- # @示例: sh ./get_merger_recods_after_date.sh --searchFromDateString "2022-12-26 10:45:24"
+ # @Example: sh ./get_merger_recods_after_date.sh --searchFromDateString "2022-12-26 10:45:24"
 ### 
 
 #responseResult=$(git log --graph --pretty=format:'%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --after "10-12-2022" --merges )

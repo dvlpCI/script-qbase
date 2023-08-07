@@ -2,14 +2,11 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-02-27 14:33:30
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-06-07 20:41:28
- # @Description: 
-### 
-# sh ./json_file_check.sh -checkedJsonF "${Checked_JSON_FILE_PATH}" -scriptResultJsonF "${SCRIPT_RESULT_JSON_FILE}"
-:<<!
-检查指定Json文件的有效性，是不是合法
-!
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-08-08 01:01:41
+ # @Description: 检查指定Json文件的有效性，是不是合法
+ # @example: sh ./json_file_check.sh -checkedJsonF "${Checked_JSON_FILE_PATH}" -scriptResultJsonF "${SCRIPT_RESULT_JSON_FILE}"
+###
 
 
 # 当前【shell脚本】的工作目录

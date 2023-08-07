@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-08-05 20:59:57
  # @Description: 获取当前分支新代码的起始时间
- # @使用示例: sh ./branch/rebasebranch_last_commit_date.sh --old-date $old_date --add-value "1" --add-type "second"
+ # @Example: sh ./branch/rebasebranch_last_commit_date.sh -rebaseBranch "master"
 ### 
 #responseResult=$(git log --graph --pretty=format:'%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --after "10-12-2022" --merges )
 #responseResult=$(git log --pretty=format:'%s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --after "10-12-2022" --merges)

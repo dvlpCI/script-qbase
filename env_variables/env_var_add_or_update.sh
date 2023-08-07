@@ -6,7 +6,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-08-05 02:16:30
 # @FilePath: env_variables/env_var_add_or_update.sh
-# @Description: 更新环境变量的值(没有该key则创建，已有该key则是更新，来避免重复多行)
+# @Description: 环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)
 ###
 
 # 定义颜色常量

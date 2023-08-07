@@ -179,7 +179,7 @@ function get_path() {
     
     # 其他
     else
-        echo "$qbase_homedir_abspath"
+        cat "$qbase_homedir_abspath/qbase.json" | jq '.support_script_path'
     fi
 }
 
