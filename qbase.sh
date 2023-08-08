@@ -2,11 +2,19 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-06 18:03:04
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-08-09 00:32:11
 # @Description:
 ###
 
+# 定义颜色常量
+NC="\033[0m" # No Color
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+BLUE="\033[34m"
+PURPLE="\033[0;35m"
+CYAN="\033[0;36m"
 
 # 计算倒数第一个参数的位置
 argCount=$#
@@ -46,6 +54,12 @@ fi
 if [ "${isTestingScript}" == true ]; then
     args+=("test")
 fi
+
+function _verbose_log() {
+    if [ "$verbose" == true ]; then
+        echo "$1"
+    fi
+}
 
 # 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
 # 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
@@ -125,8 +139,116 @@ else
     fi
 fi
 
+function get_path_json() {
+    target_category_file_abspath=$1
+    showType=$2
+    saveModuleOptionKeysToFile=$3 # 保存内容到哪个文件，可为空
+    
+    # 读取文件内容
+    content=$(cat "${target_category_file_abspath}")
+
+    requestCategoryKey="support_script_path"
+    categoryMaps=$(echo "$content" | jq -r ".${requestCategoryKey}")
+    if [ -z "${categoryMaps}" ] || [ "${categoryMaps}" == "null" ]; then
+        printf "${RED}请先在 ${target_category_file_abspath} 文件中设置 .${requestCategoryKey} ${NC}\n"
+        exit 1
+    fi
+
+    # branchBelongMapCount2=$(echo "$content" | jq ".${requestCategoryKey}" | jq ".|length")
+    # # echo "=============branchBelongMapCount2=${branchBelongMapCount2}"
+    # if [ ${branchBelongMapCount2} -eq 0 ]; then
+    #     echo "友情提醒💡💡💡：没有找到可选的分支模块类型"
+    #     return 1
+    # fi
+    if [ "${showType}" == "forUseChoose" ]; then
+        echo "已知模块选项、已知基础选项："
+    fi
+
+    # 使用jq命令解析json数据
+    categoryCount=$(echo "$content" | jq -r ".${requestCategoryKey}|length")
+    # echo "===================${categoryCount}"
+    if [ "${showType}" == "onlyMdFile" ]; then
+        markdownString=""
+        markdownString+="# 模块区分与负责人\n \n"
+        markdownString+="## 一、模块区分与负责人\n"
+        markdownString+="| $(printf '%-4s' "序号") | $(printf '%-8s' "标记") | $(printf '%-17s' "模块") | $(printf '%-4s' "功能") | $(printf '%-10s' "初始者") | $(printf '%-10s' "主开发") | $(printf '%-10s' "二开发") |\n"
+        markdownString+="| ---- | -------- | ----------------- | ---- | ---------- | ---------- | ---------- |\n"
+
+        printf "${NC}正在计算md内容，请耐心等待(预计需要5s)....${NC}\n"
+    fi
+
+    # 创建一个空数组
+    itemKeys=()
+    for ((categoryIndex = 0; categoryIndex < categoryCount; categoryIndex++)); do
+        categoryMap_String=$(echo "$content" | jq -r ".${requestCategoryKey}[$categoryIndex]")
+        # echo "$((categoryIndex+1)) categoryMap_String=${categoryMap_String}"
+
+        categoryDes=$(echo "$categoryMap_String" | jq -r '.des')
+        categoryValuesCount=$(echo "$categoryMap_String" | jq -r ".values|length")
+        if [ "${showType}" == "forUseChoose" ]; then
+            printf "===================${categoryDes}(共${categoryValuesCount}个)===================\n"
+        fi
+
+        for ((categoryValueIndex = 0; categoryValueIndex < categoryValuesCount; categoryValueIndex++)); do
+
+            categoryValueMap_String=$(echo "$categoryMap_String" | jq -r ".values[$categoryValueIndex]")
+            # echo "$((categoryValueIndex+1)) categoryValueMap_String=${categoryValueMap_String}"
+
+            itemDes=$(echo "$categoryValueMap_String" | jq -r '.des')
+            itemKey=$(echo "$categoryValueMap_String" | jq -r '.key')
+            itemValue=$(echo "$categoryValueMap_String" | jq -r '.value')
+
+            itemKeys+=("${itemKey}")
+
+            if [ "${showType}" == "forUseChoose" ]; then
+                # printf "%10s: %-20s [%s %s %s] %s\n" "$option" "$short_des" "${createrName}" "${mainerName}" "${backuperName}" "${detail_des}"
+                # 格式化字符串
+                format_str="%10s: %-20s %s\n"
+                consoleString=$(printf "$format_str" "$itemKey" "$itemDes" "${itemValue}")
+                printf "${consoleString}\n"
+            fi
+
+            if [ "${showType}" == "onlyMdFile" ]; then
+                # 构建Markdown表格
+                # markdownString+="| %-8s    | %-8s | %-17s | %-4s | %-10s | %-10s |\n" "$categoryIndex.$categoryValueIndex" "$option" "$short_des" "$option" "$createrName" "$mainerName"
+                multiline_detail_des=$(echo "$itemValue" | sed 's/;/<br>/g')
+                markdownString+="| $(printf '%-4s' "$((categoryIndex+1)).$((categoryValueIndex+1))") | $(printf '%-8s' "$itemKey") | $(printf '%-17s' "$itemDes") | $(printf '%-4s' "$itemValue") |\n"
+            fi
+        done
+    done
+
+    if [ "${saveModuleOptionKeysToFile}" != null ]; then
+        echo "${itemKeys[@]}" > ${saveModuleOptionKeysToFile} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
+    fi
+}
 
 
+function get_merger_recods_after_rebaseBranch() {    
+    rebaseFromBranch=$1
+
+    _verbose_log "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《 sh ${qbase_homedir_abspath}/branch/rebasebranch_last_commit_date.sh -rebaseBranch \"${rebaseFromBranch}\" ${YELLOW}》${NC}"
+    lastCommitDate=$(sh ${qbase_homedir_abspath}/branch/rebasebranch_last_commit_date.sh -rebaseBranch "${rebaseFromBranch}")
+    if [ $? != 0 ]; then
+        echo "${lastCommitDate}" # 此时值为错误信息
+        return 1
+    fi
+    _verbose_log "${GREEN}恭喜获得:${BLUE}main${GREEN} 分支最后一次提交commit的时间: ${BLUE}${lastCommitDate} ${GREEN}。${NC}"
+
+
+    _verbose_log "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${qbase_homedir_abspath}/branch/get_merger_recods_after_date.sh --searchFromDateString \"${lastCommitDate}\" ${YELLOW}》${NC}"
+    mergerRecordResult=$(sh ${qbase_homedir_abspath}/branch/get_merger_recods_after_date.sh --searchFromDateString "${lastCommitDate}")
+    _verbose_log "${GREEN}恭喜获得:指定日期之后的所有合入记录: ${BLUE}${mergerRecordResult} ${GREEN}。${NC}"
+
+    echo "${mergerRecordResult}"
+
+}
+
+function quickCmdExec() {
+    # echo "✅快捷命令及其参数分别为 ${BLUE}$1${BLUE} : ${CYAN}$2${CYAN}${NC}"
+    if [ "$1" == "get_merger_recods_after_rebaseBranch" ]; then
+        get_merger_recods_after_rebaseBranch "$2"
+    fi
+}
 
 
 function get_path() {
@@ -180,6 +302,7 @@ function get_path() {
     # 其他
     else
         cat "$qbase_homedir_abspath/qbase.json" | jq '.support_script_path'
+        # get_path_json "$qbase_homedir_abspath/qbase.json" "forUseChoose"
     fi
 }
 
@@ -189,6 +312,12 @@ if echo "${versionCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
     echo "${qbase_latest_version}"
 elif [ "$1" == "-path" ]; then
     get_path "$2"
+elif [ "$1" == "-quick" ]; then
+    if [ -z "$2" ]; then
+        echo "❌Error：要执行的快捷命令不能为空"
+        exit 1
+    fi
+    quickCmdExec "$2" "$3"
 else
     echo "${qbase_latest_version}"
 fi

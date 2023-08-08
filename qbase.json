@@ -1,4 +1,20 @@
 {
+    "quickCmd": [
+        {
+            "type": "branch",
+            "des": "分支",
+            "values": [
+                {
+                    "des": "获取当前分支【在指定日期后】的所有合入记录",
+                    "cmd": "get_merger_recods_after_date"
+                },
+                {
+                    "des": "获取当前分支【在rebase指定分支后】的所有合入记录",
+                    "cmd": "get_merger_recods_after_rebaseBranch"
+                }
+            ]
+        }
+    ],
     "support_script_path": [
         {
             "type": "env_var",

@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-08-03 11:44:37
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-06 00:11:22
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-08-08 23:41:11
  # @Description: 获取指定日期之后的所有合入记录(已去除 HEAD -> 等)
  # @Example: sh ./get_merger_recods_after_date.sh --searchFromDateString "2022-12-26 10:45:24"
 ### 
@@ -26,7 +26,9 @@ CYAN='\033[0;36m'
 
 
 function debug_log() {
-    if [ "${isRelease}" == true ]; then
+    # 只有直接执行本脚本的时候才能够输出日志，不然如果是形如 echo $(sh xx.sh) 的时候会导致结果值不对
+    # is_Directly_execute_this_script=true
+    if [ "${is_Directly_execute_this_script}" == true ]; then
         echo "$1"
     fi
 }
@@ -34,16 +36,13 @@ function debug_log() {
 
 
 
-# shell 参数具名化
-show_usage="args: [-date , -exceptBranch]\
-                                  [--searchFromDateString=, --exceptBranchNames=]"
-                                  
+# shell 参数具名化           
 while [ -n "$1" ]
 do
         case "$1" in
                 -date|--searchFromDateString) searchFromDateString=$2; shift 2;;
                 --) break ;;
-                *) echo $1,$2,$show_usage; break ;;
+                *) break ;;
         esac
 done
 

@@ -42,6 +42,7 @@ CYAN='\033[0;36m'
 
 function debug_log() {
     # 只有直接执行本脚本的时候才能够输出日志，不然如果是形如 echo $(sh xx.sh) 的时候会导致结果值不对
+    # is_Directly_execute_this_script=true
     if [ "${is_Directly_execute_this_script}" == true ]; then
         echo "$1"
     fi
@@ -103,7 +104,7 @@ function getFirstCommitIdFromDate() {
 function getBranchsWhichContainsCommitId() {
     firstCommitId=$1
     
-    debug_log "${YELLOW}正在执行命令(开始获取firstCommitDes: ${CYAN}${firstCommitDes}${YELLOW}这条提交所属的所有远程功能分支名):《 ${BLUE}git branch --contains \"${firstCommitId}\" -r ${YELLOW}》------${NC}"
+    debug_log "${YELLOW}正在执行命令(开始获取firstCommitDes: ${CYAN}${firstCommitDes}${YELLOW} 这条提交所属的所有远程功能分支名):《 ${BLUE}git branch --contains \"${firstCommitId}\" -r ${YELLOW}》------${NC}"
     #[git获取某次commit是在哪个分支提交的](https://www.jianshu.com/p/6ad6981f8ec5)
     branchResultForFisrtCommit=$(git branch --contains "${firstCommitId}" -r)
 
