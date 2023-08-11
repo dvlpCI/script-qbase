@@ -6,11 +6,13 @@
             "values": [
                 {
                     "des": "获取当前分支【在指定日期后】的所有合入记录",
-                    "cmd": "get_merger_recods_after_date"
+                    "cmd": "get_merger_recods_after_date",
+                    "value": "qbase -quick get_merger_recods_after_date \"2022-12-26 10:45:24\""
                 },
                 {
                     "des": "获取当前分支【在rebase指定分支后】的所有合入记录",
-                    "cmd": "get_merger_recods_after_rebaseBranch"
+                    "cmd": "get_merger_recods_after_rebaseBranch",
+                    "value": "qbase -quick get_merger_recods_after_rebaseBranch \"master\""
                 }
             ]
         }
@@ -23,12 +25,12 @@
                 {
                     "des": "环境变量文件的操作(生效环境变量文件、打开环境变量文件)",
                     "key": "env_var_effective_or_open",
-                    "value": "sh ./env_variables/env_var_effective_or_open.sh"
+                    "value": "./env_variables/env_var_effective_or_open.sh"
                 },
                 {
                     "key": "env_var_add_or_update",
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
-                    "value": "sh ./env_variables/env_var_add_or_update.sh"
+                    "value": "./env_variables/env_var_add_or_update.sh"
                 }
             ]
         },
@@ -39,12 +41,12 @@
                 {
                     "key": "get_package_util",
                     "des": "脚本包的信息获取(版本号、根目录信息)",
-                    "value": "sh ./package/get_package_info.sh"
+                    "value": "./package/get_package_info.sh"
                 },
                 {
                     "key": "install_package",
                     "des": "检查安装环境，且未安装时候需要进行安装",
-                    "value": "sh ./package/install_package.sh"
+                    "value": "./package/install_package.sh"
                 }
             ]
         },
@@ -55,17 +57,17 @@
                 {
                     "key": "sedtext",
                     "des": "任意文件中的值的更新，根据值的位置",
-                    "value": "sh ./update_value/sed_text.sh"
+                    "value": "./update_value/sed_text.sh"
                 },
                 {
                     "key": "update_json_file_singleString",
                     "des": "json文件中的值的更新，根据指定key的位置",
-                    "value": "sh ./update_value/update_json_file_singleString.sh"
+                    "value": "./update_value/update_json_file_singleString.sh"
                 },
                 {
                     "key": "py_update_json_file",
                     "des": "json文件中的值的更新，使用python实现",
-                    "value": "sh ./update_value/update_json_file.py"
+                    "value": "./update_value/update_json_file.py"
                 }
             ]
         },
@@ -77,13 +79,13 @@
                     "key": "join_paths",
                     "des": "拼接字符串",
                     "example": "./join_paths.sh --path_a \"/path/to/dir_a\" --path_b \"sub_dir_b\" --create_ifNoExsit \"true\"",
-                    "value": "sh ./path_util/join_paths.sh"
+                    "value": "./path_util/join_paths.sh"
                 },
                 {
                     "key": "get_dirpath_by_relpath",
                     "des": "获取相对于指定文件/目录的相对目录的绝对路径",
                     "example": "./get_dirpath_by_relpath.sh --file_or_dir_path \"/path/to/file_a\" --rel_path \"sub_dir_b\"",
-                    "value": "sh ./path_util/get_dirpath_by_relpath.sh"
+                    "value": "./path_util/get_dirpath_by_relpath.sh"
                 }
             ]
         },
@@ -95,13 +97,13 @@
                     "key": "days_cur_to_MdDate",
                     "des": "日期的相关计算方法--用来计算提测过程中的各个日期,与当前时间的天数间隔",
                     "example": "sh ./date/days_cur_to_MdDate.sh --Md_date \"12.09\"",
-                    "value": "sh ./date/days_cur_to_MdDate.sh"
+                    "value": "./date/days_cur_to_MdDate.sh"
                 },
                 {
                     "key": "calculate_newdate",
                     "des": "日期的相关计算方法--用来获取新时间(通过旧时间的加减)",
                     "example": "sh ./date/calculate_newdate.sh --old-date $old_date --add-value \"1\" --add-type \"second\"",
-                    "value": "sh ./date/calculate_newdate.sh"
+                    "value": "./date/calculate_newdate.sh"
                 }
             ]
         },
@@ -112,7 +114,7 @@
                 {
                     "des": "环境变量文件的操作(生效环境变量文件、打开环境变量文件)",
                     "key": "json_file_check",
-                    "value": "sh ./json_check/json_file_check.sh",
+                    "value": "./json_check/json_file_check.sh",
                     "example": "sh ./json_file_check.sh -checkedJsonF \"${Checked_JSON_FILE_PATH}\" -scriptResultJsonF \"${SCRIPT_RESULT_JSON_FILE}\""
                 }
             ]
@@ -125,18 +127,18 @@
                     "key": "rebasebranch_last_commit_date",
                     "des": "获取当前分支新代码的起始时间",
                     "example": "sh ./branch/rebasebranch_last_commit_date.sh -rebaseBranch \"master\"",
-                    "value": "sh ./branch/rebasebranch_last_commit_date.sh"
+                    "value": "./branch/rebasebranch_last_commit_date.sh"
                 },
                 {
                     "des": "获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支",
                     "key": "first_commit_info_after_date",
-                    "value": "sh ./branch/first_commit_info_after_date.sh -date \"2022-12-26 10:45:24\""
+                    "value": "./branch/first_commit_info_after_date.sh -date \"2022-12-26 10:45:24\""
                 },
                 {
                     "key": "get_merger_recods_after_date",
                     "des": "获取指定日期之后的所有合入记录(已去除 HEAD -> 等)",
                     "example": "sh ./get_merger_recods_after_date.sh --searchFromDateString \"2022-12-26 10:45:24\"",
-                    "value": "sh ./branch/get_merger_recods_after_date.sh"
+                    "value": "./branch/get_merger_recods_after_date.sh"
                 }
             ]
         }

@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-08-09 00:32:11
+ # @LastEditTime: 2023-08-11 22:20:43
 # @Description:
 ###
 
@@ -143,6 +143,10 @@ function get_path_json() {
     target_category_file_abspath=$1
     showType=$2
     saveModuleOptionKeysToFile=$3 # 保存内容到哪个文件，可为空
+    if [ -z "${target_category_file_abspath}" ]; then
+        echo "参数不能为空"
+        exit 1
+    fi
     
     # 读取文件内容
     content=$(cat "${target_category_file_abspath}")
@@ -247,6 +251,10 @@ function quickCmdExec() {
     # echo "✅快捷命令及其参数分别为 ${BLUE}$1${BLUE} : ${CYAN}$2${CYAN}${NC}"
     if [ "$1" == "get_merger_recods_after_rebaseBranch" ]; then
         get_merger_recods_after_rebaseBranch "$2"
+        
+    else 
+        echo "${RED}抱歉：暂不支持 ${BLUE}$2 ${RED} 快捷命令，请检查${NC}"
+        cat "$qbase_homedir_abspath/qbase.json" | jq '.quickCmd'
     fi
 }
 
@@ -254,60 +262,28 @@ function quickCmdExec() {
 function get_path() {
     if [ "$1" == "home" ]; then
         echo "$qbase_homedir_abspath"
-
-    # env_var:环境变量
-    elif [ "$1" == "env_var_effective_or_open" ]; then
-        echo "$qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh"
-    elif [ "$1" == "env_var_add_or_update" ]; then
-        echo "$qbase_homedir_abspath/env_variables/env_var_add_or_update.sh"
-
-    # package:脚本包
-    elif [ "$1" == "get_package_util" ]; then
-        echo "$qbase_homedir_abspath/package/get_package_info.sh"
-    elif [ "$1" == "install_package" ]; then
-        echo "$qbase_homedir_abspath/package/install_package.sh"
-
-    # value_update:内容值更新(文本或文件中)
-    elif [ "$1" == "sedtext" ]; then
-        echo "$qbase_homedir_abspath/update_value/sed_text.sh"
-    elif [ "$1" == "update_json_file_singleString" ]; then
-        echo "$qbase_homedir_abspath/update_value/update_json_file_singleString.sh"
-    elif [ "$1" == "py_update_json_file" ]; then
-        echo "$qbase_homedir_abspath/update_value/update_json_file.py"
-
-    # path:路径
-    elif [ "$1" == "join_paths" ]; then
-        echo "$qbase_homedir_abspath/path_util/join_paths.sh"
-    elif [ "$1" == "get_dirpath_by_relpath" ]; then
-        echo "$qbase_homedir_abspath/path_util/get_dirpath_by_relpath.sh"
-
-    # date:日期
-    elif [ "$1" == "days_cur_to_MdDate" ]; then
-        echo "$qbase_homedir_abspath/date/days_cur_to_MdDate.sh"
-    elif [ "$1" == "calculate_newdate" ]; then
-        echo "$qbase_homedir_abspath/date/calculate_newdate.sh"
-        
-    # json_check:json检查(文件中)
-    elif [ "$1" == "json_file_check" ]; then
-        echo "$qbase_homedir_abspath/json_check/json_file_check.sh"
-
-    # branch:分支
-    elif [ "$1" == "rebasebranch_last_commit_date" ]; then
-        echo "$qbase_homedir_abspath/branch/rebasebranch_last_commit_date.sh"
-    elif [ "$1" == "first_commit_info_after_date" ]; then
-        echo "$qbase_homedir_abspath/branch/first_commit_info_after_date.sh"
-    elif [ "$1" == "get_merger_recods_after_date" ]; then
-        echo "$qbase_homedir_abspath/branch/get_merger_recods_after_date.sh"
-    
-    # 其他
     else
-        cat "$qbase_homedir_abspath/qbase.json" | jq '.support_script_path'
-        # get_path_json "$qbase_homedir_abspath/qbase.json" "forUseChoose"
+        specified_value=$1
+        map=$(cat "$qbase_homedir_abspath/qbase.json" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.key == $value)')
+        if [ -z "${map}" ]; then
+            echo "${RED}error: not found specified_value: ${BLUE}$specified_value ${NC}"
+            cat "$qbase_homedir_abspath/qbase.json" | jq '.support_script_path'
+            exit 1
+        fi
+        relpath=$(echo "${map}" | jq -r '.value')
+        relpath="${relpath//.\//}"  # 去掉开头的 "./"
+        echo "$qbase_homedir_abspath/$relpath"
+
     fi
 }
 
+# 输出sh的所有参数
+# echo "传递给脚本的参数列表："
+# echo "$@"
+
 # 如果是获取版本号
 versionCmdStrings=("--version" "-version" "-v" "version")
+helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
     echo "${qbase_latest_version}"
 elif [ "$1" == "-path" ]; then
@@ -318,6 +294,9 @@ elif [ "$1" == "-quick" ]; then
         exit 1
     fi
     quickCmdExec "$2" "$3"
+# elif echo "${helpCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
+elif [ "$1" == "-help" ]; then
+    echo '{"-quickCmd":"'"快捷命令"'","-support_script_path":"'"支持的脚本"'"}'
 else
     echo "${qbase_latest_version}"
 fi
