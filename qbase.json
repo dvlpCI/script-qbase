@@ -19,6 +19,18 @@
     ],
     "support_script_path": [
         {
+            "type": "log",
+            "des": "打印日志",
+            "values": [
+                {
+                    "des": "将信息打印到控制台",
+                    "key": "function_log_msg",
+                    "value": "./log/function_log_msg.sh",
+                    "example": "source xxx & yyy"
+                }
+            ]
+        },
+        {
             "type": "env_var",
             "des": "环境变量",
             "values": [
