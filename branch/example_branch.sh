@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-08-09 00:20:21
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-09-05 15:31:32
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
  # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
@@ -61,6 +61,8 @@ echo "${GREEN}恭喜:获得在指定日期 ${BLUE}${searchFromDateString}${GREEN
 
 echo "\n"
 log_title "3"
-echo "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString "2023-08-03 11:46:28" ${YELLOW}》${NC}"
-mergerRecordResult=$(sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString "2023-08-03 11:46:28")
+searchFromDateString=${lastCommitDate}
+# searchFromDateString="2023-08-03 11:46:28"
+echo "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString \"${searchFromDateString}\" ${YELLOW}》${NC}"
+mergerRecordResult=$(sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString "${searchFromDateString}")
 echo "${GREEN}指定日期之后的所有合入记录: ${BLUE}${mergerRecordResult}${NC}"

@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-08-11 22:20:43
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-09-05 20:37:35
 # @Description:
 ###
 
@@ -249,13 +249,23 @@ function get_merger_recods_after_rebaseBranch() {
 
 function quickCmdExec() {
     # echo "✅快捷命令及其参数分别为 ${BLUE}$1${BLUE} : ${CYAN}$2${CYAN}${NC}"
+    if [ -z "$1" ]; then
+         printf "${YELLOW}提示：您未设置要执行的快捷命令。附:所有支持的快捷命令如下：${NC}\n"
+        _logQuickCmd
+        return
+    fi
+
     if [ "$1" == "get_merger_recods_after_rebaseBranch" ]; then
         get_merger_recods_after_rebaseBranch "$2"
         
     else 
-        echo "${RED}抱歉：暂不支持 ${BLUE}$2 ${RED} 快捷命令，请检查${NC}"
-        cat "$qbase_homedir_abspath/qbase.json" | jq '.quickCmd'
+        printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
+        _logQuickCmd
     fi
+}
+
+function _logQuickCmd() {
+    cat "$qbase_homedir_abspath/qbase.json" | jq '.quickCmd'
 }
 
 
@@ -289,10 +299,6 @@ if echo "${versionCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
 elif [ "$1" == "-path" ]; then
     get_path "$2"
 elif [ "$1" == "-quick" ]; then
-    if [ -z "$2" ]; then
-        echo "❌Error：要执行的快捷命令不能为空"
-        exit 1
-    fi
     quickCmdExec "$2" "$3"
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
 elif [ "$1" == "-help" ]; then
