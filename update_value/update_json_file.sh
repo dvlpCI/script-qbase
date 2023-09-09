@@ -48,6 +48,7 @@ bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*}
 # qscript_path_get_filepath="${bulidScriptCommon_dir_Absolute}/qscript_path_get.sh"
 # qbase_json_file_check_script_path="$(sh ${qscript_path_get_filepath} qbase json_file_check)"
 qbase_json_file_check_script_path="${bulidScriptCommon_dir_Absolute}/json_check/json_file_check.sh"
+qbase_json_value_check_script_path="${bulidScriptCommon_dir_Absolute}/json_check/json_value_check.sh"
 
 exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
     exit 1
@@ -81,8 +82,7 @@ if [ -z "${SKIP_VALUE_CHECK}" ]; then
     SKIP_VALUE_CHECK="false"
 fi
 if [ "${SKIP_VALUE_CHECK}" != "true" ]; then
-    source ${bulidScriptCommon_dir_Absolute}/a_function.sh ${bulidScriptCommon_dir_Absolute}
-    check_jsonString_valid "${UpdateJsonKeyValue}" "${RESULT_JSON_FILE_PATH}"
+    sh "${qbase_json_value_check_script_path}" -checkedJsonValue "${UpdateJsonKeyValue}" -scriptResultJsonF "${RESULT_JSON_FILE_PATH}"
     if [ $? != 0 ]; then
         exit_script
     fi

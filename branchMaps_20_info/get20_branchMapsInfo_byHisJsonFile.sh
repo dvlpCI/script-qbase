@@ -53,7 +53,7 @@ source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFi
 markdownFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/markdown/function_markdown.sh"
 JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
 
-get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branch_info/get10_branch_self_detail_info.sh
+get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get10_branch_self_detail_info.sh
 
 
 if [ ! -f "${markdownFun_script_file_Absolute}" ];then
@@ -272,7 +272,7 @@ cat ${RESULT_SALE_TO_JSON_FILE_PATH} | jq ".${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}
 
 
 # 进一步进行对上诉所得的 category 整理
-get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branch_info/get11_category_all_detail_info.sh"
+get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
 showCategoryName="true"
 echo "${YELLOW}正在执行《 ${BLUE}sh ${get_category_all_detail_info_script_path} -categoryJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" ${YELLOW}》${NC}"
 ALL_CATEGORY_BRANCH_STRING=$(sh ${get_category_all_detail_info_script_path} -categoryJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}")

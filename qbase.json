@@ -155,14 +155,20 @@
             ]
         },
         {
-            "type": "branch_info",
+            "type": "branchMaps",
             "des": "分支",
             "values": [
                 {
+                    "key": "addBranchMaps_toJsonFile",
+                    "des": "获取branchMaps",
+                    "example": "sh ./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -ignoreAddJsonFileNames \"${ignoreAddJsonFileNames}\"",
+                    "value": "./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh"
+                },
+                {
                     "key": "get20_branchMapsInfo_byHisJsonFile",
                     "des": "获取branchMaps整理后的分支信息",
-                    "example": "sh ./branch_info/get20_branchMapsInfo_byHisJsonFile.sh -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\"",
-                    "value": "./branch_info/get20_branchMapsInfo_byHisJsonFile.sh"
+                    "example": "sh ./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\"",
+                    "value": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
                 }
             ]
         }

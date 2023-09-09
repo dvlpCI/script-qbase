@@ -31,7 +31,7 @@ qbase_function_log_msg_script_path="${CommonFun_HomeDir_Absolute}/log/function_l
 source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultValueToJsonFile
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
-get_branch_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branch_info/get20_branchMapsInfo_byHisJsonFile.sh"
+get_branch_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
 
 
 Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_branch_info.json"

@@ -40,7 +40,7 @@ if [ ! -f "${JsonUpdateFun_script_file_Absolute}" ];then
     echo "❌Error:您的处理更新json文件内从的脚本文件 ${JsonUpdateFun_script_file_Absolute} 不存在，请检查！"
     exit 1
 fi
-get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branch_info/get10_branch_self_detail_info.sh
+get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get10_branch_self_detail_info.sh
 
 
 

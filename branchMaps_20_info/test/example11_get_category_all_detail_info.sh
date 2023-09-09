@@ -32,7 +32,7 @@ source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFi
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
 
-get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branch_info/get11_category_all_detail_info.sh"
+get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
 
 
 TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/example11_get_category_all_detail_info.json"
