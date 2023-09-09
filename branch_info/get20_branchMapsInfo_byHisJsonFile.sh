@@ -1,7 +1,8 @@
 #!/bin/bash
 :<<!
 脚本的测试使用如下命令：
-./get20_branch_all_detail_info.sh 
+获取branchMaps整理后的分支信息
+./get20_branchMapsInfo_byHisJsonFile.sh 
 !
 
 
@@ -90,7 +91,10 @@ function updateBranchResultFileKeyValue() {
 while [ -n "$1" ]
 do
     case "$1" in
-        -branchMaps|--branchMap-array) branchMapArray=$2; shift 2;;
+        # -branchMaps|--branchMap-array) branchMapArray=$2; shift 2;;
+        -branchMapsInJsonF|--branchMaps-json-file-path) branchMapsInJsonFile=$2; shift 2;; # 要计算的branchMaps所在的json文件
+        -branchMapsInKey|--branchMaps-key) branchMapsInKey=$2; shift 2;; # 要计算的branchMaps在json文件中的哪个字段
+
         -showCategoryName|--show-category-name) showCategoryName=$2; shift 2;;
         -showFlag|--show-branchLog-Flag) showBranchLogFlag=$2; shift 2;;
         -showName|--show-branchName) showBranchName=$2; shift 2;;
@@ -105,6 +109,13 @@ do
         --) break ;;
     esac
 done
+
+branchMapArray=$(cat ${branchMapsInJsonFile} | jq -r "${branchMapsInKey}") # -r 去除字符串引号
+if [ -z "${branchMapArray}" ]; then
+    echo "ERROR: 没有获取到分支信息，请检查文件 ${branchMapsInJsonFile} 的 ${branchMapsInKey} 字段"
+    exit 1
+fi
+
 
 # echo "✅哈哈哈哈 131"
 # echo "${branchMapArray}"

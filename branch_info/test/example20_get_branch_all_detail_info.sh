@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-25 02:04:22
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-10 01:41:04
+ # @LastEditTime: 2023-09-10 02:06:07
  # @FilePath: /AutoPackage-CommitInfo/bulidScriptCommon/brances_info/brances_info_log/test/tssh_branch_detail_info_result.sh
  # @Description: 测试分支本身的详情信息
 ### 
@@ -31,7 +31,7 @@ qbase_function_log_msg_script_path="${CommonFun_HomeDir_Absolute}/log/function_l
 source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultValueToJsonFile
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
-get_branch_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branch_info/get20_branch_all_detail_info.sh"
+get_branch_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branch_info/get20_branchMapsInfo_byHisJsonFile.sh"
 
 
 Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_branch_info.json"
@@ -40,19 +40,6 @@ TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_re
 
 # echo "正在引入方法文件(brances_info_log_common.sh)：《source ${CommonFun_HomeDir_Absolute}/brances_info/brances_info_log/brances_info_log_common.sh -commonFunHomeDir \"${CommonFun_HomeDir_Absolute}\" --branch-info-json-file \"${Develop_Branchs_FILE_PATH}\"》"
 # source ${CommonFun_HomeDir_Absolute}/brances_info/brances_info_log/brances_info_log_common.sh -commonFunHomeDir "${CommonFun_HomeDir_Absolute}" --branch-info-json-file "${Develop_Branchs_FILE_PATH}"
-
-
-
-buildContainBranchMaps=$(cat ${Develop_Branchs_FILE_PATH} | jq -r '.package_merger_branchs') # -r 去除字符串引号
-if [ -z "${buildContainBranchMaps}" ]; then
-    echo "ERROR: 没有获取到分支信息，请检查文件 ${Develop_Branchs_FILE_PATH} 的 .package_merger_branchs 字段"
-    exit 1
-fi
-logBranchIndex=0
-iBranchMap=$(echo "${buildContainBranchMaps}" | jq -r ".[$((logBranchIndex))]") # -r 去除字符串引号
-branchName=$(echo ${iBranchMap} | jq -r ".name") # -r 去除字符串引号
-# echo "----------------------测试的数据buildContainBranchMaps=${buildContainBranchMaps}"
-# echo "----------------------测试的数据iBranchMap=${iBranchMap}"
 
 
 # echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
@@ -69,14 +56,16 @@ function test_getAllBranchLogArray_andCategoryThem() {
     showCategoryName='true' # 通知时候显示
     shouldMarkdown='false'
     
-    #echo "----------------------测试的数据buildContainBranchMaps=${buildContainBranchMaps}"
     RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
     RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
     RESULT_FULL_STRING_SALE_BY_KEY="branch_info_result.Notification.current.full"           
 
     echo "----------------------------------------3.2 getAllBranchLogArray_andCategoryThem"
     echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
-    sh $get_branch_all_detail_info_script_path -branchMaps "${buildContainBranchMaps}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}"
+    echo "正在执行命令：《 sh $get_branch_all_detail_info_script_path -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" 》"
+    sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsInKey ".package_merger_branchs" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}"
+    
+
     # echo "------------3.2.②"
     # cat ${TEST_DATA_RESULT_FILE_PATH} | jq '.branch_info_result.Notification.current' | jq '.'
 
