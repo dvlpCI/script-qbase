@@ -10,9 +10,9 @@
                     "value": "qbase -quick get_merger_recods_after_date \"2022-12-26 10:45:24\""
                 },
                 {
-                    "des": "获取当前分支【在rebase指定分支后】的所有合入记录",
-                    "cmd": "get_merger_recods_after_rebaseBranch",
-                    "value": "qbase -quick get_merger_recods_after_rebaseBranch \"master\""
+                    "des": "获取当前分支【在rebase指定分支后】的所有分支名",
+                    "cmd": "getBranchNamesAccordingToRebaseBranch",
+                    "value": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
                 }
             ]
         }

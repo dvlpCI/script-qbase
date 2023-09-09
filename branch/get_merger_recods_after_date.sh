@@ -65,7 +65,7 @@ for ((i=0;i<num;i+=1))
 {
     mergeBranchName=${arr[i]}
     mergeBranchName=$(echo $mergeBranchName | sed "s/(//g" | sed "s/)//g" | sed "s/,//g") #去除左右括号
-    mergeBranchName=${mergeBranchName##*/} # 取最后的component
+    # mergeBranchName=${mergeBranchName##*/} # 取最后的component
     #echo "$((i+1)) mergeBranchName=${mergeBranchName}"
     if [ "${mergeBranchName}" == "tag:" ]; then
         #echo "$((i+1)) mergeBranchName=${mergeBranchName}=========跳过本身及其下一个"

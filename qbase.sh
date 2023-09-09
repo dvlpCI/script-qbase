@@ -226,37 +226,33 @@ function get_path_json() {
     fi
 }
 
-
-function get_merger_recods_after_rebaseBranch() {    
-    rebaseFromBranch=$1
-
-    _verbose_log "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《 sh ${qbase_homedir_abspath}/branch/rebasebranch_last_commit_date.sh -rebaseBranch \"${rebaseFromBranch}\" ${YELLOW}》${NC}"
-    lastCommitDate=$(sh ${qbase_homedir_abspath}/branch/rebasebranch_last_commit_date.sh -rebaseBranch "${rebaseFromBranch}")
-    if [ $? != 0 ]; then
-        echo "${lastCommitDate}" # 此时值为错误信息
-        return 1
-    fi
-    _verbose_log "${GREEN}恭喜获得:${BLUE}main${GREEN} 分支最后一次提交commit的时间: ${BLUE}${lastCommitDate} ${GREEN}。${NC}"
-
-
-    _verbose_log "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${qbase_homedir_abspath}/branch/get_merger_recods_after_date.sh --searchFromDateString \"${lastCommitDate}\" ${YELLOW}》${NC}"
-    mergerRecordResult=$(sh ${qbase_homedir_abspath}/branch/get_merger_recods_after_date.sh --searchFromDateString "${lastCommitDate}")
-    _verbose_log "${GREEN}恭喜获得:指定日期之后的所有合入记录: ${BLUE}${mergerRecordResult} ${GREEN}。${NC}"
-
-    echo "${mergerRecordResult}"
-
-}
-
 function quickCmdExec() {
-    # echo "✅快捷命令及其参数分别为 ${BLUE}$1${BLUE} : ${CYAN}$2${CYAN}${NC}"
+    # allArgsForQuickCmd="$@"
+    # _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${allArgsForQuickCmd}${BLUE} ${NC}"
     if [ -z "$1" ]; then
          printf "${YELLOW}提示：您未设置要执行的快捷命令。附:所有支持的快捷命令如下：${NC}\n"
         _logQuickCmd
         return
     fi
 
-    if [ "$1" == "get_merger_recods_after_rebaseBranch" ]; then
-        get_merger_recods_after_rebaseBranch "$2"
+    quickCmdString=$1
+    allArgArray=($@)
+    # _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
+    allArgCount=${#allArgArray[@]}
+    for ((i=0;i<allArgCount;i+=1))
+    {
+        if [ $i -eq 0 ]; then
+            continue
+        fi
+        currentArg=${allArgArray[i]}
+        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
+    }
+    _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${quickCmdString}${BLUE}${NC}:${CYAN}${quickCmdArgs[*]}${CYAN} ${NC}"
+
+
+    if [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
+        _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
+        sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
         
     else 
         printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
@@ -291,17 +287,36 @@ function get_path() {
 # echo "传递给脚本的参数列表："
 # echo "$@"
 
+firstArg=$1 # 去除第一个参数之前，先保留下来
+shift 1  # 去除前一个参数
+allArgsExceptFirstArg="$@"  # 将去除前一个参数，剩余的参数赋值给新变量
+# allArgArray=($@)
+# allArgCount=${#allArgArray[@]}
+# for ((i=0;i<allArgCount;i+=1))
+# {
+#     if [ $i -lt 2 ]; then
+#         continue
+#     fi
+#     currentArg=${allArgArray[i]}
+#     allArgsExceptArgCount[${#allArgsExceptArgCount[@]}]=${currentArg}
+# }
+
+
+
+# echo "打印变量firstArg的值:$firstArg"  # 打印变量b的值
+# echo "打印变量allArgsExceptFirstArg的值:$allArgsExceptFirstArg"  # 打印变量b的值
+
 # 如果是获取版本号
 versionCmdStrings=("--version" "-version" "-v" "version")
 helpCmdStrings=("-help" "help")
-if echo "${versionCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
+if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
-elif [ "$1" == "-path" ]; then
-    get_path "$2"
-elif [ "$1" == "-quick" ]; then
-    quickCmdExec "$2" "$3"
+elif [ "${firstArg}" == "-path" ]; then
+    get_path $allArgsExceptFirstArg
+elif [ "${firstArg}" == "-quick" ]; then
+    quickCmdExec $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
-elif [ "$1" == "-help" ]; then
+elif [ "${firstArg}" == "-help" ]; then
     echo '{"-quickCmd":"'"快捷命令"'","-support_script_path":"'"支持的脚本"'"}'
 else
     echo "${qbase_latest_version}"
