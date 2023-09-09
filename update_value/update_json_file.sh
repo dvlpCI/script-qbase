@@ -117,6 +117,57 @@ elif [ "${UpdateJsonKey}" == "branch_info_result.Notification.current.category" 
       jq --arg     objectName "${UpdateJsonKey}" \
          --argjson jsonString "${UpdateJsonKeyValue}" \
         '.branch_info_result.Notification.current.category += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+
+elif [ "${UpdateJsonKey}" == "branch_info_result.Notification.lastOnline" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Notification.lastOnline += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Notification.lastOnline.branch" ]; then
+  cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Notification.lastOnline.branch += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Notification.lastOnline.category" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Notification.lastOnline.category += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.current" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.current += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.current.branch" ]; then
+  cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.current.branch += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.current.category" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.current.category += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.lastOnline" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.lastOnline += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.lastOnline.branch" ]; then
+  cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.lastOnline.branch += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.lastOnline.category" ]; then
+    cat ${FILE_PATH} |
+      jq --arg     objectName "${UpdateJsonKey}" \
+         --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.branch_info_result.Pgyer.lastOnline.category += $jsonString' >> ${FilePath_temp}   # 这是添加，用+=，不用=
+
+
+
 else
   cat ${FILE_PATH} |
     jq --arg branchPathKey "${UpdateJsonKey}" --argjson jsonString "${UpdateJsonKeyValue}" \

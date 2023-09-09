@@ -111,25 +111,20 @@ do
 done
 
 branchMapArray=$(cat ${branchMapsInJsonFile} | jq -r "${branchMapsInKey}") # -r 去除字符串引号
-if [ -z "${branchMapArray}" ]; then
-    echo "ERROR: 没有获取到分支信息，请检查文件 ${branchMapsInJsonFile} 的 ${branchMapsInKey} 字段"
-    exit 1
-fi
-
-
 # echo "✅哈哈哈哈 131"
-# echo "${branchMapArray}"
+# echo "执行文件信息获取《 ${BLUE}cat ${branchMapsInJsonFile} | jq -r \"${branchMapsInKey}\" ${NC}》所得的值如下:\n${branchMapArray} ${NC}"
 # exit 1
-if [ -z "${showCategoryName}" ]; then   # 避免外面没传值
-    showCategoryName="false"
-fi
 
 #echo "要获取信息的所有分支数组branchMapArray=${branchMapArray}"
 if [ -z "${branchMapArray}" ] || [ "${branchMapArray}" == "null" ]; then
-    echo "-------------------------💡💡💡tips: input is empty"
+    echo "-------------------------💡💡💡友情提示tips：您的 ${branchMapsInJsonFile} 文件中不存在 ${branchMapsInKey} 字段的数据,请检查"
     branchMapArray="" # 写此行，只是为了将 "null" 也设置成空字符串
     updateBranchResultFileKeyValue "${RESULT_SALE_TO_JSON_FILE_PATH}" "${RESULT_FULL_STRING_SALE_BY_KEY}" ""
     return 0
+fi
+
+if [ -z "${showCategoryName}" ]; then   # 避免外面没传值
+    showCategoryName="false"
 fi
 
 # 获取分类 category 的值
