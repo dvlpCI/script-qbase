@@ -37,3 +37,12 @@ log_title "getBranchNamesAccordingToRebaseBranch"
 echo "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true --verbose ${YELLOW}》${NC}"
 resultBranchNames=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true)
 echo "《获取当前分支【在rebase指定分支后】的所有分支名的结果》如下：$resultBranchNames"
+
+
+echo "\n"
+log_title "getBranchMapsAccordingToRebaseBranch"
+workspace="/Users/lichaoqian/Project/XXX/mobile_flutter_wish"
+BranceMaps_From_Directory_PATH="${workspace}/bulidScript/featureBrances"
+BranchMapAddToJsonFile="${workspace}/bulidScript/app_branch_info.json"
+BranchMapAddToKey="feature_brances"
+sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchMapsAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}"

@@ -26,7 +26,7 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     exit 1
 }
 
-workspace="/Users/lichaoqian/Project/Bojue/mobile_flutter_wish"
+workspace="/Users/lichaoqian/Project/XXX/mobile_flutter_wish"
 BranceMaps_From_Directory_PATH="${workspace}/bulidScript/featureBrances"
 BranchMapAddToJsonFile="${workspace}/bulidScript/app_branch_info.json"
 BranchMapAddToKey="feature_brances"

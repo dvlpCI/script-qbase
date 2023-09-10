@@ -257,8 +257,12 @@ function quickCmdExec() {
     elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
         _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
         resultBranchNames=$(sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]})
+        if [ -z "${resultBranchNames}" ]; then
+            echo "${RED}没有新的提交记录，更不用说分支了${NC}"
+            return 1
+        fi
         _verbose_log "《获取当前分支【在rebase指定分支后】的所有分支名》的结果如下：$resultBranchNames"
-
+        
         shift 1
         while [ -n "$1" ]
         do
