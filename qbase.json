@@ -160,8 +160,8 @@
             "values": [
                 {
                     "key": "addBranchMaps_toJsonFile",
-                    "des": "获取branchMaps",
-                    "example": "sh ./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -ignoreAddJsonFileNames \"${ignoreAddJsonFileNames}\"",
+                    "des": "获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误",
+                    "example": "sh ./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"",
                     "value": "./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh"
                 },
                 {
