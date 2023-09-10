@@ -254,6 +254,46 @@ function quickCmdExec() {
         _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
         sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
         
+    elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
+        _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
+        resultBranchNames=$(sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]})
+        _verbose_log "《获取当前分支【在rebase指定分支后】的所有分支名》的结果如下：$resultBranchNames"
+
+        shift 1
+        while [ -n "$1" ]
+        do
+            case "$1" in
+                -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
+                --add-value) add_value=$2; shift 2;;
+                --add-type) add_type=$2; shift 2;;
+                -onlyName|--only-name) ONLY_NAME=$2; shift 2;;
+                -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;;
+                -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
+                -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
+                --) break ;;
+                *) break ;;
+            esac
+        done
+        echo "========1.1=======✅-rebaseBranch:${REBASE_BRANCH}"
+        echo "========1.2=======✅--add-value:${add_value}"
+        echo "========1.3=======✅--add-type:${add_type}"
+        echo "========1.4=======✅-onlyName:${ONLY_NAME}"
+        echo "========2.1=======✅-branchMapsFromDir:${BranceMaps_From_Directory_PATH}"
+        echo "========2.2=======✅-branchMapsAddToJsonF:${BranchMapAddToJsonFile}"
+        echo "========2.3=======✅-branchMapsAddToKey:${BranchMapAddToKey}"
+
+        requestBranchNameArray=${resultBranchNames}
+
+
+        _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
+        errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
+        if [ $? != 0 ]; then
+            echo "${RED}${errorMessage}${NC}"
+            exit 1
+        fi
+        echo "${GREEN}获取branchMaps成功，详情查看 ${BLUE}${BranchMapAddToJsonFile}${NC}"
+
+
     else 
         printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
         _logQuickCmd

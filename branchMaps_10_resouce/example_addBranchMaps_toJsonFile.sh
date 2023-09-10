@@ -30,12 +30,12 @@ workspace="/Users/lichaoqian/Project/Bojue/mobile_flutter_wish"
 BranceMaps_From_Directory_PATH="${workspace}/bulidScript/featureBrances"
 BranchMapAddToJsonFile="${workspace}/bulidScript/app_branch_info.json"
 BranchMapAddToKey="feature_brances"
-ignoreAddJsonFileNames=("chore/pack" "bugfix/online_hing")
+requestBranchNameArray=("chore/pack" "bugfix/online_hing")
 
 
 log_title "获取branchMaps"
-echo "${YELLOW}正在执行命令:《 ${BLUE}sh ${CurrentDIR_Script_Absolute}/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -ignoreAddJsonFileNames \"${ignoreAddJsonFileNames[*]}\" ${YELLOW}》${NC}"
-errorMessage=$(sh ${CurrentDIR_Script_Absolute}/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -ignoreAddJsonFileNames "${ignoreAddJsonFileNames[*]}")
+echo "${YELLOW}正在执行命令:《 ${BLUE}sh ${CurrentDIR_Script_Absolute}/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
+errorMessage=$(sh ${CurrentDIR_Script_Absolute}/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
 if [ $? != 0 ]; then
     echo "${RED}${errorMessage}${NC}"
     exit 1

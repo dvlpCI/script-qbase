@@ -227,6 +227,11 @@ if [ $? != 0 ]; then
     echo "执行命令(读取目录下的文件)发生错误如下:\n${ReadDirErrorMessage}"
     exit 1
 fi
+if [ -z "${ReadDirErrorMessage}" ]; then
+    echo "${RED}Error❌:《获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中》失败，想要要查找的数据是: ${BLUE}${requestBranchNameArray[*]}${RED}，但未在文件 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}找到任何符合条件的分支文件。${NC}"
+    # look_detail
+    exit 1
+fi
 dirFileContentsResult=("${ReadDirErrorMessage}")
 
 if [ ${#dirFileContentsResult[@]} == 0 ]; then
