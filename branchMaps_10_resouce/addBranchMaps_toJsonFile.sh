@@ -196,10 +196,8 @@ function isBranchFileInBranchNames() {
     for ((i=0;i<requestBranchNameCount;i+=1))
     {
         element=${requestBranchNameArray[$i]}
-        # 获取元素的最后一个字段
-        last_field="${element##*/}"
-        # 比较最后一个字段和变量b的值
-        if [ "$last_field" == "$branchName" ]; then
+        # last_field="${element##*/}" # 获取元素的最后一个字段
+        if [ "$element" == "$branchName" ]; then
             found=true
             break
         fi
@@ -228,7 +226,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 if [ -z "${ReadDirErrorMessage}" ]; then
-    echo "${RED}Error❌:《获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中》失败，想要要查找的数据是: ${BLUE}${requestBranchNameArray[*]}${RED}，但未在文件 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}找到任何符合条件的分支文件。${NC}"
+    echo "${RED}Error❌:《获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中》失败，想要要查找的分支数据是: ${BLUE}${requestBranchNameArray[*]}${RED}，但未在文件 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}找到任何符合条件的分支文件。${NC}"
     # look_detail
     exit 1
 fi
