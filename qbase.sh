@@ -364,9 +364,9 @@ elif [ "${firstArg}" == "-path" ]; then
     get_path $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
     quickCmdExec $allArgsExceptFirstArg
-# elif echo "${helpCmdStrings[@]}" | grep -wq "$1" &>/dev/null; then
+# elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
-    echo '{"-quickCmd":"'"快捷命令"'","-support_script_path":"'"支持的脚本"'"}'
+    echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'
 else
     echo "${qbase_latest_version}"
 fi
