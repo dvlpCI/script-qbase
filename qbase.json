@@ -37,6 +37,18 @@
             ]
         },
         {
+            "type": "notification",
+            "des": "企业微信的通知发送",
+            "values": [
+                {
+                    "des": "企业微信的通知发送",
+                    "key": "notification2wechat",
+                    "value": "./notification/notification2wechat.sh",
+                    "example": "sh xxx.sh -robot \"${FILE_ROBOT_URL}\" -content \"${CONTENT}\" -at \"${FILE_ROBOT_AT}\" -msgtype \"${msgtype}\""
+                }
+            ]
+        },
+        {
             "type": "log",
             "des": "打印日志",
             "values": [

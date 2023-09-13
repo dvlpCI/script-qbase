@@ -51,6 +51,7 @@ if [ "${shouldTest_branch_info_Notification}" == "true" ]; then
     # CONTENT=$(cat "${TESTDATA_FILE_PATH}" | jq -r '.branch_info_result.Notification.all.text')
     #echo "-------CONTENT=${CONTENT}"
     sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -msgtype "markdown"
+    if [ $? -ne 0 ]; then error_exit_script; fi
 fi
 
 

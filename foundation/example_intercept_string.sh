@@ -108,6 +108,7 @@ function truncate_string() {
 }
 string3="1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十"
 echo "🚗🚗🚗 截取前，您的长度是$length"
+length=${#str}        # 获取字符串的长度
 result_str=$(truncate_string "$string3" 30)
 resultLength=${#result_str}        # 获取字符串的长度
 echo "🚗🚗🚗 截取并拼接后，您的长度是 $resultLength\n$result_str"
@@ -118,6 +119,7 @@ fi
 
 echo "\n"
 log_title "4.截取字符串(使用shell文件)"
+length=${#str}        # 获取字符串的长度
 echo "🚗🚗🚗 截取前，您的长度是$length"
 result_str=$(sh $interceptString_script_path -string "$string3" -maxLength 30)
 resultLength=${#result_str}        # 获取字符串的长度

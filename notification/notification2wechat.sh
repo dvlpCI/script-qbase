@@ -1,4 +1,5 @@
 #!/bin/bash
+#企业微信的通知发送
 #sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${MentionedList}" -msgtype "${msgtype}"
 
 #ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
@@ -6,6 +7,22 @@
 #LongLog=$(cat $branchInfoJsonFile | jq '.branch_info_Notification')
 #sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "cos地址：https://a/b/123.txt\n官网：https://www.pgyer.com/lkproapp。\n更新内容：\n更新说明略\n分支信息:\ndev_fix:功能修复" -at "all"
 
+# 定义颜色常量
+NC="\033[0m" # No Color
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+BLUE="\033[34m"
+PURPLE="\033[0;35m"
+CYAN="\033[0;36m"
+
+function debug_log() {
+    # 只有直接执行本脚本的时候才能够输出日志，不然如果是形如 echo $(sh xx.sh) 的时候会导致结果值不对
+    # is_Directly_execute_this_script=true
+    if [ "${is_Directly_execute_this_script}" == true ]; then
+        echo "$1"
+    fi
+}
 
 # shell 参数具名化
 show_usage="args: [-robot ,-content, -at, -msgtype]\
@@ -27,11 +44,8 @@ done
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-#echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}/..
-#bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}
-echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
+parent_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
+interceptString_script_path=${parent_dir_Absolute}/foundation/intercept_string.sh
 
 
 #echo "\n\n\n正在发送通知......"
@@ -149,10 +163,22 @@ function notiMessage() {
     fi
 }
 
+maxLength=2000
+
+length=${#Content}        # 获取字符串的长度
+debug_log "🚗🚗🚗 截取前，您的长度是$length"
+resultString=$(sh $interceptString_script_path -string "$Content" -maxLength $maxLength)
+resultLength=${#resultString}        # 获取字符串的长度
+debug_log "$resultString"
+debug_log "${YELLOW}🚗🚗🚗 截取并拼接后，您的长度是 $resultLength ，内容如上。${NC}"
+if [ $resultLength -gt $maxLength ]; then
+    echo "${RED}🚗🚗🚗 截取并拼接后，您的长度大于4096，其值为$resultLength${NC}"
+    exit
+fi
 
 echo "\n"
-#echo "正在执行发送通知的命令：《notiMessage \"${ROBOT_URL}\" \"${Content}\" ${MentionedList}》"
-notiMessage -robot "${ROBOT_URL}" -content "${Content}" -at "${MentionedList[*]}" -msgtype "${msgtype}"
+#echo "正在执行发送通知的命令：《notiMessage \"${ROBOT_URL}\" \"${resultString}\" ${MentionedList}》"
+notiMessage -robot "${ROBOT_URL}" -content "${resultString}" -at "${MentionedList[*]}" -msgtype "${msgtype}"
 if [ $? != 0 ]; then
     notiMessage "发送通知失败，详情请查看日志" ${MentionedList}
 fi
