@@ -25,6 +25,18 @@
     ],
     "support_script_path": [
         {
+            "type": "foundation",
+            "des": "字符串处理(截取)",
+            "values": [
+                {
+                    "des": "字符串长度截取",
+                    "key": "intercept_string",
+                    "value": "./foundation/intercept_string.sh",
+                    "example": "sh xxx.sh -string \"$string3\" -maxLength 30"
+                }
+            ]
+        },
+        {
             "type": "log",
             "des": "打印日志",
             "values": [
