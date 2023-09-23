@@ -1,0 +1,20 @@
+{
+    "create_time": "02.17",
+    "submit_test_time": "02.17",
+    "pass_test_time": "02.17",
+    "merger_pre_time": "02.17",
+    "type": "other",
+    "name": "optimize/dev_script_pack",
+    "des": "详见outlines",
+    "outlines": [
+        {"title": "修复开发包打包"},
+        {"title": "添加人员信息，打包出错可@对应开发"},
+        {"title": "打包信息添加markdown支持"}
+    ],
+    "answer": {
+        "name": "qian"
+    },
+    "tester": {
+        "name": "qian"
+    }
+}

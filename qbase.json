@@ -191,8 +191,14 @@
                 {
                     "key": "addBranchMaps_toJsonFile",
                     "des": "获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误",
-                    "example": "sh ./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"",
-                    "value": "./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh"
+                    "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"",
+                    "value": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh"
+                },
+                {
+                    "key": "branchMapsFile_checkMap",
+                    "des": "检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值",
+                    "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\"",
+                    "value": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh"
                 },
                 {
                     "key": "get20_branchMapsInfo_byHisJsonFile",

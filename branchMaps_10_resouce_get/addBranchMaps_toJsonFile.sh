@@ -1,7 +1,7 @@
 #!/bin/bash
 : <<!
 获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误
-sh ./branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNamesString}"
+sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNamesString}"
 !
 
 # 定义颜色常量
@@ -17,7 +17,7 @@ CYAN='\033[0;36m'
 while [ -n "$1" ]
 do
         case "$1" in
-                -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;;
+                -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;; # 获取分支信息的文件源，请确保该文件夹内的json文件都是合规的
                 -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
                 -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
                 -requestBranchNamesString|--requestBranchNamesString) requestBranchNamesString=$2; shift 2;;
@@ -77,7 +77,7 @@ fi
 
 function log_msg() {
     if [ ${verbose} == true ]; then
-        printf "$1"
+        echo "$1"
     fi
 }
 
@@ -108,26 +108,37 @@ function read_dir_path() {
     ReadDirErrorMessage=""
     dirFileContentsResult=""
     for file in "${BranceMaps_From_Directory_PATH}"/*; do
-        if [ -f "$file" ]; then
-            shouldAdd=$(isBranchFileInBranchNames "$file")
-            if [ "${shouldAdd}" != "true" ]; then
-                continue
-            fi
-            ReadDirResult=$(read_dir_file "$file")
-            if [ $? -ne 0 ]; then
-                isReadDirSuccess=false
-                ReadDirErrorMessage="${ReadDirResult}"
-                if [ -n "${ReadDirErrorMessage}" ]; then
-                    ReadDirErrorMessage+="\n"
-                fi
-                ReadDirErrorMessage+="$ScriptMessage(最后一次提交者 $BranchLastCommitAuthor)" # 此时为错误信息
-                continue
-            else
-                FileContent="${ReadDirResult}"
-            fi
-            dirFileContentsResult[${#dirFileContentsResult[@]}]=${FileContent}
+        if [ ! -f "$file" ]; then
+            continue
         fi
+        
+        shouldAdd=$(isBranchFileInBranchNames "$file")
+        if [ $? != 0 ]; then
+            isReadDirSuccess=false
+            ReadDirErrorMessage=$shouldAdd
+            echo "$shouldAdd" # 此时值为错误原因
+            return 1
+        fi
+        if [ "${shouldAdd}" != "true" ]; then
+            continue
+        fi
+        
+        ReadDirResult=$(read_dir_file "$file")
+        if [ $? -ne 0 ]; then
+            isReadDirSuccess=false
+            ReadDirErrorMessage="${ReadDirResult}"
+            if [ -n "${ReadDirErrorMessage}" ]; then
+                ReadDirErrorMessage+="\n"
+            fi
+            ReadDirErrorMessage+="$ScriptMessage(最后一次提交者 $BranchLastCommitAuthor)" # 此时为错误信息
+            continue
+        else
+            FileContent="${ReadDirResult}"
+        fi
+        dirFileContentsResult[${#dirFileContentsResult[@]}]=${FileContent}
+        
     done
+
 
     if [ "${isReadDirSuccess}" != "true" ]; then
         echo "${ReadDirErrorMessage}"
@@ -181,7 +192,10 @@ function getLastCommitAuthorByBranchFile() {
 function isBranchFileInBranchNames() {
     branchAbsoluteFilePath=$1
     branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
-
+    if [ $? != 0 ]; then
+        echo "${RED}Error❌:获取文件 ${BLUE}${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹 ${BLUE}$BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
+        return 1
+    fi
     # 判断是否在数组中
     # if echo "${requestBranchNameArray[*]}" | grep -wq "${branchName}" &>/dev/null; then
     #     echo "true"
@@ -218,15 +232,15 @@ if [ ! -f "${BranchMapAddToJsonFile}" ]; then
     exit_script
 fi
 
-# isBranchFileInBranchNames "/Users/lichaoqian/Project/Bojue/mobile_flutter_wish/bulidScript/featureBrances/chore_pack.json" && exit # 测试代码
-# read_dir_path && exit # 测试代码
+# isBranchFileInBranchNames "/Users/lichaoqian/Project/CQCI/script-qbase/branchMaps_10_resouce_get/example/featureBrances/dev_demo.json" || exit # 测试代码
+# read_dir_path || exit # 测试代码
 ReadDirErrorMessage=$(read_dir_path)
 if [ $? != 0 ]; then
     echo "执行命令(读取目录下的文件)发生错误如下:\n${ReadDirErrorMessage}"
     exit 1
 fi
 if [ -z "${ReadDirErrorMessage}" ]; then
-    echo "${RED}Error❌:《获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中》失败，想要要查找的分支数据是: ${BLUE}${requestBranchNameArray[*]}${RED}，但未在文件 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}找到任何符合条件的分支文件。${NC}"
+    echo "${RED}Error❌:获取所有指定分支名的branchMaps输出到指定文件中失败。想要要查找的分支数据是: ${BLUE}${requestBranchNameArray[*]} ${RED}，查找数据的文件夹源是 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}。${NC}"
     # look_detail
     exit 1
 fi
@@ -244,7 +258,7 @@ if [ $? != 0 ]; then
 fi
 log_msg "${YELLOW}所得json结果为:\n${BLUE}${dirFileContentJsonStrings}${BLUE}${NC}"
 
-log_msg "${YELLOW}正在执行命令(将从 featureBrances 文件夹下获取到的的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 属性中):\n《 ${BLUE}sh \"${JsonUpdateFun_script_file_Absolute}\" -f \"${BranchMapAddToJsonFile}\" -k \"${BranchMapAddToKey}\" -v \"${dirFileContentJsonStrings}\" ${YELLOW}》${NC}\n"
+log_msg "${YELLOW}正在执行命令(将从 featureBrances 文件夹下获取到的的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 属性中):\n《 ${BLUE}sh \"${JsonUpdateFun_script_file_Absolute}\" -f \"${BranchMapAddToJsonFile}\" -k \"${BranchMapAddToKey}\" -v \"${dirFileContentJsonStrings}\" ${YELLOW}》${NC}"
 sh "${JsonUpdateFun_script_file_Absolute}" -f "${BranchMapAddToJsonFile}" -k "${BranchMapAddToKey}" -v "${dirFileContentJsonStrings}"
 
 
@@ -253,7 +267,7 @@ name2_values=$(jq -r ".${BranchMapAddToKey}[].name" ${BranchMapAddToJsonFile})
 hasCatchRequestBranchNameArray=($name2_values)
 uncatchRequestBranchNames=$(getUncatchRequestBranchNames)
 if [ -n "${uncatchRequestBranchNames}" ]; then
-    echo "${PURPLE}完全匹配失败，结果如下要查找的数据是: ${BLUE}${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是: ${RED}${uncatchRequestBranchNames}${NC}"
+    echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是: ${BLUE}${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是: ${RED}${uncatchRequestBranchNames}${NC}"
     look_detail
     exit 1
 fi

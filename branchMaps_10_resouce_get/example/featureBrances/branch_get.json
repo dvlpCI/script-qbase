@@ -1,0 +1,18 @@
+{
+    "create_time": "02.17",
+    "submit_test_time": "null",
+    "pass_test_time": "null",
+    "merger_pre_time": "null",
+    "type": "other",
+    "name": "chore/branch_get",
+    "des": "详见outlines",
+    "outlines": [
+        {"title": "测试分支信息的获取"}
+    ],
+    "answer": {
+        "name": "qian"
+    },
+    "tester": {
+        "name": "qian"
+    }
+}

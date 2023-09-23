@@ -1,0 +1,23 @@
+{
+    "create_time": "11.29",
+    "submit_test_time": "null",
+    "pass_test_time": "null",
+    "merger_pre_time": "null",
+    "type": "null",
+    "name": "dev_demo",
+    "des": "详见outlines",
+    "outlines": [
+        {"title": "版本管理显示及分类优化"},
+        {"title": "修复日志中的json字符串空map时候多打印的}"},
+        {"title": "蒲公英支持上传和下载的地址不同"},
+        {"title": "蒲公英支持不同生产分支上传到同一个地址下"},
+        {"title": "支持可直接上传到下载位置或只上传到上传位置"},
+        {"title": "历史版本文件从总文件中抽离独立降低耦合"}
+    ],
+    "answer": {
+        "name": "null"
+    },
+    "tester": {
+        "name": "null"
+    }
+}

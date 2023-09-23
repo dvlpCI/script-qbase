@@ -255,8 +255,8 @@ function quickCmdExec() {
         sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
     
     # elif [ "${quickCmdString}" == "getBranchMapsAccordingToBranchNames" ]; then
-    #     _verbose_log "${YELLOW}正在执行命令(根据分支名,获取并添加分支信息):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh $quickCmdArgs ${BLUE}》${NC}"
-    #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
+    #     _verbose_log "${YELLOW}正在执行命令(根据分支名,获取并添加分支信息):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh $quickCmdArgs ${BLUE}》${NC}"
+    #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
         
     elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
         _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
@@ -294,8 +294,8 @@ function quickCmdExec() {
         echo "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
 
 
-        _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
-        errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
+        _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
+        errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
         if [ $? != 0 ]; then
             echo "${RED}${errorMessage}${NC}"
             exit 1
