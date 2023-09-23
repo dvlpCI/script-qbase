@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-09-09 12:59:37
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-14 00:08:01
+ # @LastEditTime: 2023-09-24 00:02:55
  # @FilePath: /example10_notification2wechat.sh
  # @Description: 测试企业微信的通知发送--文本长度正常时候
 ### 
@@ -47,12 +47,14 @@ log_title "1.使用本地直接指定的机器人🤖，发送字符串"
 
     echo "-----------------------1.1 text发送"
     msgtype="text"
-    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT1}" -at "all" -msgtype "${msgtype}"
+    atMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
+    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT1}" -at "${atMiddleBracketIdsString}" -msgtype "${msgtype}"
     if [ $? -ne 0 ]; then error_exit_script; fi
 
     echo "-----------------------1.2 markdown发送"
     msgtype="markdown"
-    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT1}" -at "all" -msgtype "${msgtype}"
+    atMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
+    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT1}" -at "${atMiddleBracketIdsString}" -msgtype "${msgtype}"
     if [ $? -ne 0 ]; then error_exit_script; fi
 
 
@@ -61,7 +63,7 @@ log_title "1.使用本地直接指定的机器人🤖，发送字符串"
 log_title "2.使用文件中指定的机器人🤖，发送字符串"
     FILE_ROBOT_URL=$(cat $TESTDATA_FILE_PATH | jq -r '.robot_data.value')
     FILE_ROBOT_AT=$(cat $TESTDATA_FILE_PATH | jq '.robot_data.mentioned_list')
-
+    # printf "✅ FILE_ROBOT_AT=${FILE_ROBOT_AT}\n"
     
     CONTENT2="2---cos地址：https://a/b/123.txt\n官网：https://www.pgyer.com/lkproapp。\n更新内容：\n更新说明略\n分支信息:\ndev_fix:功能修复"
 
@@ -84,15 +86,15 @@ shouldTest_Json="true"
 if [ "${shouldTest_Json}" == "true" ]; then
     log_title "3、发送json文件中的内容(长度4096内) + text"
     CONTENT=$(cat $TESTDATA_FILE_PATH | jq -r '.branch_info_result_text.current.Notification_full')
-    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -msgtype "text"
+    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -at "${atMiddleBracketIdsString}" -msgtype "text"
     if [ $? -ne 0 ]; then error_exit_script; fi
 
     log_title "4、发送json文件中的内容(长度4096内) + markdown"
     CONTENT=$(cat $TESTDATA_FILE_PATH | jq -r '.branch_info_result_markdown.current.Notification_full')
-    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -msgtype "markdown"
+    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -at "${atMiddleBracketIdsString}" -msgtype "markdown"
     if [ $? -ne 0 ]; then error_exit_script; fi
     CONTENT=$(cat $TESTDATA_FILE_PATH | jq -r '.branch_info_result_markdown.lastOnline.Notification_full')
-    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -msgtype "markdown"
+    sh ${notification2wechatScriptPath} -robot "${TEST_ROBOT_URL}" -content "${CONTENT}" -at "${atMiddleBracketIdsString}" -msgtype "markdown"
     if [ $? -ne 0 ]; then error_exit_script; fi
 fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #企业微信的通知发送-字符串
-#sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${MentionedList}" -msgtype "${msgtype}"
+#sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
 
 #ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
 #branchInfoJsonFile=
@@ -33,7 +33,8 @@ do
         case "$1" in
                 -robot|--robot-url) ROBOT_URL=$2; shift 2;;
                 -content|--content) Content=$2; shift 2;;
-                -at|--at) MentionedList=$2; shift 2;;
+                # 注意📢：at 属性，尽在text时候有效,markdown无效。所以如果为了既要markdown又要at，则先markdown值，再at一条text信息。
+                -at|--at-middleBracket-ids-string) AtMiddleBracketIdsString=$2; shift 2;;
                 -msgtype|--msgtype) msgtype=$2; shift 2;;
                 --) break ;;
                 *) echo $1,$2,$show_usage; break ;;
@@ -50,7 +51,7 @@ interceptString_script_path=${parent_dir_Absolute}/foundation/intercept_string.s
 
 #echo "\n\n\n正在发送通知......"
 #echo "ROBOT_URL=${ROBOT_URL}"
-#echo "MentionedList=${MentionedList}"
+#echo "AtMiddleBracketIdsString=${AtMiddleBracketIdsString}"
 #echo "Content=${Content}"
 
 
@@ -65,7 +66,7 @@ function notiMessage() {
         case "$1" in
                 -robot|--robot-url) NotificationROBOTURL=$2; shift 2;;
                 -content|--content) Content=$2; shift 2;;
-                -at|--at) MentionedList=$2; shift 2;;
+                -at|--at-middleBracket-ids-string) AtMiddleBracketIdsString=$2; shift 2;;
                 -msgtype|--msgtype) MessageTYPE=$2; shift 2;;
                 --) break ;;
                 *) echo $1,$2,$show_usage; break ;;
@@ -73,19 +74,19 @@ function notiMessage() {
     done
 
 #    echo "$FUNCNAME 入参Content=${Content}"
-#    echo "$FUNCNAME 入参MentionedList=${MentionedList[*]}"
+#    echo "$FUNCNAME 入参AtMiddleBracketIdsString=${AtMiddleBracketIdsString}"
 #    echo "$FUNCNAME 入参NotificationROBOTURL=${NotificationROBOTURL}"
     
-    #MentionedListJsonStrings="[\"lichaoqian\", \"linzehua\", \"hongzhiqing\", \"hongjiaxing\"]"
-    #echo "测试@的人1：${MentionedListJsonStrings}"
+    # 注意📢：at 属性，尽在text时候有效,markdown无效。所以如果为了既要markdown又要at，则先markdown值，再at一条text信息。
+    # MessageTYPE="text"
+    # AtMiddleBracketIdsString="[\"@all\", \"lichaoqian\", \"linzehua\", \"hongzhiqing\", \"hongjiaxing\"]" # 有效✅
+    # AtMiddleBracketIdsString='["@all", "lichaoqian", "linzehua", "hongzhiqing", "hongjiaxing"]' # 有效✅
+    # echo "测试@的人1：${AtMiddleBracketIdsString}"
 
     #TestMentionedArray=("lichaoqian" "linzehua" "hongzhiqing" "hongjiaxing")
     #source ${bulidScriptCommon_dir_Absolute}/a_function.sh ${bulidScriptCommon_dir_Absolute}
     #getJsonStringFromArray "${TestMentionedArray[*]}" "true"
     #echo "测试@的人2：${arrayJsonResultString}"
-    
-    MentionedListJsonStrings=${MentionedList[*]}
-    #echo "实际@的人3：${MentionedListJsonStrings}"
     
 #    return
 
@@ -122,7 +123,7 @@ function notiMessage() {
             \"msgtype\": \"${MessageTYPE}\",
             \"${MessageTYPE}\": {
                 \"content\": ${Content},
-                \"mentioned_list\":${MentionedListJsonStrings}
+                \"mentioned_list\":${AtMiddleBracketIdsString}
                  }
            }"
     )
@@ -177,8 +178,8 @@ if [ $resultLength -gt $maxLength ]; then
 fi
 
 echo "\n"
-#echo "正在执行发送通知的命令：《notiMessage \"${ROBOT_URL}\" \"${resultString}\" ${MentionedList}》"
-notiMessage -robot "${ROBOT_URL}" -content "${resultString}" -at "${MentionedList[*]}" -msgtype "${msgtype}"
+#echo "正在执行发送通知的命令：《notiMessage \"${ROBOT_URL}\" \"${resultString}\" ${AtMiddleBracketIdsString}》"
+notiMessage -robot "${ROBOT_URL}" -content "${resultString}" -at "${AtMiddleBracketIdsString[*]}" -msgtype "${msgtype}"
 if [ $? != 0 ]; then
-    notiMessage "发送通知失败，详情请查看日志" ${MentionedList}
+    notiMessage "发送通知失败，详情请查看日志" ${AtMiddleBracketIdsString}
 fi

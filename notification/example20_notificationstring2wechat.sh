@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-09-09 12:59:37
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-23 19:03:19
+ # @LastEditTime: 2023-09-23 23:15:38
  # @FilePath: example20_notificationstring2wechat.sh
  # @Description: 测试企业微信的通知发送--字符串数组
 ### 
@@ -45,9 +45,12 @@ TEST_ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1f
 log_title "1、发送json文件中的数组内容(长度超过4096) + text"
 CONTENTS_JSON_FILE_PATH=${TESTDATA_FILE_PATH}
 CONTENTS_JSON_KEY="branch_info_result_slice.Notification_full_slice_text"
-
-echo "${YELLOW}正在执行命令(测试发送数组内容)《 ${BLUE}sh ${notification_strings_to_wechat_scriptPath} -robot \"${TEST_ROBOT_URL}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentKey \"${CONTENTS_JSON_KEY}\" -msgtype \"text\" ${YELLOW}》${NC}"
-sh ${notification_strings_to_wechat_scriptPath} -robot "${TEST_ROBOT_URL}" -contentJsonF "${CONTENTS_JSON_FILE_PATH}" -contentKey "${CONTENTS_JSON_KEY}" -msgtype "text"
+HEADER_TEXT=">>>>>>>>这是头部>>>>>>>>>未换行"
+FOOTER_TEXT="未换行<<<<<<<<这是尾部<<<<<<<<<"
+atMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
+msgtype="text"
+echo "${YELLOW}正在执行命令(测试发送数组内容)《 ${BLUE}sh ${notification_strings_to_wechat_scriptPath} -robot \"${TEST_ROBOT_URL}\" -headerText \"${HEADER_TEXT}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentJsonKey \"${CONTENTS_JSON_KEY}\" -footerText \"${FOOTER_TEXT}\" -at \"${atMiddleBracketIdsString}\" -msgtype \"${msgtype}\" ${YELLOW}》${NC}"
+sh ${notification_strings_to_wechat_scriptPath} -robot "${TEST_ROBOT_URL}" -headerText "${HEADER_TEXT}" -contentJsonF "${CONTENTS_JSON_FILE_PATH}" -contentJsonKey "${CONTENTS_JSON_KEY}" -footerText "${FOOTER_TEXT}" -at "${atMiddleBracketIdsString}" -msgtype "${msgtype}"
 if [ $? -ne 0 ]; then error_exit_script; fi
 
 
@@ -56,9 +59,12 @@ if [ $? -ne 0 ]; then error_exit_script; fi
 log_title "2、发送json文件中的数组内容(长度超过4096) + markdown"
 CONTENTS_JSON_FILE_PATH=${TESTDATA_FILE_PATH}
 CONTENTS_JSON_KEY="branch_info_result_slice.Notification_full_slice_markdown"
-
-echo "${YELLOW}正在执行命令(测试发送数组内容)《 ${BLUE}sh ${notification_strings_to_wechat_scriptPath} -robot \"${TEST_ROBOT_URL}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentKey \"${CONTENTS_JSON_KEY}\" -msgtype \"markdown\" ${YELLOW}》${NC}"
-sh ${notification_strings_to_wechat_scriptPath} -robot "${TEST_ROBOT_URL}" -contentJsonF "${CONTENTS_JSON_FILE_PATH}" -contentKey "${CONTENTS_JSON_KEY}" -msgtype "markdown"
+HEADER_TEXT=">>>>>>>>这是头部>>>>>>>>>未换行"
+FOOTER_TEXT="未换行<<<<<<<<这是尾部<<<<<<<<<"
+atMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
+msgtype="markdown"
+echo "${YELLOW}正在执行命令(测试发送数组内容)《 ${BLUE}sh ${notification_strings_to_wechat_scriptPath} -robot \"${TEST_ROBOT_URL}\" -headerText \"${HEADER_TEXT}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentJsonKey \"${CONTENTS_JSON_KEY}\" -footerText \"${FOOTER_TEXT}\" -at \"${atMiddleBracketIdsString}\" -msgtype \"${msgtype}\" ${YELLOW}》${NC}"
+sh ${notification_strings_to_wechat_scriptPath} -robot "${TEST_ROBOT_URL}" -headerText "${HEADER_TEXT}" -contentJsonF "${CONTENTS_JSON_FILE_PATH}" -contentJsonKey "${CONTENTS_JSON_KEY}" -footerText "${FOOTER_TEXT}" -at "${atMiddleBracketIdsString}" -msgtype "${msgtype}"
 if [ $? -ne 0 ]; then error_exit_script; fi
 
 
