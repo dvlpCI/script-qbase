@@ -41,10 +41,16 @@
             "des": "企业微信的通知发送",
             "values": [
                 {
-                    "des": "企业微信的通知发送",
+                    "des": "企业微信的通知发送--字符串",
                     "key": "notification2wechat",
                     "value": "./notification/notification2wechat.sh",
                     "example": "sh xxx.sh -robot \"${FILE_ROBOT_URL}\" -content \"${CONTENT}\" -at \"${FILE_ROBOT_AT}\" -msgtype \"${msgtype}\""
+                },
+                {
+                    "des": "企业微信的通知发送--字符串数组",
+                    "key": "notification_strings_to_wechat",
+                    "value": "./notification/notification_strings_to_wechat.sh",
+                    "example": "sh xxx.sh -robot \"${FILE_ROBOT_URL}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentKey \"${CONTENTS_JSON_KEY}\" -at \"${FILE_ROBOT_AT}\" -msgtype \"${msgtype}\""
                 }
             ]
         },

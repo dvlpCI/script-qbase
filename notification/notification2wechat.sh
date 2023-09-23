@@ -1,5 +1,5 @@
 #!/bin/bash
-#企业微信的通知发送
+#企业微信的通知发送-字符串
 #sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${MentionedList}" -msgtype "${msgtype}"
 
 #ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
