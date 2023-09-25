@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>App1Enterprise.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>armv7</string>
+				<string>arm64</string>
+			</array>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>C5CA69688AFB841088B053D7D8F7D4021DF3366C</string>
+				<key>dateExpires</key>
+				<string>2021/9/27</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>8285LLMDV3.com.test.app1Enterprise</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>8285LLMDV3</string>
+				<key>get-task-allow</key>
+				<true/>
+				<key>keychain-access-groups</key>
+				<array>
+					<string>8285LLMDV3.com.test.app1Enterprise</string>
+				</array>
+			</dict>
+			<key>name</key>
+			<string>App1Enterprise.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>7a286a85-6975-4cbd-a3f0-6f7398c71001</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: com.test.app1Enterprise</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>8285LLMDV3</string>
+				<key>name</key>
+				<string></string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

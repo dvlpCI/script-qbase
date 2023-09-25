@@ -213,6 +213,18 @@
                     "value": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
                 }
             ]
+        },
+        {
+            "type": "upload",
+            "des": "上传",
+            "values": [
+                {
+                    "des": "上传app安装包到【蒲公英】（可设置渠道）",
+                    "key": "upload_app_to_pgyer",
+                    "value": "./upload_app/upload_app_to_pgyer.sh",
+                    "example": "sh xxx.sh -f \"${ipa_file_path}\" -k \"${pgyer_api_key_VALUE}\" -c \"${buildChannelShortcut}\" -d \"${UpdateDescription}\" --should-upload-fast \"${ShouldUploadFast}\""
+                }
+            ]
         }
     ]
 }
