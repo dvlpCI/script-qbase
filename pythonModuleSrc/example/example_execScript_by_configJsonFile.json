@@ -1,0 +1,95 @@
+{
+    "action_sript_file_rel_this_dir": "../../bulidScriptCommon/upload/s3_uploadapp_pgyer",
+    "action_sript_file_des": "上传安装包到蒲公英",
+    "actions_envs_des": "要操作的环境",
+    "actions_envs_values": [
+        {
+            "env_id": "upload_app_to_pgyer",
+            "env_name": "上传安装包到蒲公英",
+            "env_action_ids": [
+                "upload_file_path",
+                "network_type",
+                "speed"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "upload_file_path",
+            "des": "要上传的文件",
+            "actionType": "custom",
+            "resultForParam": "-f"
+        },
+        {
+            "id": "network_type",
+            "des": "要上传的环境",
+            "actionType": "choose",
+            "resultForParam": "null",
+            "chooseValues": [
+                {
+                    "id": "iOS dev",
+                    "value": "-k 3aa46e5f75c648922bb2450ac2da7909 -c zHzO",
+                    "des": "iOS的开发环境"
+                },
+                {
+                    "id": "iOS test1",
+                    "value": "-k 3aa46e5f75c648922bb2450ac2da7909 -c 09nB",
+                    "des": "iOS的测试环境1"
+                },
+                {
+                    "id": "iOS test2",
+                    "value": "-k 3aa46e5f75c648922bb2450ac2da7909 -c tbpZzJ",
+                    "des": "iOS的测试环境2"
+                },
+                {
+                    "id": "iOS pro",
+                    "value": "-k 5f84348a16bef907dc0ea977deb249ab -c bjwishproitemp",
+                    "des": "iOS的生产环境"
+                },
+                {
+                    "id": "Android dev",
+                    "value": "-k 0ff51c2519a23078fac1f8e8ea1bbdef -c a0Ko",
+                    "des": "Android的开发环境"
+                },
+                {
+                    "id": "Android test1",
+                    "value": "-k 0ff51c2519a23078fac1f8e8ea1bbdef -c b2Mf",
+                    "des": "Android的测试环境1"
+                },
+                {
+                    "id": "Android test1",
+                    "value": "-k 0ff51c2519a23078fac1f8e8ea1bbdef -c b2Mf",
+                    "des": "Android的测试环境1"
+                },
+                {
+                    "id": "Android test2",
+                    "value": "-k 0ff51c2519a23078fac1f8e8ea1bbdef -c jLC6np",
+                    "des": "Android的测试环境2"
+                },
+                {
+                    "id": "Android pro",
+                    "value": "-k 70fda79d944eeb6797961db785f8d2b8 -c bjwishproAtemp",
+                    "des": "Android的生产环境"
+                }
+            ]
+        },
+        {
+            "id": "speed",
+            "des": "是否要快速上传",
+            "actionType": "choose",
+            "resultForParam": "--should-upload-fast",
+            "chooseValues": [
+                {
+                    "id": "normal",
+                    "value": "false",
+                    "des": "正常上传"
+                },
+                {
+                    "id": "fast",
+                    "value": "true",
+                    "des": "快速上传"
+                }
+            ]
+        }
+    ]
+}

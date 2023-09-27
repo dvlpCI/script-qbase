@@ -225,6 +225,18 @@
                     "example": "sh xxx.sh -f \"${ipa_file_path}\" -k \"${pgyer_api_key_VALUE}\" -c \"${buildChannelShortcut}\" -d \"${UpdateDescription}\" --should-upload-fast \"${ShouldUploadFast}\""
                 }
             ]
+        },
+        {
+            "type": "execScript",
+            "des": "执行脚本",
+            "values": [
+                {
+                    "des": "执行配置文件：自动根据配置文件，执行指定的脚本及其配置参数",
+                    "key": "execScript_by_configJsonFile",
+                    "value": "./pythonModuleSrc/dealScript_by_scriptConfig.py",
+                    "example": "python3 xxx.py \"${script_json_file_path}\""
+                }
+            ]
         }
     ]
 }

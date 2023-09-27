@@ -1,0 +1,51 @@
+{
+    "action_sript_bin": "coscmd",
+    "action_sript_file_des": "上传文件到cos",
+    "actions_envs_des": "要操作的环境",
+    "actions_envs_values": [
+        {
+            "env_id": "upload_cos",
+            "env_name": "上传任意文件到cos",
+            "env_action_ids": [
+                "region",
+                "bucket",
+                "upload_file_path",
+                "cos_path"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "region",
+            "des": "桶区域",
+            "actionType": "choose",
+            "resultForParam": "-r",
+            "chooseValues": [
+                {
+                    "id": "ap-shanghai",
+                    "value": "ap-shanghai",
+                    "des": "上海"
+                }
+            ]
+        },
+        {
+            "id": "upload_file_path",
+            "des": "要上传的文件",
+            "actionType": "custom",
+            "resultForParam": "upload -r"
+        },
+        {
+            "id": "cos_path",
+            "des": "上传到桶的哪个文件夹里",
+            "actionType": "choose",
+            "resultForParam": "null",
+            "chooseValues": [
+                {
+                    "id": "/mcms/download/app/",
+                    "value": "/mcms/download/app/",
+                    "des": "生产上的图片桶(/mcms/download/app/)"
+                }
+            ]
+        }
+    ]
+}
