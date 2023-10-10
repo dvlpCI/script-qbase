@@ -2,7 +2,7 @@
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-12 22:15:22
 LastEditors: dvlproad
-LastEditTime: 2023-09-27 14:18:00
+LastEditTime: 2023-10-10 17:34:33
 FilePath: dealScript_by_scriptConfig.py
 Description: 根据配置文件，执行指定的脚本及其配置参数
 '''
@@ -249,15 +249,16 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
 
 # ②从 jsonFile 中获取脚本的指定固定参数
 def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
+    operateDes = operateHomeMap['des']
+
+    operateActionTypeDes="选择"
+    # ③如果是选择，选择项有哪些，然后提示进行"选择"输入(只需要输入)
     if "chooseValues" not in operateHomeMap:
         print(f"{RED}发生错误:{BLUE}{pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中不存在key为 {BLUE}.chooseValues {RED}的值，请先检查补充")
         openFile(pack_input_params_file_path)
         return None
-    operateActionTypeDes="选择"
-
-    # ③如果是选择，选择项有哪些，然后提示进行"选择"输入(只需要输入)
-    operateDes = operateHomeMap['des']
     operateChooseMaps = operateHomeMap['chooseValues']
+    
     # ④选择的结果给谁用
     if 'resultForParam' not in operateHomeMap:
         operateResultForParam = ""
@@ -265,11 +266,11 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
         operateResultForParam = operateHomeMap['resultForParam']
 
     for i, chooseMap in enumerate(operateChooseMaps):
-        chooseName = chooseMap['des'] #这里只是打印此字段的值，便于选择
-        if chooseName:
-            print(f"{i+1}. {chooseName}")
+        if 'des' not in chooseMap:
+            print(f"{i+1}. {YELLOW}{BLUE}{pack_input_params_file_path} {YELLOW}的 {BLUE}{chooseMap} {YELLOW}缺失 {BLUE}des {YELLOW}值，请后续补充，以便区分用途{NC}")
         else:
-            print(f"{YELLOW}{chooseMap}缺失 {BLUE}des {YELLOW}值，请后续补充，以便区分用途{NC}")
+            chooseName = chooseMap['des'] #这里只是打印此字段的值，便于选择
+            print(f"{i+1}. {chooseName}")
 
     # 如果可选项只有一项，则直接选中
     if len(operateChooseMaps) == 1:
