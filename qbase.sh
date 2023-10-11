@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-11 15:30:13
+ # @LastEditTime: 2023-10-11 16:24:51
 # @Description:
 ###
 
@@ -300,7 +300,7 @@ function quickCmdExec() {
             echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
             exit 1
         fi
-        echo "${GREEN}获取branchMaps成功，详情查看 ${BLUE}${BranchMapAddToJsonFile}${NC}"
+        echo "${GREEN}获取branchMaps成功，详情查看${BLUE} ${BranchMapAddToJsonFile} ${GREEN}。${NC}"
 
 
     else 

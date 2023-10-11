@@ -44,6 +44,6 @@ if [ $? != 0 ]; then
     echo "${RED}${errorMessage}${NC}"
     exit 1
 fi
-echo "${GREEN}获取branchMaps成功，详情查看 ${BLUE}${BranchMapAddToJsonFile}${NC}"
+echo "${GREEN}获取branchMaps成功，详情查看${BLUE} ${BranchMapAddToJsonFile} ${GREEN}。${NC}"
 
 
