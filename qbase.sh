@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-09-05 20:37:35
+ # @LastEditTime: 2023-10-11 15:30:13
 # @Description:
 ###
 
@@ -251,7 +251,7 @@ function quickCmdExec() {
 
 
     if [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
+        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
         sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
     
     # elif [ "${quickCmdString}" == "getBranchMapsAccordingToBranchNames" ]; then
@@ -259,13 +259,13 @@ function quickCmdExec() {
     #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
         
     elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh $quickCmdArgs ${BLUE}》${NC}"
+        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《 ${BLUE}sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
         resultBranchNames=$(sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]})
         if [ -z "${resultBranchNames}" ]; then
             echo "${RED}没有新的提交记录，更不用说分支了${NC}"
             return 1
         fi
-        echo "${GREEN}恭喜：获取当前分支【在rebase指定分支后】的所有分支名的结果如下： ${BLUE}$resultBranchNames ${GREEN}。${NC}"
+        echo "${GREEN}恭喜：获取当前分支【在rebase指定分支后】的所有分支名的结果如下：${BLUE} $resultBranchNames ${GREEN}。${NC}"
         
         shift 1
         while [ -n "$1" ]
@@ -282,22 +282,22 @@ function quickCmdExec() {
                 *) break ;;
             esac
         done
-        echo "========1.1=======✅-rebaseBranch:${REBASE_BRANCH}"
-        echo "========1.2=======✅--add-value:${add_value}"
-        echo "========1.3=======✅--add-type:${add_type}"
-        echo "========1.4=======✅-onlyName:${ONLY_NAME}"
-        echo "========2.1=======✅-branchMapsFromDir:${BranceMaps_From_Directory_PATH}"
-        echo "========2.2=======✅-branchMapsAddToJsonF:${BranchMapAddToJsonFile}"
-        echo "========2.3=======✅-branchMapsAddToKey:${BranchMapAddToKey}"
+        _verbose_log "========1.1=======✅-rebaseBranch:${REBASE_BRANCH}"
+        _verbose_log "========1.2=======✅--add-value:${add_value}"
+        _verbose_log "========1.3=======✅--add-type:${add_type}"
+        _verbose_log "========1.4=======✅-onlyName:${ONLY_NAME}"
+        _verbose_log "========2.1=======✅-branchMapsFromDir:${BranceMaps_From_Directory_PATH}"
+        _verbose_log "========2.2=======✅-branchMapsAddToJsonF:${BranchMapAddToJsonFile}"
+        _verbose_log "========2.3=======✅-branchMapsAddToKey:${BranchMapAddToKey}"
 
         requestBranchNameArray=${resultBranchNames}
-        echo "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
+        _verbose_log "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
 
 
         _verbose_log "${YELLOW}正在执行命令:《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
         errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
         if [ $? != 0 ]; then
-            echo "${RED}${errorMessage}${NC}"
+            echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
             exit 1
         fi
         echo "${GREEN}获取branchMaps成功，详情查看 ${BLUE}${BranchMapAddToJsonFile}${NC}"

@@ -2,7 +2,7 @@
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-16 00:10:18
 LastEditors: dvlproad
-LastEditTime: 2023-09-27 13:23:35
+LastEditTime: 2023-10-11 15:57:16
 FilePath: base_util.py
 Description: 打开文件、执行脚本
 '''
@@ -46,7 +46,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
     if verbose==True:
         cmdString=' '.join(command)
         escaped_command = cmdString.replace("(", r"\(").replace(")", r"\)")
-        print(f"{BLUE}正在执行命令:《 {YELLOW}{escaped_command}{NC} 》")
+        print(f"{BLUE}正在执行选中的命令:《{YELLOW} {escaped_command} {BLUE}》{NC}")
 
 
     # 调用 subprocess.run() 函数执行 shell 命令
@@ -57,7 +57,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         # text=True 参数可以将输出解码为字符串。如果省略 capture_output=True 参数，则无法在 except 块中访问命令的输出
         result = subprocess.run(command) # 为了避免执行过程中，有键盘输入的需求，所以不使用 capture_output 属性
     except PermissionError:
-        # 如果没有执行权限，添加执行权限并重试
+        print(f"{CYAN}没有执行权限，正为你添加执行权限并重试{NC}")
         os.chmod(sript_file_absPath, 0o755)
         result = subprocess.run(command)
     except subprocess.CalledProcessError as error:
@@ -67,19 +67,16 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         # print(f"{RED}脚本调用失败：{error}{NC}")
         return False
 
-    print(f"\n{BLUE}脚本执行结束，执行结果如下(returncode={result.returncode})：{NC}")
     # 判断 shell 命令的返回值，并输出结果
     if result.returncode != 0:
-        print(f"{RED}抱歉:命令执行失败，请检查，returncode={result.returncode}。{NC}")
-        if verbose==True:
-            print(f"{RED}所执行的命令如下：《 {YELLOW}{' '.join(command)}{RED} 》{NC}")
+        print(f"{RED}抱歉:您的脚本命令执行失败，returncode={result.returncode}。 请检查您所执行的命令《 {YELLOW}{' '.join(command)}{RED} 》{NC}")
         exit(1)
     # elif result is not None and "exit 1" in result.stdout:
     #     print(f"{YELLOW}{sript_file_absPath}{RED} 脚本执行失败")
     #     # print(result.stdout) # 因为没有 capture_output 所以没有 stdout
     #     return False
     else:
-        print(f"{BLUE}命令执行成功,结果如下:\n")
+        # print(f"{BLUE}恭喜:您的脚本命令执行成功,结果如下:\n")
         # print(f"{result.stdout.strip()}") # 因为没有 capture_output 所以没有 stdout
         return True
 
