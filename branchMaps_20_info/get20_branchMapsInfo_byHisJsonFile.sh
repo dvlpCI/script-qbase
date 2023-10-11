@@ -147,7 +147,7 @@ do
     debug_log "${YELLOW}正在执行命令(获取单分支信息,并添加(而不是覆盖)保存到 ${RESULT_SALE_TO_JSON_FILE_PATH} 文件的 ${RESULT_BRANCH_ARRAY_SALE_BY_KEY} 中)：《 sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" 》${NC}"
     iBranchLog=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
     if [ $? != 0 ]; then
-        echo "${iBranchLog}" # 此时此值为错误信息
+        echo "${RED}您的${BLUE} ${branchMapsInJsonFile} ${RED}文件出错了，请检查。出错信息为：${NC} ${iBranchLog}" # 此时此值为错误信息
         exit 1
     fi
     # logResultValueToJsonFile "${iBranchLog}"
@@ -274,7 +274,7 @@ cat ${RESULT_SALE_TO_JSON_FILE_PATH} | jq ".${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}
 # 进一步进行对上诉所得的 category 整理
 get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
 showCategoryName="true"
-echo "${YELLOW}正在执行《 ${BLUE}sh ${get_category_all_detail_info_script_path} -categoryJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" ${YELLOW}》${NC}"
+debug_log "${YELLOW}正在执行(获取分类的所有信息)《 ${BLUE}sh ${get_category_all_detail_info_script_path} -categoryJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" ${YELLOW}》${NC}"
 ALL_CATEGORY_BRANCH_STRING=$(sh ${get_category_all_detail_info_script_path} -categoryJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}")
 if [ $? != 0 ]; then
     echo "${RED}${ALL_CATEGORY_BRANCH_STRING}${NC}" # 此时值为错误信息

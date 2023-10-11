@@ -1,11 +1,11 @@
 #!/bin/bash
 #企业微信的通知发送-字符串
-#sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
+#sh notification2wechat.sh -robot "${ROBOT_URL}" -content "${LongLog}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
 
 #ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
 #branchInfoJsonFile=
 #LongLog=$(cat $branchInfoJsonFile | jq '.branch_info_Notification')
-#sh noti_new_package_base.sh -robot "${ROBOT_URL}" -content "cos地址：https://a/b/123.txt\n官网：https://www.pgyer.com/lkproapp。\n更新内容：\n更新说明略\n分支信息:\ndev_fix:功能修复" -at "all"
+#sh notification2wechat.sh -robot "${ROBOT_URL}" -content "cos地址：https://a/b/123.txt\n官网：https://www.pgyer.com/lkproapp。\n更新内容：\n更新说明略\n分支信息:\ndev_fix:功能修复" -at "all"
 
 # 定义颜色常量
 NC="\033[0m" # No Color
@@ -37,7 +37,7 @@ do
                 -at|--at-middleBracket-ids-string) AtMiddleBracketIdsString=$2; shift 2;;
                 -msgtype|--msgtype) msgtype=$2; shift 2;;
                 --) break ;;
-                *) echo $1,$2,$show_usage; break ;;
+                *) break ;;
         esac
 done
 
@@ -59,6 +59,11 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
     exit 1
 }
 
+if [ -z "${ROBOT_URL}" ]; then
+    echo "${RED}缺少参数: -robot 机器人地址，必填。${NC}"
+    exit_script
+fi
+
 
 function notiMessage() {
     while [ -n "$1" ]
@@ -69,7 +74,7 @@ function notiMessage() {
                 -at|--at-middleBracket-ids-string) AtMiddleBracketIdsString=$2; shift 2;;
                 -msgtype|--msgtype) MessageTYPE=$2; shift 2;;
                 --) break ;;
-                *) echo $1,$2,$show_usage; break ;;
+                *) break ;;
         esac
     done
 
@@ -146,11 +151,11 @@ function notiMessage() {
         responseResultCode=$(echo ${responseResult} | jq  '.errcode') # mac上安装brew后，执行brew install jq安装jq
         #echo "responseResultCode=${responseResultCode}"
         if [ $responseResultCode = 0 ];then
-            echo "-------- 脚本${0} Success: 新版本通知成功，继续操作 --------"
+            echo "-------- Success: 通知发送成功，继续操作 --------"
         else
             responseErrorMessage=$(echo ${responseResult} | jq  '.errmsg')
     #        echo "responseErrorMessage=${responseErrorMessage}"
-            echo "-------- 脚本${0} Failure: 新版本通知失败responseErrorMessage=${responseErrorMessage}，不继续操作 --------"
+            echo "-------- Failure: 通知发送失败responseErrorMessage=${responseErrorMessage}，不继续操作 --------"
 #            source ./a_function.sh ./
 #            PackageErrorCode=-1
 #            PackageErrorMessage="新版本通知失败responseErrorMessage=${responseErrorMessage}，不继续操作"
@@ -159,7 +164,7 @@ function notiMessage() {
         fi
         
     else
-        echo "-------- 脚本${0} Failure: 新版本通知失败responseResultCode=${responseResultCode}，不继续操作 --------"
+        echo "-------- Failure: 通知发送失败responseResultCode=${responseResultCode}，不继续操作 --------"
         return 1
     fi
 }

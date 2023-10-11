@@ -326,7 +326,7 @@ function getSingleBranchLog_testState () {
     fi
 
     if [ "${testStateResult}" == "unknow" ]; then
-        echo "❌测试状态未获取到，请检查"
+        echo "${RED}❌测试状态未获取到，请检查\n${BLUE} ${iBranchMap} ${RED}\n使其至少含有${BLUE} submit_test_time \ pass_test_time \ merger_pre_time ${RED}中的一个，且有值。${NC}"
         return 1
     fi
 }

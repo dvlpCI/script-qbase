@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad dvlproad@163.com
 # @Date: 2023-02-27 21:38:10
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-24 00:02:26
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-10-11 18:05:38
 # @FilePath: notification/notification_strings_to_wechat.sh
 # @Description: 企业微信的通知发送-字符串数组
 ###
@@ -18,6 +18,16 @@ YELLOW='\033[33m'
 BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+
+function debug_log() {
+    if [ "${isRelease}" == true ]; then
+        echo "$1"
+    fi
+}
+
+exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
+    exit 1
+}
 
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
@@ -41,21 +51,18 @@ do
     esac
 done
 
+if [ -z "${ROBOT_URL}" ]; then
+    echo "${RED}执行发送字符串数组脚本命令时候发生错误，缺少参数: -robot 机器人地址，必填。${NC}"
+    exit_script
+fi
 
-
-function debug_log() {
-    if [ "${isRelease}" == true ]; then
-        echo "$1"
-    fi
-}
-
-exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
-    exit 1
-}
 
 function postMessage() {
     Content=$1
     sh ${notification2wechatScriptPath} -robot "${ROBOT_URL}" -content "${Content}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
+    if [ $? != 0 ]; then
+        exit 1
+    fi
 }
 
 

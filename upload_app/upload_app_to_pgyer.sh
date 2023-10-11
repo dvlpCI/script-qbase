@@ -174,12 +174,12 @@ then
         else
             log_params_uploadipa
         fi
-        echo "-------- 脚本${0} Failure: upload ipa 上传失败，不继续操作 --------"
+        echo "-------- Failure: upload ipa 上传失败，不继续操作 --------"
         exit_script
     fi
 
 else
-    echo "-------- 脚本${0} Failure: upload ipa 上传失败，不继续操作 --------"
+    echo "-------- Failure: upload ipa 上传失败，不继续操作 --------"
     echo "responseResult=$responseResult"
     log_params_uploadipa
     exit_script
