@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-11 18:31:24
+ # @LastEditTime: 2023-10-12 16:37:07
 # @Description:
 ###
 
@@ -330,7 +330,11 @@ function quickCmdExec() {
         showBranchAtLog='true'
         showBranchTable='false' # 通知也暂时都不显示
         showCategoryName='true' # 通知时候显示
-        shouldMarkdown='true'
+        if [ "${msgtype}" == "markdown" ]; then
+            shouldMarkdown='true'
+        else
+            shouldMarkdown='false'
+        fi
         
         RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
         RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
