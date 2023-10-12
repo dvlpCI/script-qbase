@@ -267,7 +267,7 @@ name2_values=$(jq -r ".${BranchMapAddToKey}[].name" ${BranchMapAddToJsonFile})
 hasCatchRequestBranchNameArray=($name2_values)
 uncatchRequestBranchNames=$(getUncatchRequestBranchNames)
 if [ -n "${uncatchRequestBranchNames}" ]; then
-    echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是:${BLUE} ${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是:${RED} ${uncatchRequestBranchNames}${NC}"
+    echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是:${BLUE} ${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是:${RED} ${uncatchRequestBranchNames} ${PURPLE}。${NC}"
     look_detail
     exit 1
 fi
