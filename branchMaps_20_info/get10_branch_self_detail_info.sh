@@ -237,6 +237,10 @@ function getSingleBranchLog_flag() {
             branchLogFlag+="${testerName}"
         fi
         branchLogFlag+="】"  #结束标记
+    elif [ "${TEST_STATE}" == 'coding' ]; then
+        branchLogFlag="🏃🏻‍♀️"
+    else
+        branchLogFlag="🖍"
     fi
 }
 
@@ -419,7 +423,7 @@ getSingleBranchDescription -branchMap "${iBranchMap}" --test-state "${testState}
 if [ $? != 0 ]; then
     exit_script
 fi 
-des_info_string=${Normal_BRANCH_DESCRIPT_STRING_VALUE}
+des_info_string="${Normal_BRANCH_DESCRIPT_STRING_VALUE} " # 添加空格，避免分支描述中有网页地址，导致以text输出的时候，地址的其他内容被当成地址的一部分
 # debug_log "✅哈哈哈 2③:${des_info_string}"
 # printf "%s" "${des_info_string}"
 # logResultObjectStringToJsonFile "${des_info_string}"
