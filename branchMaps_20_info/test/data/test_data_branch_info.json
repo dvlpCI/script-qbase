@@ -2,7 +2,7 @@
   "package_merger_branchs": [
     {
       "create_time": "02.09",
-      "submit_test_time": "02.09",
+      "submit_test_time": "null",
       "pass_test_time": "null",
       "merger_pre_time": "null",
       "type": "hotfix",

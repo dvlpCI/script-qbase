@@ -248,6 +248,8 @@ function getSingleBranchLog_time() {
     shouldMarkdown=$4
 
 
+    #创建分支的时间
+    branchCodingTime=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".create_time") # -r 去除字符串引号
     #提交测试的时间
     branchSubmitTestTime=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".submit_test_time") # -r 去除字符串引号
     #通过测试的时间
@@ -267,6 +269,8 @@ function getSingleBranchLog_time() {
             branchTimeLogResult+="[${branchPassTestTime}已测试通过]"
         elif [ ${testState} == 'test_submit' ]; then
             branchTimeLogResult+="[${branchSubmitTestTime}已提测]"
+        elif [ ${testState} == 'coding' ]; then
+            branchTimeLogResult+="[${branchCodingTime}开发中]"
         fi
     elif [ ${showBranchTimeLog} == 'only_last' ]; then
         if [ ${testState} == 'test_prefect' ]; then
@@ -275,6 +279,8 @@ function getSingleBranchLog_time() {
             branchTimeLogResult+="[👌🏻${branchPassTestTime}]"
         elif [ ${testState} == 'test_submit' ]; then
             branchTimeLogResult+="[❓${branchSubmitTestTime}]"
+        elif [ ${testState} == 'coding' ]; then
+            branchTimeLogResult+="[${branchCodingTime}开发中]"
         fi
     elif [ ${showBranchTimeLog} == 'none' ]; then
         branchTimeLogResult=''
@@ -312,7 +318,7 @@ function getSingleBranchLog_testState () {
     iBranchMap=$1
 
     # 1、获取测试状态，后面好根据不同的测试状态显示不同的样式
-    testStateResult="unknow"
+    testStateResult="coding" # 开发中
     #提交测试的时间
     branchSubmitTestTime=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".submit_test_time") # -r 去除字符串引号
     if [ "${branchSubmitTestTime}" != "null" ] && [ -n "${branchSubmitTestTime}" ]; then
@@ -334,7 +340,7 @@ function getSingleBranchLog_testState () {
         testStateResult='test_prefect'
     fi
 
-    if [ "${testStateResult}" == "unknow" ]; then
+    if [ "${testStateResult}" == "unknow" ]; then # 目前无此项，默认创建完分支即进入开发中状态
         echo "${RED}❌测试状态未获取到，请检查\n${BLUE} ${iBranchMap} ${RED}\n使其至少含有${BLUE} submit_test_time \ pass_test_time \ merger_pre_time ${RED}中的一个，且有值。${NC}"
         return 1
     fi
@@ -399,6 +405,8 @@ if [ "${testState}" == 'test_prefect' ]; then
 elif [ "${testState}" == 'test_pass' ]; then
     markdownFontColor="info"
 elif [ "${testState}" == 'test_submit' ]; then
+    markdownFontColor="warning"
+elif [ "${testState}" == 'coding' ]; then
     markdownFontColor="warning"
 else
     markdownFontColor="warning"
