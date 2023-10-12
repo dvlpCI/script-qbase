@@ -17,6 +17,10 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
+function log_title() {
+    echo "${PURPLE}------------------ $1 ------------------${NC}"
+}
+
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
@@ -29,11 +33,13 @@ CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
 # qscript_path_get_filepath="${CommonFun_HomeDir_Absolute}/qscript_path_get.sh"
 # qbase_function_log_msg_script_path="$(sh ${qscript_path_get_filepath} qbase function_log_msg)"
 qbase_function_log_msg_script_path="${CommonFun_HomeDir_Absolute}/log/function_log_msg.sh"
-source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultValueToJsonFile
+source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultObjectStringToJsonFile
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
 Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_branch_info.json"
 TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_result.json"
+chmod +rw "${TEST_DATA_RESULT_FILE_PATH}" # 增加读写权限
+
 
 JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
 if [ ! -f "${JsonUpdateFun_script_file_Absolute}" ];then
@@ -61,10 +67,9 @@ branchName=$(echo ${iBranchMap} | jq -r ".name") # -r 去除字符串引号
 
 
 function test_getSingleBranchLog() {
-    echo "----------------------------------------------------------------------------1基础层方法:getSingleBranchLog"
     echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
 
-    shouldMarkdown="false"
+    shouldMarkdown=$1 # "false"
     
     showBranchLogFlag='true'
     showBranchName='true'
@@ -89,28 +94,26 @@ function test_getSingleBranchLog() {
     # exit
 
     BRANCH_OUTLINES_ELEMENT_LOG_JSON="{\"name\": \"${branchName}\", \"outline\": \"${Normal_BRANCH_LOG_STRING_VALUE}\"}"
-    # logResultValueToJsonFile "${BRANCH_OUTLINES_ELEMENT_LOG_JSON}"
-    # exit
+    echo "${GREEN}恭喜您的第$((logBranchIndex+1))个分支的分支信息结果为:${BLUE}${BRANCH_OUTLINES_ELEMENT_LOG_JSON} ${GREEN}。${NC}"
 
-    echo "${GREEN}恭喜您的结果为:${BLUE}${BRANCH_OUTLINES_ELEMENT_LOG_JSON} ${GREEN}。${NC}"
 
     
-    
-    echo "------------1.1.①第$((logBranchIndex+1))个分支的分支信息如下:\n${BRANCH_OUTLINES_ELEMENT_LOG_JSON}"
-    echo "------------1.1.②"
+    # 保存所获得的分支信息到文件中，方便查看
+    # logResultObjectStringToJsonFile "${BRANCH_OUTLINES_ELEMENT_LOG_JSON}"
     echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
-
     BRANCH_OUTLINES_LOG_JSON="[${BRANCH_OUTLINES_ELEMENT_LOG_JSON}]"
-    echo "正在执行命令(测试分支信息的保存)：《 sh ${JsonUpdateFun_script_file_Absolute} -f \"${TEST_DATA_RESULT_FILE_PATH}\" -k \"branch_info_result.Notification.current.branch\" -v \"${BRANCH_OUTLINES_LOG_JSON}\" --skip-value-check \"true\" 》"
+    echo "${YELLOW}正在执行命令(保存所获得的分支信息到文件中，方便查看)：《${BLUE} sh ${JsonUpdateFun_script_file_Absolute} -f \"${TEST_DATA_RESULT_FILE_PATH}\" -k \"branch_info_result.Notification.current.branch\" -v \"${BRANCH_OUTLINES_LOG_JSON}\" --skip-value-check \"true\" ${YELLOW}》${NC}"
     sh ${JsonUpdateFun_script_file_Absolute} -f "${TEST_DATA_RESULT_FILE_PATH}" -k "branch_info_result.Notification.current.branch" -v "${BRANCH_OUTLINES_LOG_JSON}" --skip-value-check "true"
     cat ${TEST_DATA_RESULT_FILE_PATH} | jq ".${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" | jq '.'
-
-    echo "\n\n"
     echo "${YELLOW}更多详情请可点击查看文件:${BLUE}${TEST_DATA_RESULT_FILE_PATH}${NC}"
 }
 
 
 
 
+log_title "1.获取单个分支信息, text 形式"
+test_getSingleBranchLog "false"
 
-test_getSingleBranchLog
+echo "\n\n"
+log_title "2.获取单个分支信息, text 形式"
+test_getSingleBranchLog "true"

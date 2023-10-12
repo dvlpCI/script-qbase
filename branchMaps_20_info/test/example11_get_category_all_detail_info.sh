@@ -17,6 +17,10 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
+function log_title() {
+    echo "${PURPLE}------------------ $1 ------------------${NC}"
+}
+
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"

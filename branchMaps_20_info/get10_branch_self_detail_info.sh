@@ -147,7 +147,16 @@ function getSingleBranchDescription() {
                 iBranchOutlineIndex="⑩"
             fi
             iBranchOutlineTitle=$(echo ${iBranchOutline_String} | ${JQ_EXEC} -r ".title")
-            iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle}"
+            iBranchOutlineUrl=$(echo ${iBranchOutline_String} | ${JQ_EXEC} -r ".url")
+            if [ -n "${iBranchOutlineUrl}" ] && [ "${iBranchOutlineUrl}" != "null" ]; then
+                if [ "${shouldMarkdown}" == "true" ]; then
+                    iBranchOutlineLog="${iBranchOutlineIndex}[${iBranchOutlineTitle}](${iBranchOutlineUrl})"
+                else
+                    iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle} ${iBranchOutlineUrl}"
+                fi
+            else
+                iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle}"
+            fi
             #echo "$((branchOutlineIndex+1)) iBranchOutlineLog=${iBranchOutlineLog}"
             iBranchOutlineLog=$(markdown_fontColor "${shouldMarkdown}" "${iBranchOutlineLog}" "${markdownFontColor}")
 

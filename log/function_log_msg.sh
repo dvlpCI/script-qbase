@@ -78,9 +78,9 @@ function logResultValueToJsonFile() {
 
     printf "%s" '{"testResultValue":"'"$1"'"}' > ${temp_file_abspath} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
     # echo $1 > ${temp_file_abspath} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
-    cat ${temp_file_abspath}
+    cat ${temp_file_abspath} | jq '.'
 
-    echo "${YELLOW}更多详情请可点击查看文件:${BLUE}${temp_file_abspath}${NC}"
+    echo "${YELLOW}更多详情请可点击查看文件:${BLUE} ${temp_file_abspath} ${YELLOW}。${NC}"
 }
 
 function logResultObjectStringToJsonFile() {
@@ -97,7 +97,7 @@ function logResultObjectStringToJsonFile() {
 
     printf "%s" '{"testResultValue":'$1'}' > ${temp_file_abspath} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
     # # echo $1 > ${temp_file_abspath} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
-    cat ${temp_file_abspath}
+    cat ${temp_file_abspath} | jq '.'
 
     echo "${YELLOW}更多详情请可点击查看文件:${BLUE}${temp_file_abspath}${NC}"
 }
