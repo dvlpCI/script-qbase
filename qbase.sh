@@ -298,11 +298,21 @@ function quickCmdExec() {
         requestBranchNameArray=${resultBranchNames}
         _verbose_log "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
 
+        # 发送信息所需的参数
+        _verbose_log "========3.1=======✅-robot:${ROBOT_URL}"
+        _verbose_log "========3.2=======✅-msgtype:${msgtype}"
+        _verbose_log "========3.3=======✅-at:${AtMiddleBracketIdsString}"
+
 
         _verbose_log "${YELLOW}正在执行命令(获取所有指定分支名的branchMaps输出到指定文件中):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
         errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
         if [ $? != 0 ]; then
             echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
+            notification2wechat_scriptPath=${qbase_homedir_abspath}/notification/notification2wechat.sh
+            sh ${notification2wechat_scriptPath} -robot "${ROBOT_URL}" -content "${errorMessage}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
+            if [ $? != 0 ]; then
+                exit 1
+            fi
             exit 1
         fi
         echo "${GREEN}恭喜：获取branchMaps成功，详情查看${BLUE} ${BranchMapAddToJsonFile} ${GREEN}。${NC}"
@@ -327,16 +337,19 @@ function quickCmdExec() {
         RESULT_FULL_STRING_SALE_BY_KEY="branch_info_result.Notification.current.full"           
 
         _verbose_log "正在执行命令(整合 branchMapsInfo)：《 sh $get_branch_all_detail_info_script_path -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".${branchMapsInKey}\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" 》"
-        sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsInKey ".${branchMapsInKey}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}"
+        errorMessage=$(sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsInKey ".${branchMapsInKey}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}")
         if [ $? != 0 ]; then
+            echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
+            notification2wechat_scriptPath=${qbase_homedir_abspath}/notification/notification2wechat.sh
+            sh ${notification2wechat_scriptPath} -robot "${ROBOT_URL}" -content "${errorMessage}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
+            if [ $? != 0 ]; then
+                exit 1
+            fi
             exit 1
         fi
 
 
         # 发送信息
-        _verbose_log "========3.1=======✅-robot:${ROBOT_URL}"
-        _verbose_log "========3.2=======✅-msgtype:${msgtype}"
-        _verbose_log "========3.3=======✅-at:${AtMiddleBracketIdsString}"
         notification_strings_to_wechat_scriptPath=${qbase_homedir_abspath}/notification/notification_strings_to_wechat.sh
 
         CONTENTS_JSON_FILE_PATH=${RESULT_SALE_TO_JSON_FILE_PATH}

@@ -29,7 +29,7 @@ done
 requestBranchNameArray=($requestBranchNamesString)
 
 function look_detail() {
-    echo "${YELLOW}分支源添加到文件后的更多详情可查看: ${BLUE}${BranchMapAddToJsonFile} ${NC}的 ${BLUE}${BranchMapAddToKey} ${NC}"
+    echo "${YELLOW}分支源添加到文件后的更多详情可查看:${BLUE} ${BranchMapAddToJsonFile} ${NC}的 ${BLUE}${BranchMapAddToKey} ${NC}"
 }
 
 function getUncatchRequestBranchNames() {
@@ -267,7 +267,7 @@ name2_values=$(jq -r ".${BranchMapAddToKey}[].name" ${BranchMapAddToJsonFile})
 hasCatchRequestBranchNameArray=($name2_values)
 uncatchRequestBranchNames=$(getUncatchRequestBranchNames)
 if [ -n "${uncatchRequestBranchNames}" ]; then
-    echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是: ${BLUE}${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是: ${RED}${uncatchRequestBranchNames}${NC}"
+    echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是:${BLUE} ${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是:${RED} ${uncatchRequestBranchNames}${NC}"
     look_detail
     exit 1
 fi
