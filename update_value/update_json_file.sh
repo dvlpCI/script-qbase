@@ -31,6 +31,7 @@ do
                 -v|--value) UpdateJsonKeyValue=$2; shift 2;;
                 -sk|--string-key) UpdateStringKey=$2; shift 2;;
                 -sv|--string-value) UpdateStringKeyValue=$2; shift 2;;
+                -change-type|--change-type) ChangeType=$2; shift 2;; # cover 会覆盖更新，其他都是添加
                 -skipVCheck|--skip-value-check) SKIP_VALUE_CHECK=$2; shift 2;;      # 要更新的value值，已确保是合法的json，不需要再检查json的有效性。目前由于对含换行符的字符串的有效性检查还不支持，所以对那些已确保是合法的的字符串可以通过此项来跳过检查，避免更新操作被中断(可为空,默认都要检查)
                 -resultJsonF|--result-json-file) RESULT_JSON_FILE_PATH=$2; shift 2;;# 执行结果的 code 和 message 保存到的指定文件的 package_code 和 package_message 中(可为空,默认不保存执行结果)
                 --) break ;;
@@ -169,10 +170,17 @@ elif [ "${UpdateJsonKey}" == "branch_info_result.Pgyer.lastOnline.category" ]; t
 
 
 else
-  cat ${FILE_PATH} |
-    jq --arg branchPathKey "${UpdateJsonKey}" --argjson jsonString "${UpdateJsonKeyValue}" \
-      '.[$branchPathKey] += $jsonString' \
-    >> ${FilePath_temp}
+  if [ "${ChangeType}" == "cover" ]; then
+    cat ${FILE_PATH} |
+      jq --arg branchPathKey "${UpdateJsonKey}" --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.[$branchPathKey] = $jsonString' \
+      >> ${FilePath_temp}
+  else
+    cat ${FILE_PATH} |
+      jq --arg branchPathKey "${UpdateJsonKey}" --argjson jsonString "${UpdateJsonKeyValue}" \
+        '.[$branchPathKey] += $jsonString' \
+      >> ${FilePath_temp}
+  fi
 fi
 if [ $? != 0 ]; then
     echo "错误❌:更新失败,即不支持的Json键值为${UpdateJsonKey},字符串key为${UpdateStringKey}"
