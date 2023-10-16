@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-12 16:37:07
+ # @LastEditTime: 2023-10-16 14:52:15
 # @Description:
 ###
 
@@ -259,115 +259,8 @@ function quickCmdExec() {
     #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
         
     elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        resultBranchNames=$(sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]})
-        if [ -z "${resultBranchNames}" ]; then
-            echo "${RED}没有新的提交记录，更不用说分支了${NC}"
-            return 1
-        fi
-        echo "${GREEN}恭喜：获取当前分支【在rebase指定分支后】的所有分支名的结果如下：${BLUE} $resultBranchNames ${GREEN}。${NC}"
-        
-        shift 1
-        while [ -n "$1" ]
-        do
-            case "$1" in
-                -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
-                --add-value) add_value=$2; shift 2;;
-                --add-type) add_type=$2; shift 2;;
-                -onlyName|--only-name) ONLY_NAME=$2; shift 2;;
-                -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;;
-                -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
-                -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
-                # 发送信息
-                -robot|--robot-url) ROBOT_URL=$2; shift 2;;
-                -msgtype|--msgtype) msgtype=$2; shift 2;;
-                # 注意📢：at 属性，尽在text时候有效,markdown无效。所以如果为了既要markdown又要at，则先markdown值，再at一条text信息。
-                -at|--at-middleBracket-ids-string) AtMiddleBracketIdsString=$2; shift 2;;
-                --) break ;;
-                *) break ;;
-            esac
-        done
-        _verbose_log "========1.1=======✅-rebaseBranch:${REBASE_BRANCH}"
-        _verbose_log "========1.2=======✅--add-value:${add_value}"
-        _verbose_log "========1.3=======✅--add-type:${add_type}"
-        _verbose_log "========1.4=======✅-onlyName:${ONLY_NAME}"
-        _verbose_log "========2.1=======✅-branchMapsFromDir:${BranceMaps_From_Directory_PATH}"
-        _verbose_log "========2.2=======✅-branchMapsAddToJsonF:${BranchMapAddToJsonFile}"
-        _verbose_log "========2.3=======✅-branchMapsAddToKey:${BranchMapAddToKey}"
-
-        requestBranchNameArray=${resultBranchNames}
-        _verbose_log "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
-
-        # 发送信息所需的参数
-        _verbose_log "========3.1=======✅-robot:${ROBOT_URL}"
-        _verbose_log "========3.2=======✅-msgtype:${msgtype}"
-        _verbose_log "========3.3=======✅-at:${AtMiddleBracketIdsString}"
-
-
-        _verbose_log "${YELLOW}正在执行命令(获取所有指定分支名的branchMaps输出到指定文件中):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
-        errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
-        if [ $? != 0 ]; then
-            echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
-            notification2wechat_scriptPath=${qbase_homedir_abspath}/notification/notification2wechat.sh
-            sh ${notification2wechat_scriptPath} -robot "${ROBOT_URL}" -content "${errorMessage}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
-            if [ $? != 0 ]; then
-                exit 1
-            fi
-            exit 1
-        fi
-        echo "${GREEN}恭喜：获取branchMaps成功，详情查看${BLUE} ${BranchMapAddToJsonFile} ${GREEN}。${NC}"
-
-
-        # 获取信息
-        get_branch_all_detail_info_script_path="${qbase_homedir_abspath}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
-        Develop_Branchs_FILE_PATH=$BranchMapAddToJsonFile
-        branchMapsInKey="${BranchMapAddToKey}"
-        RESULT_SALE_TO_JSON_FILE_PATH=$BranchMapAddToJsonFile
-
-        showBranchLogFlag='true'
-        showBranchName='true'
-        showBranchTimeLog='all'
-        showBranchAtLog='true'
-        showBranchTable='false' # 通知也暂时都不显示
-        showCategoryName='true' # 通知时候显示
-        if [ "${msgtype}" == "markdown" ]; then
-            shouldMarkdown='true'
-        else
-            shouldMarkdown='false'
-        fi
-        
-        RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
-        RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
-        RESULT_FULL_STRING_SALE_BY_KEY="branch_info_result.Notification.current.full"           
-
-        _verbose_log "正在执行命令(整合 branchMapsInfo)：《 sh $get_branch_all_detail_info_script_path -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".${branchMapsInKey}\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" 》"
-        errorMessage=$(sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsInKey ".${branchMapsInKey}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}")
-        if [ $? != 0 ]; then
-            echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
-            notification2wechat_scriptPath=${qbase_homedir_abspath}/notification/notification2wechat.sh
-            sh ${notification2wechat_scriptPath} -robot "${ROBOT_URL}" -content "${errorMessage}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
-            if [ $? != 0 ]; then
-                exit 1
-            fi
-            exit 1
-        fi
-
-
-        # 发送信息
-        notification_strings_to_wechat_scriptPath=${qbase_homedir_abspath}/notification/notification_strings_to_wechat.sh
-
-        CONTENTS_JSON_FILE_PATH=${RESULT_SALE_TO_JSON_FILE_PATH}
-        CONTENTS_JSON_KEY="${RESULT_FULL_STRING_SALE_BY_KEY}_slice"
-        HEADER_TEXT=">>>>>>>>您当前打包的分支信息如下>>>>>>>>>\n"
-        # FOOTER_TEXT="未换行<<<<<<<<这是尾部<<<<<<<<<"
-        # AtMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
-        _verbose_log "${YELLOW}正在执行命令(发送分支数组内容)《 ${BLUE}sh ${notification_strings_to_wechat_scriptPath} -robot \"${ROBOT_URL}\" -headerText \"${HEADER_TEXT}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentJsonKey \"${CONTENTS_JSON_KEY}\" -footerText \"${FOOTER_TEXT}\" -at \"${AtMiddleBracketIdsString}\" -msgtype \"${msgtype}\" ${YELLOW}》${NC}"
-        sh ${notification_strings_to_wechat_scriptPath} -robot "${ROBOT_URL}" -headerText "${HEADER_TEXT}" -contentJsonF "${CONTENTS_JSON_FILE_PATH}" -contentJsonKey "${CONTENTS_JSON_KEY}" -footerText "${FOOTER_TEXT}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
-        if [ $? != 0 ]; then
-            exit 1
-        fi
-
-
+        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支信息并通知给你):《${BLUE} sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
+        sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]}
 
     else 
         printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
