@@ -227,6 +227,18 @@
             ]
         },
         {
+            "type": "excel",
+            "des": "上传",
+            "values": [
+                {
+                    "des": "excel 行数据的比较",
+                    "key": "excel_row_data_compare",
+                    "value": "./excel_data_compare/excel_row_data_compare.py",
+                    "example": "python3.9 xxx.py -filePath \"$filePath\" -startRowNo \"$startRowNo\" -idColumnNo \"$idColumnNo\" -valueColumnNo \"$valueColumnNo\" -valueDiffColumnNo \"$valueDiffColumnNo\" -successMS \"$successMS\" -failureMS \"$failureMS\" -resultSaveToFilePath \"$resultSaveToFilePath\""
+                }
+            ]
+        },
+        {
             "type": "execScript",
             "des": "执行脚本",
             "values": [

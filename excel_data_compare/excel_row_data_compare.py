@@ -1,11 +1,19 @@
 '''
 Author: dvlproad
 Date: 2023-10-24 18:04:20
-LastEditors: dvlproad
-LastEditTime: 2023-10-24 20:02:21
-Description: 依次对行比较，当当前行与其上一行相比，若两个类一致，且tti数据相差超过
+LastEditors: dvlproad dvlproad@163.com
+LastEditTime: 2023-10-24 22:27:20
+Description: excel 行数据的比较: 依次对行比较，当当前行与其上一行相比，若两个类一致，且tti数据相差超过
 '''
 
+# 定义颜色常量
+NC='\033[0m' # No Color
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 
 # 获取具名参数的值
 import argparse
@@ -17,6 +25,7 @@ parser.add_argument("-valueColumnNo", "--valueColumnNo", help="The value for arg
 parser.add_argument("-valueDiffColumnNo", "--valueDiffColumnNo", help="The value for argument 'valueDiffColumnNo'")
 parser.add_argument("-successMS", "--successMS", help="The value for argument 'successMS'")
 parser.add_argument("-failureMS", "--failureMS", help="The value for argument 'failureMS'")
+parser.add_argument("-resultSaveToFilePath", "--resultSaveToFilePath", help="The value for argument 'resultSaveToFilePath'")
 args = parser.parse_args()  # 解析命令行参数
 filePath = args.filePath
 startRowNo = int(args.startRowNo)
@@ -25,6 +34,7 @@ valueColumnNo = int(args.valueColumnNo)
 valueDiffColumnNo = int(args.valueDiffColumnNo)
 successMS = args.successMS
 failureMS = args.failureMS
+resultSaveToFilePath = args.resultSaveToFilePath
 if filePath is None:
     print("您要处理加载时长的文件 -filePath 不能为空，请检查！")
     exit(1)
@@ -46,12 +56,18 @@ if successMS is None:
 if failureMS is None:
     print("新版本加载时长增加多少则是优化失败的参数(负数) -failureMS 不能为空，请检查！")
     exit(1)
+if resultSaveToFilePath is None:
+    print("结果要保存的文件 -resultSaveToFilePath 不能为空，请检查！")
+    exit(1)
 
 
+try:
+    from openpyxl import load_workbook
+    from openpyxl.styles import PatternFill
+except ImportError:
+    print(f"{RED}openpyxl 未安装，请先执行{BLUE} pip3 install openpyxl {RED}。{NC}")
+    exit(1)
 
-
-from openpyxl import load_workbook
-from openpyxl.styles import PatternFill
 
 # 加载Excel文件
 workbook = load_workbook(filePath)
@@ -61,6 +77,9 @@ sheet = workbook.active
 for row in range(startRowNo, sheet.max_row + 1):
     current_tti = sheet.cell(row=row, column=valueColumnNo).value
     previous_tti = sheet.cell(row=row - 1, column=valueColumnNo).value
+    if current_tti is None or previous_tti is None:
+        print(f"{RED}您总共要处理{sheet.max_row}行，但第{row}行TTI值不能为空，请检查！{NC}")
+        exit(1)
     current_page_class = sheet.cell(row=row, column=idColumnNo).value
     previous_page_class = sheet.cell(row=row - 1, column=idColumnNo).value
 
@@ -90,7 +109,7 @@ for row in range(startRowNo, sheet.max_row + 1):
     
 
 # 保存修改后的Excel文件
-workbook.save(filePath)
+workbook.save(resultSaveToFilePath)
 
 
 import subprocess
@@ -107,4 +126,4 @@ def open_file_with_default_tool(file_path):
         print("Unsupported platform: " + sys.platform)
 
 
-open_file_with_default_tool(filePath)
+open_file_with_default_tool(resultSaveToFilePath)
