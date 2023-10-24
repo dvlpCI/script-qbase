@@ -1,4 +1,5 @@
 #!/user/local/bin/python3
+# 获取文本中的某些文本(eg:toast文本等)
 # 定义颜色常量
 NC='\033[0m' # No Color
 RED='\033[31m'

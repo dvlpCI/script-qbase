@@ -227,8 +227,20 @@
             ]
         },
         {
+            "type": "get_file_text",
+            "des": "获取文本中的某些文本(eg:toast文本等)",
+            "values": [
+                {
+                    "des": "获取文本中的某些文本(eg:toast文本等)",
+                    "key": "get_file_some_text",
+                    "value": "./get_file_text/get_file_some_text.py",
+                    "example": "python3.9 xxx.py -codeDir \"$codeDir\" -codeSuffixsString \"$codeSuffixsString\" -toastCodePrefixSuffixsString \"$toastCodePrefixSuffixsString\" -resultSaveToSheetFilePath \"$resultSaveToSheetFilePath\""
+                }
+            ]
+        },
+        {
             "type": "excel",
-            "des": "上传",
+            "des": "excel的操作",
             "values": [
                 {
                     "des": "excel 行数据的比较",
