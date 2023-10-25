@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-24 14:21:59
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-25 12:38:41
+ # @LastEditTime: 2023-10-25 17:28:06
  # @Description: 
 ### 
 # 定义颜色常量
@@ -26,6 +26,14 @@ fi
 
 
 # echo "$@"
+
+# 从外部传入的值，用于决定使用哪个命令
+pythonCommand="$1"
+if [[ $pythonCommand != python* ]]; then
+    echo "${RED}使用的 python 命令${BLUE} ${pythonCommand} ${RED}不能为空，请填写，一般为 python3.9。${NC}"
+    exit 1
+fi
+shift 1 #第一个参数已提取，为后面正确取到 $@ ，这里需要跳过第一个参数
 
 allArgArray=($@)
 # _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
@@ -60,6 +68,8 @@ for ((i=0;i<allArgCount;i+=1))
 }
 # echo "脚本所附带的参数如下: ${quickCmdArgs[*]}"
 
-echo "${YELLOW}正在执行脚本(比较excel行数据):《${BLUE} python3.9 \"$test_python_path\" ${quickCmdArgs[*]} ${YELLOW}》${NC}"
-python3.9 "$test_python_path" ${quickCmdArgs[*]} # 不能使用 "${quickCmdArgs[*]}" 否则会多出一对双引号
+# 使用选定的 Python 命令执行脚本
+echo "${YELLOW}正在执行脚本(比较excel行数据):《${BLUE} $pythonCommand \"$test_python_path\" ${quickCmdArgs[*]} ${YELLOW}》${NC}"
+# exit
+$pythonCommand "$test_python_path" ${quickCmdArgs[*]} # 不能使用 "${quickCmdArgs[*]}" 否则会多出一对双引号
 # python3.9 "$test_script_path" -filePath "$filePath" -startRowNo "$startRowNo" -idColumnNo "$idColumnNo" -valueColumnNo "$valueColumnNo" -valueDiffColumnNo "$valueDiffColumnNo" -successMS "$successMS" -failureMS "$failureMS" -resultSaveToFilePath "$resultSaveToFilePath"
