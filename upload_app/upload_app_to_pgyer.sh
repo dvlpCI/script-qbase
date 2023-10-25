@@ -24,7 +24,23 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
-exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
+# 以下代码为测试上传安装后的返回值
+# responseJsonString='{
+#     "key1": "value1", "qrCodeUrl": "https://www.baidu.com", "message": "success"
+# }'
+# # 在Mac的shell下，如果你希望打印$a的原始值而不是解释转义字符，你可以使用printf命令而不是echo命令。printf命令可以提供更精确的控制输出格式的能力。
+# printf "%s" "${responseJsonString}"
+# exit 0
+
+
+exit_script_with_response_error_message() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
+    responseResult='{
+        "code": 1, 
+        "message": "$1"
+    }'
+    # 使用 jq 添加键值对，并将变量 processLogValue 的值作为参数传递
+    responseResult=$(echo "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
+    printf "%s" "${responseResult}"
     exit 1
 }
 
@@ -71,8 +87,7 @@ do
 done
 
 if [ ! -f "${ipa_file_path}" ]; then
-	echo "${RED}Error:要上传到蒲公英的安装包文件不存在，请检查 ${BLUE}-f ${RED}参数的值 ${BLUE}${ipa_file_path} ${RED}。${NC}"
-	exit_script
+	exit_script_with_response_error_message "${RED}Error:要上传到蒲公英的安装包文件不存在，请检查 ${BLUE}-f ${RED}参数的值 ${BLUE}${ipa_file_path} ${RED}。${NC}"
 fi
 
 debug_log "-------- 脚本的入参如下 --------"
@@ -96,7 +111,7 @@ log_params_uploadipa() {
 	echo "\n\n"
 }
 
-echo "${PURPLE}>>>>>>>>>>>>>>> step7：begin upload app to 蒲公英 >>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
+processLog+="\n${PURPLE}>>>>>>>>>>>>>>> step7：begin upload app to 蒲公英 >>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
 debug_log "ipa路径IPA_FILE_FULLPATH:   ${ipa_file_path}"
 
 
@@ -105,12 +120,12 @@ then
     DOT="."
     if [[ $FEATUREBRANCH == *$DOT* ]]
     then
-        echo "分支${FEATUREBRANCH}包含.，所以其不能作为渠道，请在外部入参前替换其中的.为_"
-        exit_script
+        errorMessage="分支${FEATUREBRANCH}包含.，所以其不能作为渠道，请在外部入参前替换其中的.为_"
+        exit_script_with_response_error_message "${errorMessage}"
     fi
    
     # 需事先在蒲公英上建立此渠道短链，否则会提示The channel shortcut URL is invalid
-    echo "${PURPLE}上传目标${BLUE} ${ipa_file_path} ${PURPLE}：只会上传到蒲公英的上的【指定渠道】:${BLUE} ${buildChannelShortcut} ${PURPLE}。${NC}"
+    processLog="${PURPLE}上传目标${BLUE} ${ipa_file_path} ${PURPLE}：只会上传到蒲公英的上的【指定渠道】:${BLUE} ${buildChannelShortcut} ${PURPLE}。${NC}"
     if [ "${ShouldUploadFast}" == true ]; then
     	# echo "${YELLOW}正在执行《 ${BLUE}sh ${CurrentDIR_Script_Absolute}/uploadfast_app_to_pgyer.sh -k $xcxwo_api_key_VALUE -c \"${buildChannelShortcut}\" -d \"${UpdateDescription}\" \"${ipa_file_path}\" ${YELLOW}》...${NC}"
     	sh ${CurrentDIR_Script_Absolute}/uploadfast_app_to_pgyer.sh -k $xcxwo_api_key_VALUE -c "${buildChannelShortcut}" -d "${UpdateDescription}" "${ipa_file_path}"
@@ -118,8 +133,8 @@ then
 			echo "快传,上传成功"
 			exit 0
 		else
-			echo "${RED}快传,上传失败${NC}"
-			exit_script
+			errorMessage="${RED}快传,上传失败${NC}"
+			exit_script_with_response_error_message "${errorMessage}"
 		fi
     else
 	    responseResult=$(curl -F "file=@${ipa_file_path}" -F "_api_key=${xcxwo_api_key_VALUE}" -F "buildChannelShortcut=${buildChannelShortcut}" -F "buildUpdateDescription=${UpdateDescription}" https://www.xcxwo.com/apiv2/app/upload)
@@ -130,11 +145,11 @@ else
 		# echo "${YELLOW}正在执行《 ${BLUE}sh ${CurrentDIR_Script_Absolute}/uploadfast_app_to_pgyer.sh -k $xcxwo_api_key_VALUE -d \"${UpdateDescription}\" \"${ipa_file_path}\" ${YELLOW}》...${NC}"    
 		sh ${CurrentDIR_Script_Absolute}/uploadfast_app_to_pgyer.sh -k $xcxwo_api_key_VALUE -d "${UpdateDescription}" "${ipa_file_path}"
 		if [ $? != 0 ]; then
-			echo "快传,上传成功"
+			successMessage="快传,上传成功"
 			exit 0
 		else
-			echo "${RED}快传,上传失败${NC}"
-			exit_script
+			errorMessage="${RED}快传,上传失败${NC}"
+			exit_script_with_response_error_message "${errorMessage}"
 		fi
 
     else
@@ -142,15 +157,22 @@ else
     fi
 fi
 
+# 以下代码为测试上传安装后的返回值
+# responseResult='{
+#     "code": 0, 
+#     "data": {"buildQRCodeURL": "https://www.baidu.com"}, 
+#     "message": "success"
+# }'
+
 #echo '{"foo": 0,"bar":1}' | jq .
 #responseResult='{"foo": 0,"bar":1}'
 #responseResult='{"code":1212,"message":"The channel shortcut URL is invalid"}'
-#echo $responseResult | jq .
+# echo $responseResult | jq .
 #echo '============================='
 
 if [ $? = 0 ]   # 上个命令的退出状态，或函数的返回值。
 then
-    echo "responseResult=$responseResult"
+    debug_log "responseResult=$responseResult"
     responseResultCode=$(echo ${responseResult} | jq -r '.code') # mac上安装brew后，执行brew install jq安装jq
     # if [ $? != 0 ]; then
     # 	echo "${RED}Error❌${responseResultCode}:安装包文件上传脚本执行失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
@@ -159,34 +181,52 @@ then
 
     # echo "responseResultCode=$responseResultCode"
     if [ $responseResultCode = 0 ];then
-        qrCode=$(echo ${responseResult} | jq -r '.data.buildQRCodeURL')
-        echo "${GREEN}恭喜:安装包文件上传上传成功 ，继续操作，二维码地址:${BLUE} ${qrCode} ${GREEN}...${NC}"
+        qrCodeUrl=$(echo ${responseResult} | jq -r '.data.buildQRCodeURL')
+        processLog+="\n${GREEN}恭喜:安装包文件上传上传成功 ，继续操作，二维码地址:${BLUE} ${qrCodeUrl} ${GREEN}...${NC}"
     else
-        echo "${RED}Error❌${responseResultCode}:安装包文件上传失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
+        errorMessage="${RED}Error❌${responseResultCode}:安装包文件上传失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
         responseErrorMessage=$(echo ${responseResult} | jq  '.message')
         #echo "responseErrorMessage=$responseErrorMessage"
         if [ $responseResultCode = 1212 ];then
             # "The channel shortcut URL is invalid"
-            echo "${RED}Error❌:请先在蒲公英控制台上添加渠道 ${buildChannelShortcut} ，使得地址 https://www.xcxwo.com/$buildChannelShortcut 可以正常访问。${NC}"
+            errorMessage+="\n${RED}Error❌:请先在蒲公英控制台上添加渠道 ${buildChannelShortcut} ，使得地址 https://www.xcxwo.com/$buildChannelShortcut 可以正常访问。${NC}"
         elif [ $responseResultCode = 1002 ];then
             # "_api_key not found"
-            echo "${RED}Error❌:${responseErrorMessage},请检查${xcxwo_api_key_VALUE}是否有效,蒲公英_api_key的值，请进入https://www.xcxwo.com/doc/view/api#uploadApp中的接口查看。${NC}"
+            errorMessage+="\n${RED}Error❌:${responseErrorMessage},请检查${xcxwo_api_key_VALUE}是否有效,蒲公英_api_key的值，请进入https://www.xcxwo.com/doc/view/api#uploadApp中的接口查看。${NC}"
         else
             log_params_uploadipa
         fi
         echo "-------- Failure: upload ipa 上传失败，不继续操作 --------"
-        exit_script
+        exit_script_with_response_error_message "${errorMessage}"
     fi
 
 else
-    echo "-------- Failure: upload ipa 上传失败，不继续操作 --------"
-    echo "responseResult=$responseResult"
+    processLog+="-------- Failure: upload ipa 上传失败，不继续操作 --------"
+    errorMessage="responseResult=$responseResult"
     log_params_uploadipa
-    exit_script
+    exit_script_with_response_error_message "${errorMessage}"
 fi
-echo ""
-echo "${PURPLE}<<<<<<<<<<<<<<<< step7：end upload app to 蒲公英 <<<<<<<<<<<<<<<<<<<<<<<<<<<<${NC}"
+processLog+="\n"
+processLog+="\n${PURPLE}<<<<<<<<<<<<<<<< step7：end upload app to 蒲公英 <<<<<<<<<<<<<<<<<<<<<<<<<<<<${NC}"
 
+responseResult='{
+    "code": 1, 
+    "message": "上传成功"
+}'
+# 使用 jq 添加键值对
+responseResult='{
+    "code": 1,
+    "message": "上传成功"
+}'
+# processLog="\这是要转义\n\哈哈"
+# 对 processLogValue 进行斜杠转义
+# processLog=$(echo "$processLog" | sed 's/\\/\\\\/g')
+
+# 使用 jq 添加键值对，并将变量 processLogValue 的值作为参数传递
+# 必须使用 printf "%s" "$responseResult" ，否则当 responseResult 中某个key 的值有斜杠时候会出现错误
+# responseResult=$(printf "%s" "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
+responseResult=$(printf "%s" "$responseResult" | jq --arg qrCode "$qrCodeUrl" '. + { "qrCodeUrl": $qrCode }')
+printf "%s" "${responseResult}"
 
 # 结果：
 

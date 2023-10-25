@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-24 14:21:59
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-25 12:02:26
+ # @LastEditTime: 2023-10-25 12:38:41
  # @Description: 
 ### 
 # 定义颜色常量
@@ -33,29 +33,29 @@ allArgCount=${#allArgArray[@]}
 for ((i=0;i<allArgCount;i+=1))
 {
     currentArg=${allArgArray[i]}
+    quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
     
 
     # 使用正则表达式匹配数值模式
-    isNumber=$(echo "$currentArg" | grep -E "^-?[0-9]+(\.[0-9]+)?$")
-    if [[ $currentArg =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
-        isNumber="true"
-    else
-        isNumber="false"
-    fi
+    # isNumber=$(echo "$currentArg" | grep -E "^-?[0-9]+(\.[0-9]+)?$")
+    # if [[ $currentArg =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+    #     isNumber="true"
+    # else
+    #     isNumber="false"
+    # fi
     
-    if [[ "${currentArg:0:1}" == "-" ]]; then
-        isMayBeArgKey="true"
-    else
-        isMayBeArgKey="false"
-    fi
-    echo "======isMayBeArgKey:${isMayBeArgKey}----isNumber:${isNumber}============${currentArg}"
+    # if [[ "${currentArg:0:1}" == "-" ]]; then
+    #     isMayBeArgKey="true"
+    # else
+    #     isMayBeArgKey="false"
+    # fi
+    # echo "======isMayBeArgKey:${isMayBeArgKey}----isNumber:${isNumber}============${currentArg}"
     
-
     # if [[ "${isMayBeArgKey}" == "true" ]] && [[ "${isNumber}" != "true" ]]; then
     #     # 是 argKey 的时候，直接使用自身
     #     quickCmdArgs[${#quickCmdArgs[@]}]="${currentArg}"
     # else
-        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
+    #     quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
     # fi
 }
 # echo "脚本所附带的参数如下: ${quickCmdArgs[*]}"
