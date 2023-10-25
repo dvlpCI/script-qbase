@@ -9,7 +9,8 @@
 
 CurrentDIR_Script_Absolute="$(cd "$(dirname "$0")" && pwd)" # 当前脚本所在目录
 CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-test_script_path="${CommonFun_HomeDir_Absolute}/excel_row_data_compare.py"
+test_python_path="${CommonFun_HomeDir_Absolute}/excel_row_data_compare.py"
+test_script_path="${CommonFun_HomeDir_Absolute}/excel_row_data_compare.sh"
 
 projectAbsRootPath="$CurrentDIR_Script_Absolute"
 
@@ -24,4 +25,8 @@ resultSaveToFilePath="${projectAbsRootPath}/APP加载时长.xlsx"
 
 cd "$projectAbsRootPath" || exit
 
-python3.9 "$test_script_path" -filePath "$filePath" -startRowNo "$startRowNo" -idColumnNo "$idColumnNo" -valueColumnNo "$valueColumnNo" -valueDiffColumnNo "$valueDiffColumnNo" -successMS "$successMS" -failureMS "$failureMS" -resultSaveToFilePath "$resultSaveToFilePath"
+# 测试 python 脚本
+# python3.9 "$test_python_path" -filePath "$filePath" -startRowNo "$startRowNo" -idColumnNo "$idColumnNo" -valueColumnNo "$valueColumnNo" -valueDiffColumnNo "$valueDiffColumnNo" -successMS "$successMS" -failureMS "$failureMS" -resultSaveToFilePath "$resultSaveToFilePath"
+
+# 测试 shell 脚本
+sh "$test_script_path" -filePath "$filePath" -startRowNo "$startRowNo" -idColumnNo "$idColumnNo" -valueColumnNo "$valueColumnNo" -valueDiffColumnNo "$valueDiffColumnNo" -successMS "$successMS" -failureMS "$failureMS" -resultSaveToFilePath "$resultSaveToFilePath"
