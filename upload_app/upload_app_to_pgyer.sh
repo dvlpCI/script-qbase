@@ -1,6 +1,11 @@
 #!/bin/bash
-# 脚本说明：上传ipa到蒲公英xcxwo（可设置渠道）
-
+###
+ # @Author: dvlproad
+ # @Date: 2023-10-12 17:13:36
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-10-26 14:34:06
+ # @Description: 上传安装包到 蒲公英xcxwo（可设置渠道） (同时使用于iOS 和 Android)
+### 
 # 使用示例:请在终端执行如下命令：
 # sh s3_uploadipa_xcxwo_app1.sh -f "${ipa_file_path}" -k ${xcxwo_api_key_VALUE} -c ${buildChannelShortcut} -d ${UpdateDescription}
 :<<!
@@ -11,8 +16,8 @@
 外界参数4：选填：buildChannelShortcut   有值时候,只上传到指定渠道(需事先在蒲公英上建立此渠道短链，否则会提示The channel shortcut URL is invalid)
 
 2、使用示例:请在终端执行如下命令：
-sh s3_uploadipa_xcxwo_app1.sh -f "./outputApp1Enterprise/Debug-iphoneos13.2/archive/App1Enterprise/App1Enterprise.ipa" -k da2bc35c7943aa78e66ee9c94fdd0824 -c dev1-dev_f1 -d "测试蒲公英上传到指定位置，请勿下载"
-sh s3_uploadapp_xcxwo.sh --ipa-file-path "./outputApp1Enterprise/Debug-iphoneos13.2/archive/App1Enterprise/App1Enterprise.ipa" --pgyer-api-key da2bc35c7943aa78e66ee9c94fdd0824 --channel dev1-dev_1_noexsit --update-description "测试蒲公英上传到指定位置，请勿下载"
+sh upload_app_to_pgyer.sh -f "./outputApp1Enterprise/Debug-iphoneos13.2/archive/App1Enterprise/App1Enterprise.ipa" -k da2bc35c7943aa78e66ee9c94fdd0824 -c dev1-dev_f1 -d "测试蒲公英上传到指定位置，请勿下载"
+sh upload_app_to_pgyer.sh --ipa-file-path "./outputApp1Enterprise/Debug-iphoneos13.2/archive/App1Enterprise/App1Enterprise.ipa" --pgyer-api-key da2bc35c7943aa78e66ee9c94fdd0824 --channel dev1-dev_1_noexsit --update-description "测试蒲公英上传到指定位置，请勿下载"
 !
 
 # 定义颜色常量
@@ -204,10 +209,7 @@ fi
 processLog+="\n"
 processLog+="\n${PURPLE}<<<<<<<<<<<<<<<< step7：end upload app to 蒲公英 <<<<<<<<<<<<<<<<<<<<<<<<<<<<${NC}"
 
-responseResult='{
-    "code": 1, 
-    "message": "上传成功"
-}'
+
 # 使用 jq 添加键值对
 responseResult='{
     "message": "上传成功"

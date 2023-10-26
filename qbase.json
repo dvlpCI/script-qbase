@@ -219,10 +219,16 @@
             "des": "上传",
             "values": [
                 {
-                    "des": "上传app安装包到【蒲公英】（可设置渠道）",
+                    "des": "上传安装包到 蒲公英xcxwo（可设置渠道） (同时使用于iOS 和 Android)",
                     "key": "upload_app_to_pgyer",
                     "value": "./upload_app/upload_app_to_pgyer.sh",
                     "example": "sh xxx.sh -f \"${ipa_file_path}\" -k \"${pgyer_api_key_VALUE}\" -c \"${buildChannelShortcut}\" -d \"${UpdateDescription}\" --should-upload-fast \"${ShouldUploadFast}\""
+                },
+                {
+                    "des": "上传安装包到 testFlight (只使用于iOS)",
+                    "key": "upload_app_to_testflight",
+                    "value": "./upload_app/upload_app_to_testflight.sh",
+                    "example": "sh xxx.sh -ipa \"${ipa_file_path}\" -TransporterUserName \"${TransporterUserName}\" -TransporterPassword \"${TransporterPassword}\""
                 }
             ]
         },
