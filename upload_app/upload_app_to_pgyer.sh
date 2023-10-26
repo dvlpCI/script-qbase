@@ -35,11 +35,11 @@ CYAN='\033[0;36m'
 
 exit_script_with_response_error_message() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
     responseResult='{
-        "code": 1, 
-        "message": "$1"
+        "code": 1
     }'
     # 使用 jq 添加键值对，并将变量 processLogValue 的值作为参数传递
-    responseResult=$(echo "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
+    responseResult=$(echo "$responseResult" | jq --arg message "$1" '. + { "message": $message }')
+    # responseResult=$(echo "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
     printf "%s" "${responseResult}"
     exit 1
 }
@@ -90,6 +90,11 @@ if [ ! -f "${ipa_file_path}" ]; then
 	exit_script_with_response_error_message "${RED}Error:要上传到蒲公英的安装包文件不存在，请检查 ${BLUE}-f ${RED}参数的值 ${BLUE}${ipa_file_path} ${RED}。${NC}"
 fi
 
+PgyerChannelWordCount=$(echo "${buildChannelShortcut}" | awk '{print NF}')
+if [ "${buildChannelShortcut}" == "null" ] || [ -z "${buildChannelShortcut}" ] || [ ${PgyerChannelWordCount} != 1 ]; then
+    exit_script_with_response_error_message "蒲公英渠道号PgyerChannel的单词数只能是一个，且不能为null。您当前渠道值为:${buildChannelShortcut}，渠道单词数为:${PgyerChannelWordCount}"
+fi
+
 debug_log "-------- 脚本的入参如下 --------"
 debug_log "ipa_file_path=$ipa_file_path"
 debug_log "xcxwo_api_key_VALUE=$xcxwo_api_key_VALUE"
@@ -101,15 +106,6 @@ debug_log "-------- 脚本的入参如上 --------"
 
 
 # [上传ipa](https://www.xcxwo.com/doc/view/api#uploadApp)
-log_params_uploadipa() {
-	echo "\n\n"
-	echo "---------------------------    log_params_uploadipa    ---------------------------"
-	echo "请仔细检查下面值是否是与你想导出的一致，如不一致，会导出失败，或者导出的包成功，但导成错误的包"
-	echo "-ipa_file_path 	    ${ipa_file_path}"
-	echo "-buildChannelShortcut ${buildChannelShortcut}"
-	echo "---------------------------    log_params_uploadipa    ---------------------------"
-	echo "\n\n"
-}
 
 processLog+="\n${PURPLE}>>>>>>>>>>>>>>> step7：begin upload app to 蒲公英 >>>>>>>>>>>>>>>>>>>>>>>>>>>>${NC}"
 debug_log "ipa路径IPA_FILE_FULLPATH:   ${ipa_file_path}"
@@ -173,37 +169,36 @@ fi
 if [ $? = 0 ]   # 上个命令的退出状态，或函数的返回值。
 then
     debug_log "responseResult=$responseResult"
-    responseResultCode=$(echo ${responseResult} | jq -r '.code') # mac上安装brew后，执行brew install jq安装jq
+    responseResultCode=$(printf "%s" "${responseResult}" | jq -r '.code') # mac上安装brew后，执行brew install jq安装jq
     # if [ $? != 0 ]; then
     # 	echo "${RED}Error❌${responseResultCode}:安装包文件上传脚本执行失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
     # 	exit_script
     # fi
 
-    # echo "responseResultCode=$responseResultCode"
-    if [ $responseResultCode = 0 ];then
-        qrCodeUrl=$(echo ${responseResult} | jq -r '.data.buildQRCodeURL')
+    debug_log "responseResultCode=$responseResultCode"
+    if [ "$responseResultCode" = 0 ];then
+        qrCodeUrl=$(printf "%s" "${responseResult}" | jq -r '.data.buildQRCodeURL')
         processLog+="\n${GREEN}恭喜:安装包文件上传上传成功 ，继续操作，二维码地址:${BLUE} ${qrCodeUrl} ${GREEN}...${NC}"
     else
-        errorMessage="${RED}Error❌${responseResultCode}:安装包文件上传失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
-        responseErrorMessage=$(echo ${responseResult} | jq  '.message')
+        processLog+="${RED}Error❌:安装包文件上传失败，完整的返回结果responseResult=${BLUE}$responseResult${NC}"
+        responseErrorMessage=$(printf "%s" "${responseResult}" | jq  '.message')
         #echo "responseErrorMessage=$responseErrorMessage"
-        if [ $responseResultCode = 1212 ];then
+        if [ "$responseResultCode" = 1212 ];then
             # "The channel shortcut URL is invalid"
-            errorMessage+="\n${RED}Error❌:请先在蒲公英控制台上添加渠道 ${buildChannelShortcut} ，使得地址 https://www.xcxwo.com/$buildChannelShortcut 可以正常访问。${NC}"
-        elif [ $responseResultCode = 1002 ];then
+            errorMessage="${RED}Error❌:请先在蒲公英控制台上添加渠道 ${buildChannelShortcut} ，使得地址 https://www.xcxwo.com/$buildChannelShortcut 可以正常访问。${NC}"
+        elif [ "$responseResultCode" = 1002 ];then
             # "_api_key not found"
-            errorMessage+="\n${RED}Error❌:${responseErrorMessage},请检查${xcxwo_api_key_VALUE}是否有效,蒲公英_api_key的值，请进入https://www.xcxwo.com/doc/view/api#uploadApp中的接口查看。${NC}"
+            errorMessage="${RED}Error❌:${responseErrorMessage},请检查${xcxwo_api_key_VALUE}是否有效,蒲公英_api_key的值，请进入https://www.xcxwo.com/doc/view/api#uploadApp中的接口查看。${NC}"
         else
-            log_params_uploadipa
+            errorMessage="${RED}Error❌:responseResultCode=${responseResultCode} ${NC}.${NC}"
         fi
-        echo "-------- Failure: upload ipa 上传失败，不继续操作 --------"
+        processLog+="-------- Failure: upload ipa 上传失败，不继续操作 --------"
         exit_script_with_response_error_message "${errorMessage}"
     fi
 
 else
     processLog+="-------- Failure: upload ipa 上传失败，不继续操作 --------"
     errorMessage="responseResult=$responseResult"
-    log_params_uploadipa
     exit_script_with_response_error_message "${errorMessage}"
 fi
 processLog+="\n"
@@ -215,7 +210,6 @@ responseResult='{
 }'
 # 使用 jq 添加键值对
 responseResult='{
-    "code": 1,
     "message": "上传成功"
 }'
 # processLog="\这是要转义\n\哈哈"
@@ -225,6 +219,7 @@ responseResult='{
 # 使用 jq 添加键值对，并将变量 processLogValue 的值作为参数传递
 # 必须使用 printf "%s" "$responseResult" ，否则当 responseResult 中某个key 的值有斜杠时候会出现错误
 # responseResult=$(printf "%s" "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
+responseResult=$(printf "%s" "$responseResult" | jq --arg code "$responseResultCode" '. + { "code": $code }')
 responseResult=$(printf "%s" "$responseResult" | jq --arg qrCode "$qrCodeUrl" '. + { "qrCodeUrl": $qrCode }')
 printf "%s" "${responseResult}"
 
