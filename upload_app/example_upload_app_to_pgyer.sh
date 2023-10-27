@@ -108,10 +108,16 @@ function testUploadToAll() {
     printf "responseJsonString=%s\n" "${responseJsonString}"
 
     uploadSuccessTypesString=$(printf "%s" "${responseJsonString}" | jq -r ".uploadSuccessTypes")
+    if [ "${uploadSuccessTypesString}" == "null" ]; then
+        uploadSuccessTypesString=""
+    fi
     uploadSuccessTypeArray=(${uploadSuccessTypesString})
     uploadSuccessCount=${#uploadSuccessTypeArray[@]}
     echo "${PURPLE} 上传结果成功 ${uploadSuccessCount} 个平台，分别为: ${uploadSuccessTypeArray[*]} ${PURPLE} 。${NC}"
     uploadFailureTypesString=$(printf "%s" "${responseJsonString}" | jq -r ".uploadFailureTypes")
+    if [ "${uploadFailureTypesString}" == "null" ]; then
+        uploadFailureTypesString=""
+    fi
     uploadFailureTypeArray=(${uploadFailureTypesString})
     uploadFailureCount=${#uploadFailureTypeArray[@]}
     echo "${PURPLE} 上传结果失败 ${uploadFailureCount} 个平台，分别为: ${uploadFailureTypeArray[*]} ${PURPLE} 。${NC}"

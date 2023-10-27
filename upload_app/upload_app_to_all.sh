@@ -203,7 +203,7 @@ function uploadToPgyer() {
     responseJsonString=$(sh ${qbase_upload_app_to_pgyer_script_path} -f "${ipa_file_path}" -k "${pgyerApiKey}" --pgyer-channel "${pgyerChannelShortcut}" -d "${pgyerChangeLog}" --should-upload-fast "${pgyerShouldUploadFast}")
     # responseJsonString='{
     #     "code": 0,
-    #     "message": "上传成功",
+    #     "message": "上传pgyer成功",
     #     "appNetworkUrl": "https://www.xcxwo.com/app/qrcodeHistory/9680a4ad4436cad0cf4e5f8a9eb937d36d55b653cf425fda298db7818232d818"
     # }'
     
@@ -229,6 +229,11 @@ function uploadToCos() {
     coscmdPath=$(which coscmd)
     debug_log "正在执行命令(上传安装包到cos):《 ${coscmdPath} -b ${CosUploadToBUCKETName} -r ${CosUploadToREGION} upload -r ${ipa_file_path} ${CosUploadToBUCKETDir} 》"
     responseJsonString=$(${coscmdPath} -b "${CosUploadToBUCKETName}" -r "${CosUploadToREGION}" upload -r "${ipa_file_path}" "${CosUploadToBUCKETDir}")
+    # responseJsonString='{
+    #     "code": 0,
+    #     "message": "上传cos成功",
+    #     "appNetworkUrl": "https://www.xxx.com/app/qrcodeHistory/111"
+    # }'
     cosErrorCode=$?
     if [ ${cosErrorCode} = 0 ]   # 上个命令的退出状态，或函数的返回值。
     then
