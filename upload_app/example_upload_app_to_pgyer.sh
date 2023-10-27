@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-16 16:06:35
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 10:40:44
+ # @LastEditTime: 2023-10-27 18:50:21
  # @Description: 上传ipa到蒲公英xcxwo（可设置渠道）
 ### 
 
@@ -101,6 +101,14 @@ function testUploadToAll() {
         exit 1
     fi
     printf "responseJsonString=%s\n" "${responseJsonString}"
+
+    uploadResultCode=$(printf "%s" "${responseJsonString}" | jq -r '.code')
+    if [ "${uploadResultCode}" != "0" ]; then
+        uploadResultCode=$(printf "%s" "${responseJsonString}" | jq -r '.message')
+        echo "${RED}上传ipa到各个平台失败的结果显示如下: ${BLUE} ${responseJsonString} ${BLUE}。${NC}"
+        return 1
+    fi
+
     pgyerQRCodeUrl=$(printf "%s" "${responseJsonString}" | jq -r '.pgyer.appNetworkUrl')
     echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
     cosAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r '.cos.appNetworkUrl')
@@ -111,3 +119,10 @@ function testUploadToAll() {
 # testUploadToPgyer
 # testUploadToCos
 testUploadToAll
+# sh ${CurrentDIR_Script_Absolute}/upload_app_to_all.sh -ipa "${ipa_file_path}" \
+#         -updateDesString "${updateDesString}" -updateDesFromFilePath "${updateDesFromFilePath}" -updateDesFromFileKey "${updateDesFromFileKey}" \
+#         -pgyerHelpOwner "${pgyerOwner}" -pgyerHelpChannelKey "${pgyerChannelKey}" \
+#         -pgyerApiKey "${pgyerApiKey}" -pgyerChannelShortcut "${pgyerChannelShortcut}" -pgyerShouldUploadFast "${pgyerShouldUploadFast}" \
+#         -CosREGION "${CosUploadToREGION}" -CosBUCKETName "${CosUploadToBUCKETName}" -CosBUCKETDir "${CosUploadToBUCKETDir}" -CosResultHostUrl "${CosResultHostUrl}" \
+#         -TransporterUserName "${Transporter_USERNAME}" -TransporterPassword "${Transporter_PASSWORD}" \
+#         -LogPostToRobotUrl "${LogPostToRobotUrl}" -LogPostTextHeader "${LogPostTextHeader}"

@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 10:42:14
+ # @LastEditTime: 2023-10-27 18:49:38
  # @Description: 上传安装包到 各个平台(pgyer、cos、testFlight)
 ### 
 
@@ -196,7 +196,11 @@ function uploadToPgyer() {
     debug_log "=====================您的的蒲公英上传位置为PgyerOwner=${pgyerOwner},pgyerChannelShortcut=${pgyerChannelShortcut},pgyerChannelKey=${pgyerChannelKey}"
     debug_log "${BLUE}正在执行命令(上传安装包到蒲公英上)：《${YELLOW} sh ${qbase_upload_app_to_pgyer_script_path} -f \"${ipa_file_path}\" -k \"${pgyerApiKey}\" --pgyer-channel \"${pgyerChannelShortcut}\" -d \"${pgyerChangeLog}\" --should-upload-fast \"${pgyerShouldUploadFast}\" ${BLUE}》...${NC}\n"
     responseJsonString=$(sh ${qbase_upload_app_to_pgyer_script_path} -f "${ipa_file_path}" -k "${pgyerApiKey}" --pgyer-channel "${pgyerChannelShortcut}" -d "${pgyerChangeLog}" --should-upload-fast "${pgyerShouldUploadFast}")
-    
+    # responseJsonString='{
+    #     "code": 0,
+    #     "message": "上传成功",
+    #     "appNetworkUrl": "https://www.xcxwo.com/app/qrcodeHistory/9680a4ad4436cad0cf4e5f8a9eb937d36d55b653cf425fda298db7818232d818"
+    # }'
     
     payerResponseResultCode=$(echo ${responseJsonString} | jq -r '.code')
     payerResponseResultMessage=$(echo ${responseJsonString} | jq -r '.message')
@@ -252,6 +256,36 @@ function uploadToAppStore() {
 
 
 
+function getComponentUploadResultCodeAndMessage() {
+    compontentResultMessage=""
+
+    compontentKey=$1
+    compontentJsonString=$(printf "%s" "${lastResponseJsonString}" | jq -r ".${compontentKey}")
+    if [ -z "${compontentJsonString}" ]; then
+        return 0; # 没有此项上传需求
+    fi
+    
+    # 上传失败
+    compontentResultCode=$(printf "%s" "${compontentJsonString}" | jq -r ".code")
+    if [ "${compontentResultCode}" != 0 ]; then
+        compontentResultMessage=$(printf "%s" "${compontentJsonString}" | jq -r '.message')
+        return 1
+    fi
+    
+
+    # 上传成功
+    if [ "${compontentKey}" == "testFlight" ]; then 
+        return 0;
+    fi
+    # 上传成功，并更新地址给文件
+    compontentAppNetworkUrl=$(printf "%s" "${compontentJsonString}" | jq -r '.appNetworkUrl')
+    if [ ${#compontentAppNetworkUrl} == 0 ]; then
+        compontentResultMessage="上传成功，但 ${compontentKey} 的更新地址获取失败 。"
+        return 1
+    fi
+}
+
+
 # 获取提供给蒲公英的更新说明
 if [ -n "${updateDesString}" ]; then
     lastAllChangeLogResult="${updateDesString}"
@@ -268,19 +302,39 @@ else
     fi
 fi
 
-
-
+allCompontentResultCode=0
+allCompontentResultMessage=""
 if [ "${ShoudUploadToPgyer}" == "true" ] ; then
     uploadToPgyer
+
+    getComponentUploadResultCodeAndMessage "pgyer"
+    if [ $? != 0 ]; then 
+        allCompontentResultCode=$((allCompontentResultCode+1))
+        allCompontentResultMessage+="${compontentResultMessage}"
+    fi
 fi
 
 if [ "${ShoudUploadToCos}" == "true" ] ; then
     uploadToCos
+
+    getComponentUploadResultCodeAndMessage "cos"
+    if [ $? != 0 ]; then 
+        allCompontentResultCode=$((allCompontentResultCode+1))
+        allCompontentResultMessage+="${compontentResultMessage}"
+    fi
 fi
 
 if [ "${ShoudUploadToAppStrore}" == "true" ] ; then
     uploadToAppStore
+
+    getComponentUploadResultCodeAndMessage "testFlight"
+    if [ $? != 0 ]; then 
+        allCompontentResultCode=$((allCompontentResultCode+1))
+        allCompontentResultMessage+="${compontentResultMessage}"
+    fi
 fi
 
+lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg code "$allCompontentResultCode" '. + { "code": $code }')
+lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg message "$allCompontentResultMessage" '. + { "message": $message }')
 lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg log "$uploadToAllProcessLog" '. + { "log": $log }')
 printf "%s" "${lastResponseJsonString}"
