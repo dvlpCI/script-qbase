@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 18:49:38
+ # @LastEditTime: 2023-10-28 00:26:25
  # @Description: 上传安装包到 各个平台(pgyer、cos、testFlight)
 ### 
 
@@ -35,6 +35,11 @@ lastResponseJsonString='{
 
 function addDataToLastJsonWithCompontentKey {
     local responseResultCode=$1
+    # if [[ "$responseResultCode" =~ ^[0-9]+$ ]]; then
+    #     responseResultCode=$((responseResultCode + 0)) # 如果是纯数字字符串，则将其转换为数值
+    # fi
+    # responseResultCode=0
+
     local responseResultMessage=$2
     local responseResultAppNetworkUrl=$3
     local compontentKey=$4
@@ -204,8 +209,8 @@ function uploadToPgyer() {
     
     payerResponseResultCode=$(echo ${responseJsonString} | jq -r '.code')
     payerResponseResultMessage=$(echo ${responseJsonString} | jq -r '.message')
-    payerResponseResultQRCodeUrl=$(echo ${responseJsonString} | jq -r '.qrCodeUrl')
-    addDataToLastJsonWithCompontentKey "$payerResponseResultCode" "$payerResponseResultMessage" "$payerResponseResultQRCodeUrl" "pgyer"
+    payerResponseResultAppNetworkUrl=$(echo ${responseJsonString} | jq -r '.appNetworkUrl')
+    addDataToLastJsonWithCompontentKey "$payerResponseResultCode" "$payerResponseResultMessage" "$payerResponseResultAppNetworkUrl" "pgyer"
 
     postWechatMessage "结束上传pgyer......(${pgyerOwner})${pgyerChannelShortcut}[${ipa_file_path}]"
 }
@@ -224,7 +229,8 @@ function uploadToCos() {
     coscmdPath=$(which coscmd)
     debug_log "正在执行命令(上传安装包到cos):《 ${coscmdPath} -b ${CosUploadToBUCKETName} -r ${CosUploadToREGION} upload -r ${ipa_file_path} ${CosUploadToBUCKETDir} 》"
     responseJsonString=$(${coscmdPath} -b "${CosUploadToBUCKETName}" -r "${CosUploadToREGION}" upload -r "${ipa_file_path}" "${CosUploadToBUCKETDir}")
-    if [ $? = 0 ]   # 上个命令的退出状态，或函数的返回值。
+    cosErrorCode=$?
+    if [ ${cosErrorCode} = 0 ]   # 上个命令的退出状态，或函数的返回值。
     then
         cosResponseResultCode=0
         UPLOAD_FILE_Name=$(basename "$ipa_file_path") 
@@ -232,7 +238,7 @@ function uploadToCos() {
         cosResponseResultMessage="Success: ${ipa_file_path} 文件上传cos成功，路径为${cosResponseResultAppNetworkUrl}"
     else
         cosResponseResultCode=1
-        cosResponseResultMessage="Failure: ${ipa_file_path} 文件上传cos失败(配置文件本地目录： ~/.cos.conf)，不继续操作。"
+        cosResponseResultMessage="Failure: ${ipa_file_path} 文件上传cos失败，将不继续操作。附失败原因如下:《 ${cosErrorCode}:${responseJsonString} 》。 (若要查看本地配置文件，请查看目录： ~/.cos.conf)"
         cosResponseResultAppNetworkUrl="上传cos失败，无地址"
     fi
     
@@ -256,7 +262,7 @@ function uploadToAppStore() {
 
 
 
-function getComponentUploadResultCodeAndMessage() {
+function _getComponentUploadResultCodeAndMessage() {
     compontentResultMessage=""
 
     compontentKey=$1
@@ -285,6 +291,18 @@ function getComponentUploadResultCodeAndMessage() {
     fi
 }
 
+function _updateSuccessAndFailureTypes_And_TotalFailureMessage() {
+    compontentKey=$1
+
+    _getComponentUploadResultCodeAndMessage "${compontentKey}"
+    if [ $? != 0 ]; then 
+        uploadFailureTypeArray+=("${compontentKey}") # 使用赋值操作将变量添加到数组变量
+        uploadFailureTotalMessage+="${compontentResultMessage}"
+    else
+        uploadSuccessTypeArray+=("${compontentKey}") # 使用赋值操作将变量添加到数组变量
+    fi
+}
+
 
 # 获取提供给蒲公英的更新说明
 if [ -n "${updateDesString}" ]; then
@@ -295,46 +313,37 @@ else
         lastAllChangeLogResult=""
     else
         lastAllChangeLogResult=$(cat ${updateDesFromFilePath} | ${JQ_EXEC} ".${updateDesFromFileKey}")
-        if [ -z "${lastAllChangeLogResult}" ] || [ "${lastAllChangeLogResult}" == "null" ]; then
+        if [ $? != 0 ] || [ -z "${lastAllChangeLogResult}" ] || [ "${lastAllChangeLogResult}" == "null" ]; then
             postWechatMessage "您选择了说明文案从文件中获取，但未正确设置 -updateDesFromFilePath 和 -updateDesFromFileKey 参数，请检查。(附:updateDesString=$updateDesString, updateDesFromFilePath=${updateDesFromFilePath}, updateDesFromFileKey=${updateDesFromFileKey} )。"
             lastAllChangeLogResult=""
         fi
     fi
 fi
 
-allCompontentResultCode=0
-allCompontentResultMessage=""
+
+uploadFailureTotalMessage=""
+uploadSuccessTypeArray=()
+uploadFailureTypeArray=()
+
 if [ "${ShoudUploadToPgyer}" == "true" ] ; then
     uploadToPgyer
-
-    getComponentUploadResultCodeAndMessage "pgyer"
-    if [ $? != 0 ]; then 
-        allCompontentResultCode=$((allCompontentResultCode+1))
-        allCompontentResultMessage+="${compontentResultMessage}"
-    fi
+    _updateSuccessAndFailureTypes_And_TotalFailureMessage "pgyer"
 fi
 
 if [ "${ShoudUploadToCos}" == "true" ] ; then
     uploadToCos
-
-    getComponentUploadResultCodeAndMessage "cos"
-    if [ $? != 0 ]; then 
-        allCompontentResultCode=$((allCompontentResultCode+1))
-        allCompontentResultMessage+="${compontentResultMessage}"
-    fi
+    _updateSuccessAndFailureTypes_And_TotalFailureMessage "cos"
 fi
 
 if [ "${ShoudUploadToAppStrore}" == "true" ] ; then
     uploadToAppStore
-
-    getComponentUploadResultCodeAndMessage "testFlight"
-    if [ $? != 0 ]; then 
-        allCompontentResultCode=$((allCompontentResultCode+1))
-        allCompontentResultMessage+="${compontentResultMessage}"
-    fi
+    _updateSuccessAndFailureTypes_And_TotalFailureMessage "testFlight"
 fi
 
-lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg code "$allCompontentResultCode" '. + { "code": $code }')
-lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg message "$allCompontentResultMessage" '. + { "message": $message }')
-lastResponseJsonString=$(echo "$lastResponseJsonString" | jq --arg log "$uploadToAllProcessLog" '. + { "log": $log }')
+# uploadFailureCount=${#uploadFailureTypeArray[@]}
+# lastResponseJsonString=$(printf "%s" "$lastResponseJsonString" | jq --arg uploadFailureCount "$uploadFailureCount" '. + { "uploadFailureCount": $uploadFailureCount }')
+lastResponseJsonString=$(printf "%s" "$lastResponseJsonString" | jq --arg uploadSuccessTypes "${uploadSuccessTypeArray[*]}" '. + { "uploadSuccessTypes": $uploadSuccessTypes }')
+lastResponseJsonString=$(printf "%s" "$lastResponseJsonString" | jq --arg uploadFailureTypes "${uploadFailureTypeArray[*]}" '. + { "uploadFailureTypes": $uploadFailureTypes }')
+lastResponseJsonString=$(printf "%s" "$lastResponseJsonString" | jq --arg uploadFailureTotalMessage "$uploadFailureTotalMessage" '. + { "uploadFailureTotalMessage": $uploadFailureTotalMessage }')
+lastResponseJsonString=$(printf "%s" "$lastResponseJsonString" | jq --arg log "$uploadToAllProcessLog" '. + { "log": $log }')
 printf "%s" "${lastResponseJsonString}"

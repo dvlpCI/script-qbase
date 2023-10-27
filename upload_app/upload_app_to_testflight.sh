@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-26 14:32:56
+ # @LastEditTime: 2023-10-28 00:20:20
  # @Description: 上传安装包到 testFlight (只使用于iOS)
 ### 
 
@@ -77,6 +77,6 @@ responseResult='{
 # responseResult=$(printf "%s" "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
 responseResult=$(printf "%s" "$responseResult" | jq --arg code "$responseResultCode" '. + { "code": $code }')
 responseResult=$(echo "$responseResult" | jq --arg message "$responseResultMessage" '. + { "message": $message }')
-# responseResult=$(printf "%s" "$responseResult" | jq --arg qrCode "$qrCodeUrl" '. + { "qrCodeUrl": $qrCode }')
+# responseResult=$(printf "%s" "$responseResult" | jq --arg appNetworkUrl "$tfCodeUrl" '. + { "appNetworkUrl": $appNetworkUrl }')
 printf "%s" "${responseResult}"
 

@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-16 16:06:35
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 18:50:21
+ # @LastEditTime: 2023-10-28 00:25:35
  # @Description: 上传ipa到蒲公英xcxwo（可设置渠道）
 ### 
 
@@ -50,6 +50,10 @@ LogPostToRobotUrl="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da
 LogPostTextHeader="这是上传过程中对日志进行补充的标题"
 
 
+exit_with_message() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
+    printf "%s" "$1"
+    exit 1
+}
 
 
 # 示例1
@@ -81,8 +85,9 @@ function testUploadToCos() {
         exit 1
     fi
     printf "responseJsonString=%s\n" "${responseJsonString}"
+
     cosAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r '.cos.appNetworkUrl')
-    echo "${GREEN}上传ipa到cos成功，地址为 ${cosAppNetworkUrl}.${NC}"
+    echo "${YELLOW}上传ipa到cos的地址为${BLUE} ${cosAppNetworkUrl} ${YELLOW}。${NC}"
 }
 
 # 示例3
@@ -102,17 +107,29 @@ function testUploadToAll() {
     fi
     printf "responseJsonString=%s\n" "${responseJsonString}"
 
-    uploadResultCode=$(printf "%s" "${responseJsonString}" | jq -r '.code')
-    if [ "${uploadResultCode}" != "0" ]; then
-        uploadResultCode=$(printf "%s" "${responseJsonString}" | jq -r '.message')
-        echo "${RED}上传ipa到各个平台失败的结果显示如下: ${BLUE} ${responseJsonString} ${BLUE}。${NC}"
+    uploadSuccessTypesString=$(printf "%s" "${responseJsonString}" | jq -r ".uploadSuccessTypes")
+    uploadSuccessTypeArray=(${uploadSuccessTypesString})
+    uploadSuccessCount=${#uploadSuccessTypeArray[@]}
+    echo "${PURPLE} 上传结果成功 ${uploadSuccessCount} 个平台，分别为: ${uploadSuccessTypeArray[*]} ${PURPLE} 。${NC}"
+    uploadFailureTypesString=$(printf "%s" "${responseJsonString}" | jq -r ".uploadFailureTypes")
+    uploadFailureTypeArray=(${uploadFailureTypesString})
+    uploadFailureCount=${#uploadFailureTypeArray[@]}
+    echo "${PURPLE} 上传结果失败 ${uploadFailureCount} 个平台，分别为: ${uploadFailureTypeArray[*]} ${PURPLE} 。${NC}"
+
+    # 成功的信息
+    for compontentKey in "${uploadSuccessTypeArray[@]}"; do
+        compontentAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r ".${compontentKey}.appNetworkUrl")
+        echo "${GREEN}上传ipa到 ${compontentKey} 成功，地址为 ${compontentAppNetworkUrl} .${NC}"
+    done
+    # 失败的信息
+    if [ "${uploadFailureCount}" != "0" ]; then
+        uploadFailureTotalMessage=$(printf "%s" "${responseJsonString}" | jq -r '.uploadFailureTotalMessage')
+        echo "${RED}上传ipa到各个平台失败的所有原因显示如下:${BLUE} ${uploadFailureTotalMessage} ${BLUE}。${NC}"
         return 1
     fi
 
-    pgyerQRCodeUrl=$(printf "%s" "${responseJsonString}" | jq -r '.pgyer.appNetworkUrl')
-    echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
-    cosAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r '.cos.appNetworkUrl')
-    echo "${GREEN}上传ipa到cos成功，地址为 ${cosAppNetworkUrl}.${NC}"
+
+    
 }
 
 # echo "\n\n"

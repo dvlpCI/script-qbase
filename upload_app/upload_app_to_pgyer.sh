@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-26 20:02:32
+ # @LastEditTime: 2023-10-28 00:18:19
  # @Description: 上传安装包到 蒲公英xcxwo（可设置渠道） (同时使用于iOS 和 Android)
 ### 
 # 使用示例:请在终端执行如下命令：
@@ -31,7 +31,7 @@ CYAN='\033[0;36m'
 
 # 以下代码为测试上传安装后的返回值
 # responseJsonString='{
-#     "key1": "value1", "qrCodeUrl": "https://www.baidu.com", "message": "success"
+#     "key1": "value1", "appNetworkUrl": "https://www.baidu.com", "message": "success"
 # }'
 # # 在Mac的shell下，如果你希望打印$a的原始值而不是解释转义字符，你可以使用printf命令而不是echo命令。printf命令可以提供更精确的控制输出格式的能力。
 # printf "%s" "${responseJsonString}"
@@ -219,7 +219,7 @@ responseResult='{
 # 必须使用 printf "%s" "$responseResult" ，否则当 responseResult 中某个key 的值有斜杠时候会出现错误
 # responseResult=$(printf "%s" "$responseResult" | jq --arg processLog "$processLog" '. + { "processLog": $processLog }')
 responseResult=$(printf "%s" "$responseResult" | jq --arg code "$responseResultCode" '. + { "code": $code }')
-responseResult=$(printf "%s" "$responseResult" | jq --arg qrCode "$qrCodeUrl" '. + { "qrCodeUrl": $qrCode }')
+responseResult=$(printf "%s" "$responseResult" | jq --arg appNetworkUrl "$qrCodeUrl" '. + { "appNetworkUrl": $appNetworkUrl }')
 printf "%s" "${responseResult}"
 
 # 结果：
