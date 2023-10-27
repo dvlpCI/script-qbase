@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-26 14:34:06
+ # @LastEditTime: 2023-10-26 20:02:32
  # @Description: 上传安装包到 蒲公英xcxwo（可设置渠道） (同时使用于iOS 和 Android)
 ### 
 # 使用示例:请在终端执行如下命令：
@@ -75,9 +75,6 @@ CUR_DIR=$PWD    #$PWD代表获取当前路径，当cd后，$PWD也会跟着更�
 #FEATUREBRANCH=$3
 #!
 # shell 参数具名化
-show_usage="args: [-f , -k , -c , -d]\
-                                  [--ipa-file-path=, --pgyer-api-key=, --pgyer-channel=, --update-description=]"
-
 while [ -n "$1" ]
 do
         case "$1" in
@@ -87,12 +84,12 @@ do
                 -d|--update-description) UpdateDescription=$2; shift 2;;
 				-fast|--should-upload-fast) ShouldUploadFast=$2; shift 2;;
                 --) break ;;
-                *) echo $1,$2,$show_usage; break ;;
+                *) break ;;
         esac
 done
 
 if [ ! -f "${ipa_file_path}" ]; then
-	exit_script_with_response_error_message "${RED}Error:要上传到蒲公英的安装包文件不存在，请检查 ${BLUE}-f ${RED}参数的值 ${BLUE}${ipa_file_path} ${RED}。${NC}"
+	exit_script_with_response_error_message "${RED}Error:要上传到蒲公英的安装包文件不存在，请检查 ${BLUE}-f ${RED}参数的值${BLUE} ${ipa_file_path} ${RED}。${NC}"
 fi
 
 PgyerChannelWordCount=$(echo "${buildChannelShortcut}" | awk '{print NF}')

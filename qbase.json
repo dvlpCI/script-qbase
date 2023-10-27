@@ -229,6 +229,12 @@
                     "key": "upload_app_to_testflight",
                     "value": "./upload_app/upload_app_to_testflight.sh",
                     "example": "sh xxx.sh -ipa \"${ipa_file_path}\" -TransporterUserName \"${TransporterUserName}\" -TransporterPassword \"${TransporterPassword}\""
+                },
+                {
+                    "des": "上传安装包到 各个平台(pgyer、cos、testFlight)",
+                    "key": "upload_app_to_all",
+                    "value": "./upload_app/upload_app_to_all.sh",
+                    "example": "responseJsonString=$(sh xxx/upload_app_to_all.sh -ipa \"${ipa_file_path}\" -updateDesString \"${updateDesString}\" -updateDesFromFilePath \"${updateDesFromFilePath}\" -updateDesFromFileKey \"${updateDesFromFileKey}\" -pgyerHelpOwner \"${pgyerOwner}\" -pgyerHelpChannelKey \"${pgyerChannelKey}\" -pgyerApiKey \"${pgyerApiKey}\" -pgyerChannelShortcut \"${pgyerChannelShortcut}\" -pgyerShouldUploadFast \"${pgyerShouldUploadFast}\" -CosREGION \"${CosUploadToREGION}\" -CosBUCKETName \"${CosUploadToBUCKETName}\" -CosBUCKETDir \"${CosUploadToBUCKETDir}\" -CosResultHostUrl \"${CosResultHostUrl}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" -LogPostToRobotUrl \"${LogPostToRobotUrl}\" -LogPostTextHeader \"${LogPostTextHeader}\")"
                 }
             ]
         },
