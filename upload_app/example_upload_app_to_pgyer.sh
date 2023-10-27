@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-16 16:06:35
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 10:05:32
+ # @LastEditTime: 2023-10-27 10:40:44
  # @Description: 上传ipa到蒲公英xcxwo（可设置渠道）
 ### 
 
@@ -28,7 +28,6 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 ipa_file_path="${CurrentDIR_Script_Absolute}/App1Enterprise/App1Enterprise.ipa"
-# ipa_file_path="/Users/qian/Pictures/shuma_bg2.webp"
 updateDesString="测试蒲公英上传到指定位置，请勿下载"
 
 # 蒲公英的配置
@@ -39,7 +38,7 @@ pgyerShouldUploadFast="false"
 # Cos的配置
 CosUploadToREGION="ap-shanghai"
 CosUploadToBUCKETName="prod-xhw-image-1302324914"
-CosUploadToBUCKETDir="/mcms/download/app/"
+CosUploadToBUCKETDir="/mcms/download/app"
 CosResultHostUrl="https://images.xihuanwu.com"
 
 # TestFlight的配置
@@ -54,41 +53,61 @@ LogPostTextHeader="这是上传过程中对日志进行补充的标题"
 
 
 # 示例1
-log_title "上传ipa到蒲公英"
-responseJsonString=$(sh ${CurrentDIR_Script_Absolute}/upload_app_to_pgyer.sh -f "${ipa_file_path}" -k "${pgyerApiKey}" -c "${pgyerChannelShortcut}" -d "${updateDesString}" --should-upload-fast "${pgyerShouldUploadFast}")
-if [ $? != 0 ]; then
-    errorMessage=$(echo ${responseJsonString} | jq -r '.message')
-    echo "${RED}上传ipa到蒲公英失败的结果显示如下：${errorMessage}${NC}"
-    exit 1
-fi
-printf "responseJsonString=%s\n" "${responseJsonString}"
-pgyerQRCodeUrl=$(printf "%s" ${responseJsonString} | jq -r '.qrCodeUrl')
-echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
+function testUploadToPgyer() {
+    log_title "上传ipa到蒲公英"
+    responseJsonString=$(sh ${CurrentDIR_Script_Absolute}/upload_app_to_pgyer.sh -f "${ipa_file_path}" -k "${pgyerApiKey}" -c "${pgyerChannelShortcut}" -d "${updateDesString}" --should-upload-fast "${pgyerShouldUploadFast}")
+    if [ $? != 0 ]; then
+        errorMessage=$(echo ${responseJsonString} | jq -r '.message')
+        echo "${RED}上传ipa到蒲公英失败的结果显示如下：${errorMessage}${NC}"
+        exit 1
+    fi
+    printf "responseJsonString=%s\n" "${responseJsonString}"
+    pgyerQRCodeUrl=$(printf "%s" ${responseJsonString} | jq -r '.qrCodeUrl')
+    echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
+}
 
 
 # 示例2:cos
-echo "\n\n"
-log_title "上传ipa到cos"
-sh ${CurrentDIR_Script_Absolute}/upload_app_to_all.sh -ipa "${ipa_file_path}" \
-    -updateDesString "${updateDesString}" -updateDesFromFilePath "${updateDesFromFilePath}" -updateDesFromFileKey "${updateDesFromFileKey}" \
-    -CosREGION "${CosUploadToREGION}" -CosBUCKETName "${CosUploadToBUCKETName}" -CosBUCKETDir "${CosUploadToBUCKETDir}" -CosResultHostUrl "${CosResultHostUrl}" \
-    -LogPostToRobotUrl "${LogPostToRobotUrl}" -LogPostTextHeader "${LogPostTextHeader}"
+function testUploadToCos() {
+    ipa_file_path="/Users/qian/Pictures/shuma_bg2.webp"
+    
+    log_title "上传ipa到cos"
+    responseJsonString=$(sh ${CurrentDIR_Script_Absolute}/upload_app_to_all.sh -ipa "${ipa_file_path}" \
+        -updateDesString "${updateDesString}" -updateDesFromFilePath "${updateDesFromFilePath}" -updateDesFromFileKey "${updateDesFromFileKey}" \
+        -CosREGION "${CosUploadToREGION}" -CosBUCKETName "${CosUploadToBUCKETName}" -CosBUCKETDir "${CosUploadToBUCKETDir}" -CosResultHostUrl "${CosResultHostUrl}" \
+        -LogPostToRobotUrl "${LogPostToRobotUrl}" -LogPostTextHeader "${LogPostTextHeader}")
+    if [ $? != 0 ]; then
+        echo "${RED}上传ipa到各个平台失败的结果显示如下:${BLUE} ${responseJsonString} ${BLUE}。${NC}"
+        exit 1
+    fi
+    printf "responseJsonString=%s\n" "${responseJsonString}"
+    cosAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r '.cos.appNetworkUrl')
+    echo "${GREEN}上传ipa到cos成功，地址为 ${cosAppNetworkUrl}.${NC}"
+}
 
 # 示例3
-echo "\n\n"
-log_title "上传ipa到各个平台"
-responseJsonString=$(sh ${CurrentDIR_Script_Absolute}/upload_app_to_all.sh -ipa "${ipa_file_path}" \
-    -updateDesString "${updateDesString}" -updateDesFromFilePath "${updateDesFromFilePath}" -updateDesFromFileKey "${updateDesFromFileKey}" \
-    -pgyerHelpOwner "${pgyerOwner}" -pgyerHelpChannelKey "${pgyerChannelKey}" \
-    -pgyerApiKey "${pgyerApiKey}" -pgyerChannelShortcut "${pgyerChannelShortcut}" -pgyerShouldUploadFast "${pgyerShouldUploadFast}" \
-    -CosREGION "${CosUploadToREGION}" -CosBUCKETName "${CosUploadToBUCKETName}" -CosBUCKETDir "${CosUploadToBUCKETDir}" -CosResultHostUrl "${CosResultHostUrl}" \
-    -TransporterUserName "${Transporter_USERNAME}" -TransporterPassword "${Transporter_PASSWORD}" \
-    -LogPostToRobotUrl "${LogPostToRobotUrl}" -LogPostTextHeader "${LogPostTextHeader}" \
-    )
-if [ $? != 0 ]; then
-    echo "${RED}上传ipa到各个平台失败的结果显示如下:${BLUE} ${responseJsonString} ${BLUE}。${NC}"
-    exit 1
-fi
-printf "responseJsonString=%s\n" "${responseJsonString}"
-pgyerQRCodeUrl=$(printf "%s" "${responseJsonString}" | jq -r '.pgyer.appNetworkUrl')
-echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
+function testUploadToAll() {
+    log_title "上传ipa到各个平台"
+    responseJsonString=$(sh ${CurrentDIR_Script_Absolute}/upload_app_to_all.sh -ipa "${ipa_file_path}" \
+        -updateDesString "${updateDesString}" -updateDesFromFilePath "${updateDesFromFilePath}" -updateDesFromFileKey "${updateDesFromFileKey}" \
+        -pgyerHelpOwner "${pgyerOwner}" -pgyerHelpChannelKey "${pgyerChannelKey}" \
+        -pgyerApiKey "${pgyerApiKey}" -pgyerChannelShortcut "${pgyerChannelShortcut}" -pgyerShouldUploadFast "${pgyerShouldUploadFast}" \
+        -CosREGION "${CosUploadToREGION}" -CosBUCKETName "${CosUploadToBUCKETName}" -CosBUCKETDir "${CosUploadToBUCKETDir}" -CosResultHostUrl "${CosResultHostUrl}" \
+        -TransporterUserName "${Transporter_USERNAME}" -TransporterPassword "${Transporter_PASSWORD}" \
+        -LogPostToRobotUrl "${LogPostToRobotUrl}" -LogPostTextHeader "${LogPostTextHeader}" \
+        )
+    if [ $? != 0 ]; then
+        echo "${RED}上传ipa到各个平台失败的结果显示如下:${BLUE} ${responseJsonString} ${BLUE}。${NC}"
+        exit 1
+    fi
+    printf "responseJsonString=%s\n" "${responseJsonString}"
+    pgyerQRCodeUrl=$(printf "%s" "${responseJsonString}" | jq -r '.pgyer.appNetworkUrl')
+    echo "${GREEN}上传ipa到蒲公英成功，地址为 ${pgyerQRCodeUrl}.${NC}"
+    cosAppNetworkUrl=$(printf "%s" "${responseJsonString}" | jq -r '.cos.appNetworkUrl')
+    echo "${GREEN}上传ipa到cos成功，地址为 ${cosAppNetworkUrl}.${NC}"
+}
+
+# echo "\n\n"
+# testUploadToPgyer
+# testUploadToCos
+testUploadToAll

@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-12 17:13:36
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-27 10:12:51
+ # @LastEditTime: 2023-10-27 10:42:14
  # @Description: 上传安装包到 各个平台(pgyer、cos、testFlight)
 ### 
 
@@ -119,7 +119,7 @@ done
 uploadToAllProcessLog=""
 
 if [ ! -f "${ipa_file_path}" ]; then
-    exit_script_with_response_error_message "Error:要上传的文件 ${ipa_file_path} 不能为空，请检查后再上传！"
+    exit_script_with_response_error_message "Error:要上传的文件 -f 的参数值 ${ipa_file_path} 不能为空，请检查后再上传！"
 fi
 
 
