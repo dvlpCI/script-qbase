@@ -3,7 +3,7 @@
 # @Author: dvlproad dvlproad@163.com
 # @Date: 2023-02-27 21:38:10
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-08-06 18:00:51
+ # @LastEditTime: 2023-10-29 00:47:38
 # @FilePath: /AutoPackage-CommitInfo/bulidScriptCommon/upload/upload_result_log.sh
 # @Description: 上传结束的各种log获取方法
 ###
@@ -58,7 +58,7 @@ function cover_json_value() {
 
 
 # 读取input.json文件内容
-json_file=${CurrentDIR_Script_Absolute}/example_update_value.json
+json_file=${CurrentDIR_Script_Absolute}/data/example_value_update_in_file.json
 
 key1="branch_info_result.Notification.current.slice"
 key2="branch_info_result.Notification.lastOnline.slice"

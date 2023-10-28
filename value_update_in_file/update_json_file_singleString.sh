@@ -1,4 +1,11 @@
 #!/bin/bash
+###
+ # @Author: dvlproad
+ # @Date: 2023-10-28 21:03:33
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-10-29 02:34:20
+ # @Description: 
+### 
 # 更新/添加指定json文件中的指定字段
 # sh update_json_file_singleString.sh -jsonF ${FILE_PATH} -k ${UpdateJsonKey} -v "${UpdateJsonKeyValue}"
 # sh update_json_file_singleString.sh -jsonF "../bulidScript/app_info.json" -k "package_message" -v "这是新的更新说明"
@@ -16,6 +23,9 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 #echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
 sed_text_script_file_path=${bulidScriptCommon_dir_Absolute}/value_update_in_file/sed_text.sh
+value_get_in_json_file_scriptPath=${bulidScriptCommon_dir_Absolute}/value_get_in_json_file/value_get_in_json_file.sh
+
+
 
 # 定义颜色常量
 NC='\033[0m' # No Color
@@ -35,70 +45,6 @@ function debug_log() {
 }
 
 
-function getJsonFileKeyValue() {
-    while [ -n "$1" ]
-    do
-            case "$1" in
-                    -jsonF|--json-file) FILE_PATH=$2; shift 2;;
-                    -k|--key) UpdateJsonKey=$2; shift 2;;
-                    -ifNullCreate|--ifNull-createIt) ifNullCreateIt=$2; shift 2;;
-                    --) break ;;
-                    *) echo $1,$2; break ;;
-            esac
-    done
-    
-    
-    #echo "---正执行《 $FUNCNAME 》方法，在${FILE_PATH}中获取${UpdateJsonKey}字段的值"
-    if [ ! -f "${FILE_PATH}" ];then
-        printf "${RED}❌调用$0中的《 $FUNCNAME 》方法更新${UpdateJsonKey}值的时候，发生错误，你要更新的文件不存在，请检查！${NC}\n"
-        return 1
-    fi
-    
-    JQ_EXEC=`which jq`
-    # 只需处理一层时候，可简写为如下
-    #JsonFileKeyValueResult=$(cat ${FILE_PATH} | ${JQ_EXEC} -r ".package_code") # "package_code_0"
-#    JsonFileKeyValueResult=$(cat ${FILE_PATH} | ${JQ_EXEC} -r --arg UpdateJsonKey "$UpdateJsonKey" '.[$UpdateJsonKey]')
-#    echo ${JsonFileKeyValueResult}
-    
-    
-    # 需要处理多层key时候，应使用如下:(eg:package_url_result.package_local_backup_dir)
-#    appOfficialWebsite=$(cat $FILE_PATH | ${JQ_EXEC} .package_result | ${JQ_EXEC} '.package_official_website' | sed 's/\"//g')
-    
-    keyArray=(${UpdateJsonKey//./ })
-    # echo "$FUNCNAME 方法的日志 keyArray=${keyArray[*]}"
-    keyCount=${#keyArray[@]}
-    
-    # 📢注：使用 cat ${FILE_PATH} 是为了避免出现使用 echo ${CurrentJsonString} 时候出现的CurrentJsonString中含有乱七八糟的字符串(eg✅)时候，出现提取错误的问题
-    if [ $keyCount -eq 1 ]; then
-        #echo "=========只有一层key"
-        keyName=${keyArray[0]}
-        JsonFileKeyValueResult=$(cat "${FILE_PATH}" | ${JQ_EXEC} -r --arg keyName "$keyName" '.[$keyName]')
-        if [ $? != 0 ]; then
-            printf "${RED}❌:jquery获取出错，请检查。(可能原因为您的${FILE_PATH}文件不是标准json，如是上文出错信息会提示可能哪一行有问题)${NC}\n"
-            return 1
-        fi
-    else
-        #echo "=========有多层key"
-        RootJsonString=`cat ${FILE_PATH}`
-        CurrentJsonString=${RootJsonString}
-
-        for ((i=0;i<keyCount;i++))
-        do
-            keyName=${keyArray[i]}
-            
-            # echo "CurrentJsonString=${CurrentJsonString}"
-            JsonFileKeyValueResult=$(printf "%s" ${CurrentJsonString} | ${JQ_EXEC} -r --arg keyName "$keyName" '.[$keyName]')
-            if [ $? != 0 ]; then
-                printf "${RED}❌:jquery获取出错，请检查。${NC}\n"
-                return 1
-            fi
-            # echo "第$((i+1))层 $keyName:${JsonFileKeyValueResult}"
-            CurrentJsonString=${JsonFileKeyValueResult}
-        done
-    fi
-    
-    #echo "---通过《 $FUNCNAME 》方法，获取${UpdateJsonKey}键值的结果为${JsonFileKeyValueResult}"
-}
 
 
 while [ -n "$1" ]
@@ -108,7 +54,7 @@ do
                 -k|--key) UpdateJsonKey=$2; shift 2;;
                 -v|--value) UpdateJsonKeyValue=$2; shift 2;;
                 --) break ;;
-                *) echo $1,$2; break ;;
+                *) break ;;
         esac
 done
 # test eg:
@@ -116,18 +62,32 @@ done
 # UpdateJsonKey="package_url_result.package_local_backup_dir"
 # UpdateJsonKeyValue="这是新的更新说明"
 
+# 已知有如下json，
+# {
+#     "ab": {
+#         "ef":{
+#             }
+#     }
+# }
+# 则层级key_name=ab.ef。代表是想修改ab里面ef键的值
+# jq --arg key "$UpdateJsonKey" --argjson new_value "$UpdateJsonKeyValue" 'setpath($key | split(".") | map(select(. != ""))) |= $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+jq --arg key "$UpdateJsonKey" --argjson new_value "$UpdateJsonKeyValue" '.[$key] = $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+if [ $? != 0 ]; then
+    exit 1
+else
+    exit 0
+fi
 
 
 
 # echo "${YELLOW}正在执行在${BLUE} ${FILE_PATH} ${YELLOW}中更新/添加${BLUE} ${UpdateJsonKey} ${YELLOW}字段的值为${BLUE} ${UpdateJsonKeyValue} ${YELLOW}。${NC}"
-getJsonFileKeyValue -jsonF "${FILE_PATH}" -k "${UpdateJsonKey}"
+Old_JsonValue=$(sh ${value_get_in_json_file_scriptPath} -jsonF "${FILE_PATH}" -k "${UpdateJsonKey}")
 if [ $? != 0 ]; then
     exit 1;
 fi
-Old_JsonValue=${JsonFileKeyValueResult}
-#    echo "Old_JsonValue=${Old_JsonValue}"
-if [ "${Old_JsonValue}" == "null" ];then
-    printf "${RED}❌Error:$FUNCNAME 方法执行失败。原因为在 ${FILE_PATH} 中 ${BLUE}${UpdateJsonKey} ${RED}的值不能为null，否则容易导致其他null值，也会被sed替换掉${NC}\n"
+# debug_log "Old_JsonValue=${Old_JsonValue}"
+if [ -z "${Old_JsonValue}" ] || [ "${Old_JsonValue}" == "null" ];then
+    printf "${RED}❌Error:$FUNCNAME 方法执行失败。原因为在 ${FILE_PATH} 中 ${BLUE}${UpdateJsonKey} ${RED}的值不能为空或null，否则容易导致其他空或null值，也会被sed替换掉${NC}\n"
     exit 1
 fi
 
@@ -144,11 +104,3 @@ if [ ${scriptResultCode} != 0 ]; then
 fi
 
 debug_log "更新成功"
-#
-#    getJsonFileKeyValue -jsonF ${FILE_PATH} -k ${UpdateJsonKey}
-#    New_JsonValue=${JsonFileKeyValueResult}
-#    if [ "${New_JsonValue}" == "${UpdateJsonKeyValue}" ]; then
-#        return 0
-#    else
-#        return 1
-#    fi

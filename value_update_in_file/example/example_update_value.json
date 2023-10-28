@@ -1,14 +1,3 @@
 {
-    "branch_info_result.Notification.current.slice": "12345",
-    "branch_info_result": {
-        "Notification": {
-            "current": {
-                "slice": [
-                ]
-            },
-            "lastOnline": {
-                "slice": []
-            }
-        }
-    }
+    
 }

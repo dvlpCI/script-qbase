@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-27 22:37:52
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-07-26 02:31:54
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-10-29 00:51:01
  # @FilePath: example/value_get_and_update/ts_value_update_in_file_whereText.sh
  # @Description: 测试文本更改
 ### 
@@ -12,11 +12,11 @@
 # 当前【shell脚本】的工作目录
 # $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-Base_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}
+Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute} # 使用此方法可以避免路径上有..
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}
 
-script_file_path=${Base_HomeDir_Absolute}/value_update_in_file/sed_text.sh
-TEST_JSON_FILE_PATH=${CurrentDIR_Script_Absolute}/data/tsdata_update_text_variable.json
+script_file_path=${CategoryFun_HomeDir_Absolute}/sed_text.sh
+TEST_JSON_FILE_PATH=${CurrentDIR_Script_Absolute}/data/example_value_update_in_file.json
 
 
 
@@ -53,7 +53,7 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
 function logTitle() {
-    printf "${PURPLE}------- $1 -------${NC}\n"
+    printf "${PURPLE}$1${NC}\n"
 }
 
 logTitle "-----------   一、更新字符串   -----------"
@@ -82,7 +82,8 @@ sh ${script_file_path} -f "${TEST_JSON_FILE_PATH}" -r "~/Project/a.txt" -t "/Use
 cat "${TEST_JSON_FILE_PATH}" | jq '.data_string_file_path'
 
 
-logTitle "-----------   二、更新数组   -----------"
+echo "            --------           "
+logTitle "-----------   二、更新数组(TODO:无效)   -----------"
 logTitle "6 多行字符串(有换行符)"
 # | @json表达式将该数组值转义，并输出为字符串。
 # -r选项用于输出原始字符串，而不是带引号的字符串。如果不使用-r选项，则输出的字符串会带有双引号。如果你需要在Shell脚本中使用这个字符串，最好使用-r选项。

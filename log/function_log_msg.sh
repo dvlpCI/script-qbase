@@ -61,7 +61,7 @@ function logResultValueToFile() {
     printf "%s" $1 > ${temp_file_abspath} # 创建文件，并写入内容到该文件。如果该文件已经存在，则会覆盖原有内容。
     cat ${temp_file_abspath}
 
-    echo "${YELLOW}更多详情请可点击查看文件:${BLUE}${temp_file_abspath}${NC}"
+    echo "${YELLOW}\n要更多详情请可点击查看文件:${BLUE}${temp_file_abspath}${NC}"
 }
 
 function logResultValueToJsonFile() {
