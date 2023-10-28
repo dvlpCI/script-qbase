@@ -95,7 +95,7 @@ CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可
 
 qbase_json_file_check_script_path="${CommonFun_HomeDir_Absolute}/json_check/json_file_check.sh"
 get_jsonstring_script_file=${CommonFun_HomeDir_Absolute}/json_formatter/get_jsonstring.sh
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
+JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
 
 #exit
 

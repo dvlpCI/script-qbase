@@ -105,17 +105,17 @@
                 {
                     "key": "sedtext",
                     "des": "任意文件中的值的更新，根据值的位置",
-                    "value": "./update_value/sed_text.sh"
+                    "value": "./value_update_in_file/sed_text.sh"
                 },
                 {
                     "key": "update_json_file_singleString",
                     "des": "json文件中的值的更新，根据指定key的位置",
-                    "value": "./update_value/update_json_file_singleString.sh"
+                    "value": "./value_update_in_file/update_json_file_singleString.sh"
                 },
                 {
                     "key": "py_update_json_file",
                     "des": "json文件中的值的更新，使用python实现",
-                    "value": "./update_value/update_json_file.py"
+                    "value": "./value_update_in_file/update_json_file.py"
                 }
             ]
         },

@@ -51,7 +51,7 @@ source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFi
 
 
 markdownFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/markdown/function_markdown.sh"
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
+JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
 
 get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get10_branch_self_detail_info.sh
 

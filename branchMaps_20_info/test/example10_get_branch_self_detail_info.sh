@@ -41,7 +41,7 @@ TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_re
 chmod +rw "${TEST_DATA_RESULT_FILE_PATH}" # 增加读写权限
 
 
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
+JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
 if [ ! -f "${JsonUpdateFun_script_file_Absolute}" ];then
     echo "❌Error:您的处理更新json文件内从的脚本文件 ${JsonUpdateFun_script_file_Absolute} 不存在，请检查！"
     exit 1

@@ -15,7 +15,7 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 #bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute}/..
 bulidScriptCommon_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
 #echo "bulidScriptCommon_dir_Absolute=${bulidScriptCommon_dir_Absolute}"
-sed_text_script_file_path=${bulidScriptCommon_dir_Absolute}/update_value/sed_text.sh
+sed_text_script_file_path=${bulidScriptCommon_dir_Absolute}/value_update_in_file/sed_text.sh
 
 # 定义颜色常量
 NC='\033[0m' # No Color

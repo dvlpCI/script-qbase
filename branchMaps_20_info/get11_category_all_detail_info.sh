@@ -43,7 +43,7 @@ CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可
 # echo "CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute} ✅"
 
 markdownFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/markdown/function_markdown.sh"
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/update_value/update_json_file.sh"
+JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
 
 
 if [ ! -f "${markdownFun_script_file_Absolute}" ];then
