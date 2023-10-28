@@ -142,7 +142,7 @@ function updateText3() {
     BRANCH_DETAIL_INFO_FILE_PATH="~/.jenkins/workspace/wish_android_测试/bulidScript/app_branch_info.json"
     PackageErrorMessage="您所开发的有${#missingDeclareBranchNameArray[@]}个分支(详见文尾附2)，未在${BRANCH_DETAIL_INFO_FILE_PATH}文件中标明功能(标明方法见文尾,👉🏻提示:如有添加请检查是不是name写错了)。从而会导致自动化打包时候无法获取，从而提供所打包的所含功能说明。故请前往补充后再执行打包。\n附1：标明方法①(推荐)前往项目的 featureBrances ，在该目录下添加一个描述该分支的json文件信息；标明方法②(不推荐)直接在${BRANCH_DETAIL_INFO_FILE_PATH}文件中的 featureBrances 属性里添加。\n附2：缺少标注功能的分支分别为${missingDeclareBranchNameArray[*]}分支。"
     
-    sh ${CommonFun_HomeDir_Absolute}/sed_text.sh -appInfoF ${TEST_JSON_FILE_PATH} -r "unknow data3" -t "${PackageErrorMessage}"
+    sh ${CommonFun_HomeDir_Absolute}/sed_text.sh -f ${TEST_JSON_FILE_PATH} -r "unknow data3" -t "${PackageErrorMessage}"
 }
 
 updateText3

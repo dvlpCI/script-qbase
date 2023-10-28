@@ -131,14 +131,14 @@ if [ "${Old_JsonValue}" == "null" ];then
     exit 1
 fi
 
-debug_log "${YELLOW}正在执行命令(替换文本):《${BLUE} sh $sed_text_script_file_path -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" ${YELLOW}》${NC}"
-sh $sed_text_script_file_path -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
+debug_log "${YELLOW}正在执行命令(替换文本):《${BLUE} sh $sed_text_script_file_path -f \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" ${YELLOW}》${NC}"
+sh $sed_text_script_file_path -f "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
 scriptResultCode=$?
 if [ ${scriptResultCode} != 0 ]; then
     debug_log "=============${scriptResultCode}"
-    debug_log "执行命令(替换文本)发生错误:《 sh $sed_text_script_file_path -appInfoF \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" 》"
+    debug_log "执行命令(替换文本)发生错误:《 sh $sed_text_script_file_path -f \"${FILE_PATH}\" -r \"${Old_JsonValue}\" -t \"${UpdateJsonKeyValue}\" 》"
     UpdateJsonKeyValue="错误信息输出失败，请查看打包日志"
-    sh $sed_text_script_file_path -appInfoF "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
+    sh $sed_text_script_file_path -f "${FILE_PATH}" -r "${Old_JsonValue}" -t "${UpdateJsonKeyValue}"
     
     exit ${scriptResultCode}
 fi

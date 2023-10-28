@@ -1,0 +1,38 @@
+{
+  "data1": "111",
+  "data2": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行",
+  "data3": "unknow data3",
+  "branch_info_result": {
+    "current": {
+      "data3": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行"
+    }
+  },
+  "test_result": {
+    "data3": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行\n结束",
+    "data2": "第1.1行n第1.1行\n第1.2行n第1.2行\n\n第2.1行n第2.1行\n第2.2行n第2.2行"
+  },
+  "data_string": "这是未替换前的字符串",
+  "data_array": [
+    "这是未替换前的数组"
+  ],
+  "data_result": {
+    "local_backup_dir": "这是未替换前的备份路径"
+  },
+  "data_string_1": "关/注",
+  "data_string_2": "这是未替换前的字符串2",
+  "data_string_3": "failure:编译打包失败，未生成release/wish.apk",
+  "data_string_4": "要点1n\nn要点2:关/注",
+  "data_string_5": "您当前打包的需求较上次有所缺失，请先补全，再打包，至少缺失旧包dev_fix。\n可能原因如下:dev_fix未合并进来，或者是有新的提交也会造成这个问题。",
+  "data_string_6": "更新说明略\n分支信息:\ndev_fix:功能修复",
+  "data_string_file_path": "/Users/qian/Project/CQCI/AutoPackage-CommitInfo/bulidScript/app_branch_info.json",
+  "data_array_1_res": [
+    {
+      "dev_script_pack": "打包提示优化"
+    },
+    {
+      "dev_fix": "修复"
+    }
+  ],
+  "data_array_1_new": [{"dev_script_pack":"打包提示优化"},{"dev_fix":"修复"}],
+  "data_array_2_org": ["data_array_string1"]
+}
