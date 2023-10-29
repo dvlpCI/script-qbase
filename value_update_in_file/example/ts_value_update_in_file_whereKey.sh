@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-27 22:37:52
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-29 02:36:28
+ # @LastEditTime: 2023-10-29 21:27:07
  # @FilePath: example/value_get_and_update/ts_value_update_in_file_whereKey.sh
  # @Description: 测试文本更改
 ### 
@@ -30,7 +30,7 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute} # 使用此方法可以避免路径上有..
 CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}
 
-TEST_JSON_FILE_PATH=${CurrentDIR_Script_Absolute}/data/example_value_update_in_file.json
+TEST_JSON_FILE_PATH=${CurrentDIR_Script_Absolute}/ts_value_update_in_file_whereKey.json
 update_json_file_singleString_scriptPath=${CategoryFun_HomeDir_Absolute}/update_json_file_singleString.sh
 
 
@@ -65,20 +65,52 @@ function tsFun_updateJsonFileValue() {
 }
 
 
-logTitle "1.........."
-tsFun_updateJsonFileValue
+
+# tsFun_updateJsonFileValue
+stringValue="https://www.xcxwo.com/app/qrcodeHistory/xxx"
+dicValue='{
+    "c": "这是嵌套key + json字典"
+}'
+arrayValue="[{\"dev_script_pack\":\"打包提示优化1234\"},{\"dev_fix\":\"修复\"}]"
 
 
-# logTitle "update1"
-# sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "data_string" -v "这是新的更新说明"
 
-logTitle "2.........."
+
+logTitle "0.测试嵌套key"
+new_value="修改后的值34422"
+# new_value=$dicValue
+# jq '.target.b.c = "修改后的值"' "$TEST_JSON_FILE_PATH" > temp.json && mv temp.json "$TEST_JSON_FILE_PATH"
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "target.b.c" -v "${new_value}"
+
+
+logTitle "1.单层key"
+logTitle "1.1. 单层key + 字符串"
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "singleKey1_str" -v "${stringValue}"
+
+
+logTitle "1.2. 单层key + json字典"
+singleKey="singleKey2_dic"
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "singleKey2_dic" -v "${dicValue}"
+
+
+logTitle "1.3. 单层key + json数组"
 # 使用 jq 修改 JSON 文件
-# jq '.data_array_1_new = '"[{\"dev_script_pack\":\"打包提示优化3224\"},{\"dev_fix\":\"修复\"}]" "$TEST_JSON_FILE_PATH" > temp.json && mv temp.json "$TEST_JSON_FILE_PATH"
-sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "data_array_1_new" -v "[{\"dev_script_pack\":\"打包提示优化1234\"},{\"dev_fix\":\"修复\"}]"
-# sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "data_array_2_new.abc" -v "[{\"dev_script_pack\":\"打包提示优化1234\"},{\"dev_fix\":\"修复\"}]"
+# jq '.singleKey2_dic = '"[{\"dev_script_pack\":\"打包提示优化3224\"},{\"dev_fix\":\"修复\"}]" "$TEST_JSON_FILE_PATH" > temp.json && mv temp.json "$TEST_JSON_FILE_PATH"
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "singleKey3_arr" -v "${arrayValue}"
 
 
 
-# logTitle "update3"
-# sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "data_result.local_backup_dir" -v "本地备份路径"
+
+echo "\n"
+logTitle "2.嵌套key"
+logTitle "2.1. 嵌套key + 字符串"
+nestingKey="nestingKey1_string.a.b.c"
+nestingValue="这是嵌套key + 字符串"
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "${nestingKey}" -v "${nestingValue}"
+
+logTitle "2.2. 嵌套key + json字典"
+nestingKey="nestingKey2_dic.a.b"
+nestingValue='{
+    "c": "这是嵌套key + json字典"
+}'
+sh ${update_json_file_singleString_scriptPath} -jsonF "${TEST_JSON_FILE_PATH}" -k "${nestingKey}" -v "${nestingValue}"

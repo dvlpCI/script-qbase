@@ -254,7 +254,7 @@ function uploadToCos() {
 function uploadToAppStore() {
     postWechatMessage "正在上传appstore......[${ipa_file_path}]"
 
-    printf "${BLUE}正在执行命令(上传安装包到testFlight上)：《 ${YELLOW}sh ${qbase_upload_app_to_testflight_script_path} -ipa \"${ipa_file_path}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" ${BLUE}》...${NC}\n"
+    printf "${BLUE}正在执行命令(上传安装包到testFlight上)：《${YELLOW} sh ${qbase_upload_app_to_testflight_script_path} -ipa \"${ipa_file_path}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" ${BLUE}》...${NC}\n"
     responseJsonString=$(sh ${qbase_upload_app_to_testflight_script_path} -ipa "${ipa_file_path}" -TransporterUserName "${Transporter_USERNAME}" -TransporterPassword "${Transporter_PASSWORD}")
     
     tfResponseResultCode=$(echo ${responseJsonString} | jq -r '.code')

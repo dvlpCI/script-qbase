@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-10-28 21:03:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-29 02:34:20
+ # @LastEditTime: 2023-10-29 21:25:34
  # @Description: 
 ### 
 # 更新/添加指定json文件中的指定字段
@@ -71,7 +71,35 @@ done
 # }
 # 则层级key_name=ab.ef。代表是想修改ab里面ef键的值
 # jq --arg key "$UpdateJsonKey" --argjson new_value "$UpdateJsonKeyValue" 'setpath($key | split(".") | map(select(. != ""))) |= $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
-jq --arg key "$UpdateJsonKey" --argjson new_value "$UpdateJsonKeyValue" '.[$key] = $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+
+
+# 已知json文件内容如下：
+# '{
+#   "other": {
+#     "c": "这是干扰项"
+#   },
+#   "target": {
+#     "b": {
+#       "c": "这是目标项"
+#     }
+#   }
+# }'
+# 请使用shell修改 target里的b的c的键值。
+# jq '.target.b.c = "修改后的值"' "$JSON_FILE_PATH" > temp.json && mv temp.json "$JSON_FILE_PATH"
+
+
+# 使用单引号，形如 '.[$key] = $new_value' 的时候，key 和 new_value 都需要通过 --arg 或 --argjson 定义，且等号前面是 .[$key]
+# 使用双引号，形如 ".$key = \$new_value" 的时候，key 不需要定义，但需写为 .$key；而 new_value 不仅需要通过 --arg 或 --argjson 定义，还应 \$new_value
+# 判断 new_value 是否为 JSON
+if jq -e . >/dev/null 2>&1 <<<"$UpdateJsonKeyValue"; then
+    # new_value 是一个有效的 JSON
+    # jq --arg key "$UpdateJsonKey" --argjson new_value "$UpdateJsonKeyValue" '.[$key] = $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+    jq --argjson new_value "$UpdateJsonKeyValue" ".$UpdateJsonKey = \$new_value" "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+else
+    # new_value 是一个普通字符串
+    # jq --arg key "$UpdateJsonKey" --arg new_value "$UpdateJsonKeyValue" '.[$key] = $new_value' "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+    jq --arg new_value "$UpdateJsonKeyValue" ".$UpdateJsonKey = \$new_value" "$FILE_PATH" > temp.json && mv temp.json "$FILE_PATH"
+fi
 if [ $? != 0 ]; then
     exit 1
 else
