@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-29 17:35:53
+ # @LastEditTime: 2023-10-29 23:17:43
 # @Description:
 ###
 
@@ -287,6 +287,11 @@ function _logQuickCmd() {
 
 
 function get_path() {
+    if [ -z "$1" ]; then
+        echo "$qbase_homedir_abspath"
+        return
+    fi
+
     if [ "$1" == "home" ]; then
         echo "$qbase_homedir_abspath"
     else
