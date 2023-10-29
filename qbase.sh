@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-16 14:52:15
+ # @LastEditTime: 2023-10-29 17:35:53
 # @Description:
 ###
 
@@ -15,6 +15,14 @@ YELLOW="\033[33m"
 BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
+
+if [ "$1" == "-package" ]; then
+    packageArg=$2 # 去除第一个参数之前，先保留下来
+    shift 2  # 去除前两个个参数
+else
+    packageArg="qbase"
+fi
+
 
 # 计算倒数第一个参数的位置
 argCount=$#
@@ -131,12 +139,17 @@ if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
     qbase_latest_version="local_qbase"
     qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 else
-    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "qbase")
+    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
     qbase_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
     qbase_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qbase_latest_version}")
     if [ $? != 0 ]; then
         exit 1
     fi
+fi
+qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
+if [ ! -f "${qpackageJsonF}" ]; then
+    echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+    exit 1
 fi
 
 function get_path_json() {
@@ -269,7 +282,7 @@ function quickCmdExec() {
 }
 
 function _logQuickCmd() {
-    cat "$qbase_homedir_abspath/qbase.json" | jq '.quickCmd'
+    cat "$qpackageJsonF" | jq '.quickCmd'
 }
 
 
@@ -278,10 +291,10 @@ function get_path() {
         echo "$qbase_homedir_abspath"
     else
         specified_value=$1
-        map=$(cat "$qbase_homedir_abspath/qbase.json" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.key == $value)')
+        map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.key == $value)')
         if [ -z "${map}" ]; then
             echo "${RED}error: not found specified_value: ${BLUE}$specified_value ${NC}"
-            cat "$qbase_homedir_abspath/qbase.json" | jq '.support_script_path'
+            cat "$qpackageJsonF" | jq '.support_script_path'
             exit 1
         fi
         relpath=$(echo "${map}" | jq -r '.value')
