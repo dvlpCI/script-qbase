@@ -19,8 +19,16 @@ CYAN="\033[0;36m"
 if [ "$1" == "-package" ]; then
     packageArg=$2 # 去除第一个参数之前，先保留下来
     shift 2  # 去除前两个个参数
+    if [ "$1" == "-packageCodeDirName" ]; then
+        packageCodeNameArg=$2 # 去除第一个参数之前，先保留下来
+        shift 2  # 去除前两个个参数
+    else
+        echo "${RED}您当前的 ${packageArg} 库，需要添加其代码所在目录的名称，即 -packageCodeDirName bin或者lib ,否则等下找不到代码。${NC}"
+        exit 1
+    fi
 else
     packageArg="qbase"
+    packageCodeNameArg="bin" # 该值取决于您在 xxx.rb 中的设置
 fi
 
 
@@ -96,6 +104,8 @@ function getMaxVersionNumber_byDir() {
         versions+=("$version")
     done
 
+    # echo "温馨提示:您 $packageArg 库里的 $dir_path 目录下的所有版本号为: ${versions[*]} 。"
+
     # 选择最新的版本号
     latest_version=$(echo "${versions[@]}" | tr ' ' '\n' | sort -r | head -n 1)
     echo "${latest_version}"
@@ -107,7 +117,7 @@ function getHomeDir_abspath_byVersion() {
     latest_version="$2"
 
     # 输出最新版本的路径
-    curretnVersionDir_abspath="$dir_path/$latest_version/bin" # 放在bin目录下
+    curretnVersionDir_abspath="$dir_path/$latest_version/$packageCodeNameArg" # 一般放在bin或者lib目录下
     if [[ $curretnVersionDir_abspath =~ ^~.* ]]; then
         # 如果 $curretnVersionDir_abspath 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
         curretnVersionDir_abspath="${HOME}${curretnVersionDir_abspath:1}"
@@ -120,8 +130,12 @@ function getHomeDir_abspath_byVersion() {
 }
 function getqscript_allVersionHomeDir_abspath() {
     requstQScript=$1
-    homebrew_Cellar_dir="$(echo $(which $requstQScript) | sed 's/\/bin\/.*//')"
+    
+    packageBinNameArg="bin"
+    # homebrew_Cellar_dir="$(echo $(which $requstQScript) | sed 's/\/'bin'\/.*//')" 
+    homebrew_Cellar_dir=$(echo $(which $requstQScript) | sed "s/\(.*\)\/$packageBinNameArg\/.*/\1/")
     if [ -z "${homebrew_Cellar_dir}" ]; then
+        echo "执行命令(截取${packageCodeNameArg}前的路径，作为homebrew的Cellar文件夹路径)失败，请检查：《 echo $(which $requstQScript) | sed \"s/\(.*\)\/$packageBinNameArg\/.*/\1/\" 》 。"
         return 1
     fi
 
@@ -134,13 +148,17 @@ function getqscript_allVersionHomeDir_abspath() {
     echo "${qscript_allVersion_homedir}"
 }
 
-
 if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
     qbase_latest_version="local_qbase"
     qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 else
     qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+    # echo "您的 qtargetScript_allVersion_homedir = ${qtargetScript_allVersion_homedir}"
     qbase_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
+
     qbase_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qbase_latest_version}")
     if [ $? != 0 ]; then
         exit 1

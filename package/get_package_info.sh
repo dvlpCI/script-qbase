@@ -145,6 +145,8 @@ if [ "${requstQPackageParam}" == "version" ]; then
 elif [ "${requstQPackageParam}" == "homedir_abspath" ]; then
     qPackage_homedir_abspath=$(echo "$qPackageJson" | jq -r '.homedir_abspath')
     echo "${qPackage_homedir_abspath}"
+else
+    printf "%s" "${qPackageJson}"
 fi
 
 
