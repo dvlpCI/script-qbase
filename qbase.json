@@ -1,6 +1,17 @@
 {
     "quickCmd": [
         {
+            "type": "value",
+            "des": "值的创建、获取、修改",
+            "values": [
+                {
+                    "des": "获取给app的版本号和build号",
+                    "cmd": "getAppVersionAndBuildNumber",
+                    "value": "qbase -quick getAppVersionAndBuildNumber"
+                }
+            ]
+        },
+        {
             "type": "branch",
             "des": "分支",
             "values": [

@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-10-29 23:17:43
+ # @LastEditTime: 2023-11-01 11:23:03
 # @Description:
 ###
 
@@ -239,48 +239,6 @@ function get_path_json() {
     fi
 }
 
-function quickCmdExec() {
-    # allArgsForQuickCmd="$@"
-    # _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${allArgsForQuickCmd}${BLUE} ${NC}"
-    if [ -z "$1" ]; then
-         printf "${YELLOW}提示：您未设置要执行的快捷命令。附:所有支持的快捷命令如下：${NC}\n"
-        _logQuickCmd
-        return
-    fi
-
-    quickCmdString=$1
-    allArgArray=($@)
-    # _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
-    allArgCount=${#allArgArray[@]}
-    for ((i=0;i<allArgCount;i+=1))
-    {
-        if [ $i -eq 0 ]; then
-            continue
-        fi
-        currentArg=${allArgArray[i]}
-        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
-    }
-    _verbose_log "✅快捷命令及其所有参数分别为${BLUE} ${quickCmdString}${BLUE}${NC}:${CYAN}${quickCmdArgs[*]} ${CYAN}。${NC}"
-
-
-    if [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
-    
-    # elif [ "${quickCmdString}" == "getBranchMapsAccordingToBranchNames" ]; then
-    #     _verbose_log "${YELLOW}正在执行命令(根据分支名,获取并添加分支信息):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh $quickCmdArgs ${BLUE}》${NC}"
-    #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
-        
-    elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支信息并通知给你):《${BLUE} sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]}
-
-    else 
-        printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
-        _logQuickCmd
-    fi
-}
-
 function _logQuickCmd() {
     cat "$qpackageJsonF" | jq '.quickCmd'
 }
@@ -340,7 +298,10 @@ if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
 elif [ "${firstArg}" == "-path" ]; then
     get_path $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
-    quickCmdExec $allArgsExceptFirstArg
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh $allArgsExceptFirstArg
+    if [ $? -ne 0 ]; then
+        _logQuickCmd
+    fi
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
     echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'

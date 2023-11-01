@@ -26,6 +26,15 @@ do
         esac
 done
 
+if [[ $BranceMaps_From_Directory_PATH =~ ^~.* ]]; then
+    # 如果 $BranceMaps_From_Directory_PATH 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
+    BranceMaps_From_Directory_PATH="${HOME}${BranceMaps_From_Directory_PATH:1}"
+fi
+if [[ $BranchMapAddToJsonFile =~ ^~.* ]]; then
+    # 如果 $BranchMapAddToJsonFile 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
+    BranchMapAddToJsonFile="${HOME}${BranchMapAddToJsonFile:1}"
+fi
+
 requestBranchNameArray=($requestBranchNamesString)
 
 function look_detail() {
