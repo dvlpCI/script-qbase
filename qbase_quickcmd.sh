@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-01 11:28:27
+ # @LastEditTime: 2023-11-06 16:10:21
 # @Description:
 ###
 
@@ -64,6 +64,28 @@ function _verbose_log() {
 
 qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 
+packageArg="qbase"
+qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
+if [ ! -f "${qpackageJsonF}" ]; then
+    echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+    exit 1
+fi
+function _logQuickCmd() {
+    cat "$qpackageJsonF" | jq '.quickCmd'
+}
+
+function get_path_quickCmd() {
+    specified_value=$1
+    map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[] | select(.cmd == $value)')
+    if [ -z "${map}" ]; then
+        echo "${RED}error: not found specified_value: ${BLUE}$specified_value ${NC}"
+        cat "$qpackageJsonF" | jq '.quickCmd'
+        exit 1
+    fi
+    relpath=$(echo "${map}" | jq -r '.cmd_script')
+    relpath="${relpath//.\//}"  # 去掉开头的 "./"
+    echo "$qbase_homedir_abspath/$relpath"
+}
 
 
 function quickCmdExec() {
@@ -89,23 +111,28 @@ function quickCmdExec() {
     }
     _verbose_log "✅快捷命令及其所有参数分别为${BLUE} ${quickCmdString}${BLUE}${NC}:${CYAN}${quickCmdArgs[*]} ${CYAN}。${NC}"
 
-    if [ "${quickCmdString}" == "getAppVersionAndBuildNumber" ]; then
-        sh ${qbase_homedir_abspath}/value_create/value_create_app_version_and_build.sh
+    
 
-    elif [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
+    if [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
         _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
         sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
-    
+        return $?
     # elif [ "${quickCmdString}" == "getBranchMapsAccordingToBranchNames" ]; then
     #     _verbose_log "${YELLOW}正在执行命令(根据分支名,获取并添加分支信息):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh $quickCmdArgs ${BLUE}》${NC}"
     #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
-        
+
     elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
         _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支信息并通知给你):《${BLUE} sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
         sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]}
+        return $?
+    fi
 
+    quickCmd_script_path=$(get_path_quickCmd "${quickCmdString}")
+    if [ -f "$quickCmd_script_path" ]; then
+        # _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${quickCmd_script_path} ${quickCmdArgs[*]} ${BLUE}》${NC}"
+        sh ${quickCmd_script_path} ${quickCmdArgs[*]}
     else 
-        printf "${RED}抱歉：暂不支持 ${BLUE}$1 ${RED} 快捷命令，请检查${NC}\n"
+        printf "${RED}抱歉：暂不支持 ${BLUE}${quickCmdString} ${RED} 快捷命令，请检查${NC}\n"
         exit 1
     fi
 }

@@ -7,6 +7,7 @@
                 {
                     "des": "获取给app的版本号和build号",
                     "cmd": "getAppVersionAndBuildNumber",
+                    "cmd_script": "./value_create/value_create_app_version_and_build.sh",
                     "value": "qbase -quick getAppVersionAndBuildNumber"
                 }
             ]
