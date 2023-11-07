@@ -98,7 +98,7 @@ do
         -showCategoryName|--show-category-name) showCategoryName=$2; shift 2;;
         -showFlag|--show-branchLog-Flag) showBranchLogFlag=$2; shift 2;;
         -showName|--show-branchName) showBranchName=$2; shift 2;;
-        -showTime|--show-branchTimeLog) showBranchTimeLog=$2; shift 2;;
+        -showTime|--show-branchTimeLog) showBranchTimeLog=$2; shift 2;; # 时间显示方式(all、only_last、none)
         -showAt|--show-branchAtLog) showBranchAtLog=$2; shift 2;;
         -showTable|--show-branchTable) showBranchTable=$2; shift 2;;
         -shouldMD|--should-markdown) shouldMarkdown=$2; shift 2;;

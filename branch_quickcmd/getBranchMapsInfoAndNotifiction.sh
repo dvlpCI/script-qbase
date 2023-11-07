@@ -41,25 +41,13 @@ qbase_homedir_abspath=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以�
 quickCmdArgs="$@"
 # echo "==========所有参数为: ${quickCmdArgs[*]}"
 
-debug_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${YELLOW}》${NC}"
-resultBranchNames=$(sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]})
-if [ -z "${resultBranchNames}" ]; then
-    echo "${RED}您当前目录下的项目，没有新的提交记录，更不用说分支了，请检查确保cd到正确目录，或者提交了代码。${NC}"
-    exit 1
-fi
-echo "${GREEN}恭喜：获取当前分支【在rebase指定分支后】的所有分支名的结果如下：${BLUE} $resultBranchNames ${GREEN}。${NC}"
-
 # shift 1
 while [ -n "$1" ]
 do
     case "$1" in
-        -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
-        --add-value) add_value=$2; shift 2;;
-        --add-type) add_type=$2; shift 2;;
-        -onlyName|--only-name) ONLY_NAME=$2; shift 2;;
-        -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;;
-        -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
-        -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
+        # -branchMaps|--branchMap-array) branchMapArray=$2; shift 2;;
+        -branchMapsInJsonF|--branchMaps-json-file-path) branchMapsInJsonFile=$2; shift 2;; # 要计算的branchMaps所在的json文件
+        -branchMapsInKey|--branchMaps-key) branchMapsInKey=$2; shift 2;; # 要计算的branchMaps在json文件中的哪个字段
 
         -showCategoryName|--show-category-name) showCategoryName=$2; shift 2;;
         -showFlag|--show-branchLog-Flag) showBranchLogFlag=$2; shift 2;;
@@ -92,13 +80,8 @@ do
     esac
 done
 
-debug_log "========1.1=======✅-rebaseBranch:${REBASE_BRANCH}"
-debug_log "========1.2=======✅--add-value:${add_value}"
-debug_log "========1.3=======✅--add-type:${add_type}"
-debug_log "========1.4=======✅-onlyName:${ONLY_NAME}"
-debug_log "========2.1=======✅-branchMapsFromDir:${BranceMaps_From_Directory_PATH}"
-debug_log "========2.2=======✅-branchMapsAddToJsonF:${BranchMapAddToJsonFile}"
-debug_log "========2.3=======✅-branchMapsAddToKey:${BranchMapAddToKey}"
+debug_log "========2.2=======✅-branchMapsInJsonF:${branchMapsInJsonFile}"
+debug_log "========2.3=======✅-branchMapsInKey:${branchMapsInKey}"
 
 debug_log "========2.3=======✅-showCategoryName:${showCategoryName}"
 debug_log "========2.3=======✅-showFlag:${showBranchLogFlag}"
@@ -112,7 +95,7 @@ if [[ "${lowercase_shouldMarkdown}" == "true" ]]; then # 将shouldMarkdown的值
 else
     msgtype='text'
 fi
-
+debug_log "========2.3=======✅msgtype:${msgtype}"
 
 requestBranchNameArray=${resultBranchNames}
 debug_log "========r.r=======✅-requestBranchNamesString:${requestBranchNameArray[*]}"
@@ -124,25 +107,11 @@ debug_log "========3.2=======✅-at:${AtMiddleBracketIdsString}"
 # debug_log "========3.4=======✅-xxx:${xxx}"
 
 
-debug_log "${YELLOW}正在执行命令(获取所有指定分支名的branchMaps输出到指定文件中):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\" ${YELLOW}》${NC}"
-errorMessage=$(sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}" -shouldDeleteHasCatchRequestBranchFile "${shouldDeleteHasCatchRequestBranchFile}")
-if [ $? != 0 ]; then
-    echo "${errorMessage}" # 这是错误信息，其内部已经对输出内容，添加${RED}等颜色区分了
-    notification2wechat_scriptPath=${qbase_homedir_abspath}/notification/notification2wechat.sh
-    sh ${notification2wechat_scriptPath} -robot "${ROBOT_URL}" -content "${errorMessage}" -at "${AtMiddleBracketIdsString}" -msgtype "${msgtype}"
-    if [ $? != 0 ]; then
-        exit 1
-    fi
-    exit 1
-fi
-echo "${GREEN}恭喜：获取branchMaps成功，详情查看${BLUE} ${BranchMapAddToJsonFile} ${GREEN}。${NC}"
-
-
 # 获取信息
 get_branch_all_detail_info_script_path="${qbase_homedir_abspath}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
-Develop_Branchs_FILE_PATH=$BranchMapAddToJsonFile
-branchMapsInKey="${BranchMapAddToKey}"
-RESULT_SALE_TO_JSON_FILE_PATH=$BranchMapAddToJsonFile
+Develop_Branchs_FILE_PATH=$branchMapsInJsonFile
+branchMapsInKey="${branchMapsInKey}"
+RESULT_SALE_TO_JSON_FILE_PATH=$branchMapsInJsonFile
 
 # showCategoryName='true' # 通知时候显示
 # showBranchLogFlag='true'

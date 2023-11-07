@@ -2,7 +2,7 @@
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-16 00:10:18
 LastEditors: dvlproad
-LastEditTime: 2023-10-11 15:57:16
+LastEditTime: 2023-11-07 11:42:18
 FilePath: base_util.py
 Description: 打开文件、执行脚本
 '''
@@ -42,9 +42,17 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
             # 如果脚本文件是 Shell 文件，则在 command 数组的第一个位置插入 sh
             command.insert(0, "sh")
 
+    
+    command = [str(item) for item in command]   # 将布尔类型的元素转换为字符串，避免 ' '.join(command) 和 subprocess.run(command) 中出现不是字符串的值而出错
+    try:
+        cmdString=' '.join(command)
+        print(cmdString)
+    except TypeError as e:
+        print(f"{RED}Error:将{BLUE} {command} {RED}数组拼接成字符串时出错，出错原因为:{BLUE} {str(e)} {RED}。{NC}")
+        return False
+
     print(f"\n{BLUE}开始执行脚本，执行过程中输出内容如下：{NC}")
     if verbose==True:
-        cmdString=' '.join(command)
         escaped_command = cmdString.replace("(", r"\(").replace(")", r"\)")
         print(f"{BLUE}正在执行选中的命令:《{YELLOW} {escaped_command} {BLUE}》{NC}")
 
@@ -69,7 +77,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
 
     # 判断 shell 命令的返回值，并输出结果
     if result.returncode != 0:
-        print(f"{RED}抱歉:您的脚本命令执行失败，returncode={result.returncode}。 请检查您所执行的命令《 {YELLOW}{' '.join(command)}{RED} 》{NC}")
+        print(f"{RED}抱歉:您的脚本命令执行失败，returncode={result.returncode}。 请检查您所执行的命令《{YELLOW} {cmdString} {RED}》{NC}")
         exit(1)
     # elif result is not None and "exit 1" in result.stdout:
     #     print(f"{YELLOW}{sript_file_absPath}{RED} 脚本执行失败")

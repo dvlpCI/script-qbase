@@ -27,10 +27,17 @@
                     "value": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
                 },
                 {
-                    "des": "获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中",
+                    "des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
+                    "cmd": "getBranchMapsInfoAndNotifiction",
+                    "cmd_script": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh",
+                    "value": "qbase -quick getBranchMapsInfoAndNotifiction "
+                },
+                {
+                    "des": "获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中，并进行整理及整理后发送通知",
                     "cmd": "getBranchMapsAccordingToRebaseBranch",
                     "value": "qbase -quick getBranchMapsAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
                 }
+
                 
             ]
         }

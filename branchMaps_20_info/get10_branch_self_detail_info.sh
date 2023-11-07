@@ -382,6 +382,8 @@ fi
 
 if [ -z "${shouldMarkdown}" ] ; then
     shouldMarkdown="false"
+else
+    shouldMarkdown=$(echo "$shouldMarkdown" | tr '[:upper:]' '[:lower:]') # 将值转换为小写形式
 fi
 
 # 1、获取测试状态，后面好根据不同的测试状态显示不同的样式
