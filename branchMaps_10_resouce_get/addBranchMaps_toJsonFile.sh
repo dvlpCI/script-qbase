@@ -13,6 +13,10 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
+exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
+    exit 1
+}
+
 # shell 参数具名化
 while [ -n "$1" ]
 do
@@ -21,6 +25,7 @@ do
                 -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
                 -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
                 -requestBranchNamesString|--requestBranchNamesString) requestBranchNamesString=$2; shift 2;;
+                -shouldDeleteHasCatchRequestBranchFile|--should-delete-has-catch-request-branch-file) shouldDeleteHasCatchRequestBranchFile=$2; shift 2;; # 如果脚本执行成功是否要删除掉已经捕获的文件(一般用于在版本归档时候删除就文件)
                 --) break ;;
                 *) break ;;
         esac
@@ -34,32 +39,22 @@ if [[ $BranchMapAddToJsonFile =~ ^~.* ]]; then
     # 如果 $BranchMapAddToJsonFile 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
     BranchMapAddToJsonFile="${HOME}${BranchMapAddToJsonFile:1}"
 fi
+#获取featureBrances文件夹下的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 中
+if [ ! -d "${BranceMaps_From_Directory_PATH}" ]; then
+    echo "Error❌:您的 -branchMapsFromDir 指向的'map是从哪个文件夹路径获取'的参数值 ${BranceMaps_From_Directory_PATH} 不存在，请检查！"
+    exit_script
+fi
+
+if [ ! -f "${BranchMapAddToJsonFile}" ]; then
+    echo "Error❌:您的 -branchMapsAddToJsonF 指向的'要添加到哪个文件路径'的参数值 ${BranchMapAddToJsonFile} 不存在，请检查！"
+    exit_script
+fi
 
 requestBranchNameArray=($requestBranchNamesString)
 
 function look_detail() {
     echo "${YELLOW}分支源添加到文件后的更多详情可查看:${BLUE} ${BranchMapAddToJsonFile} ${NC}的 ${BLUE}${BranchMapAddToKey} ${NC}"
 }
-
-function getUncatchRequestBranchNames() {
-    c2=()  # 创建一个空数组来存储结果
-
-    requestBranchNameCount=${#requestBranchNameArray[@]}
-    for ((i=0;i<requestBranchNameCount;i+=1))
-    {
-        element=${requestBranchNameArray[$i]}
-        # 获取元素的最后一个字段
-        last_field="${element##*/}"
-        
-        # 检查元素是否在name2_values中
-        if ! echo "${hasCatchRequestBranchNameArray[*]}" | grep -wq "${last_field}" &>/dev/null; then
-            c2+=("$element")  # 将元素添加到数组c2中
-        fi
-    }
-
-    echo "${c2[*]}"
-}
-
 
 
 
@@ -108,11 +103,8 @@ JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_i
 
 #exit
 
-exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还去继续多余的执行其他操作
-    exit 1
-}
 
-function read_dir_path() {
+function get_required_branch_file_paths_from_dir() {
     isReadDirSuccess=true
     ReadDirErrorMessage=""
     dirFileContentsResult=""
@@ -132,6 +124,27 @@ function read_dir_path() {
             continue
         fi
         
+        requiredBranch_FilePaths[${#requiredBranch_FilePaths[@]}]=${file}
+    done
+
+
+    if [ "${isReadDirSuccess}" != "true" ]; then
+        echo "${ReadDirErrorMessage}"
+        return 1
+    fi
+
+    printf "%s" "${requiredBranch_FilePaths[*]}"
+}
+
+
+function read_requiredBranchFilePaths() {
+    isReadDirSuccess=true
+    ReadDirErrorMessage=""
+    dirFileContentsResult=""
+
+    requiredBranch_FilePaths=($1) #转成数组
+
+    for file in "${requiredBranch_FilePaths[@]}"; do
         ReadDirResult=$(read_dir_file "$file")
         if [ $? -ne 0 ]; then
             isReadDirSuccess=false
@@ -156,6 +169,39 @@ function read_dir_path() {
 
     echo "${dirFileContentsResult[*]}"
 }
+
+
+# 获取branch文件是否应该被添加，并返回true或false
+function isBranchFileInBranchNames() {
+    branchAbsoluteFilePath=$1
+    branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
+    if [ $? != 0 ]; then
+        echo "${RED}Error❌:获取文件 ${BLUE}${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹 ${BLUE}$BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
+        return 1
+    fi
+    # 判断是否在数组中
+    # if echo "${requestBranchNameArray[*]}" | grep -wq "${branchName}" &>/dev/null; then
+    #     echo "true"
+    # else
+    #     echo "false---${requestBranchNameArray[*]}---${branchName}"
+    # fi
+
+    found=false
+    # 遍历数组a中的每个元素
+
+    requestBranchNameCount=${#requestBranchNameArray[@]}
+    for ((i=0;i<requestBranchNameCount;i+=1))
+    {
+        element=${requestBranchNameArray[$i]}
+        # last_field="${element##*/}" # 获取元素的最后一个字段
+        if [ "$element" == "$branchName" ]; then
+            found=true
+            break
+        fi
+    }
+    echo "$found"
+}
+
 
 function read_dir_file() {
     absoluteFilePath=$1
@@ -197,70 +243,34 @@ function getLastCommitAuthorByBranchFile() {
     echo "${errorBranchUser}"
 }
 
-# 获取branch文件是否应该被添加，并返回true或false
-function isBranchFileInBranchNames() {
-    branchAbsoluteFilePath=$1
-    branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
-    if [ $? != 0 ]; then
-        echo "${RED}Error❌:获取文件 ${BLUE}${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹 ${BLUE}$BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
-        return 1
-    fi
-    # 判断是否在数组中
-    # if echo "${requestBranchNameArray[*]}" | grep -wq "${branchName}" &>/dev/null; then
-    #     echo "true"
-    # else
-    #     echo "false---${requestBranchNameArray[*]}---${branchName}"
-    # fi
-
-    found=false
-    # 遍历数组a中的每个元素
-
-    requestBranchNameCount=${#requestBranchNameArray[@]}
-    for ((i=0;i<requestBranchNameCount;i+=1))
-    {
-        element=${requestBranchNameArray[$i]}
-        # last_field="${element##*/}" # 获取元素的最后一个字段
-        if [ "$element" == "$branchName" ]; then
-            found=true
-            break
-        fi
-    }
-    echo "$found"
-}
-
-
-
-#获取featureBrances文件夹下的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 中
-if [ ! -d "${BranceMaps_From_Directory_PATH}" ]; then
-    echo "Error❌:您的App_Feature_Brances_Directory_PATH= ${BranceMaps_From_Directory_PATH} 文件夹不存在，请检查！"
-    exit_script
-fi
-
-if [ ! -f "${BranchMapAddToJsonFile}" ]; then
-    echo "Error❌:您的Branch_Info_FILE_PATH=${BranchMapAddToJsonFile} 文件不存在，请检查！"
-    exit_script
-fi
 
 # isBranchFileInBranchNames "/Users/lichaoqian/Project/CQCI/script-qbase/branchMaps_10_resouce_get/example/featureBrances/dev_demo.json" || exit # 测试代码
 # read_dir_path || exit # 测试代码
-ReadDirErrorMessage=$(read_dir_path)
+requiredBranch_FilePathsString=$(get_required_branch_file_paths_from_dir)
+if [ $? != 0 ]; then
+    echo "$requiredBranch_FilePathsString" # 此时值为错误消息
+    exit 1
+fi
+
+ReadDirErrorMessage=$(read_requiredBranchFilePaths "${requiredBranch_FilePathsString}")
 if [ $? != 0 ]; then
     echo "执行命令(读取目录下的文件)发生错误如下:\n${ReadDirErrorMessage}"
     exit 1
 fi
 if [ -z "${ReadDirErrorMessage}" ]; then
-    echo "${RED}Error❌:获取所有指定分支名的branchMaps输出到指定文件中失败。想要要查找的分支数据是: ${BLUE}${requestBranchNameArray[*]} ${RED}，查找数据的文件夹源是 ${BLUE}${BranceMaps_From_Directory_PATH} ${RED}。${NC}"
+    echo "${RED}Error❌:获取所有指定分支名的branchMaps输出到指定文件中失败。想要要查找的分支数据是:${BLUE} ${requestBranchNameArray[*]} ${RED}，查找数据的文件夹源是${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}。${NC}"
     # look_detail
     exit 1
 fi
 dirFileContentsResult=("${ReadDirErrorMessage}")
-
 if [ ${#dirFileContentsResult[@]} == 0 ]; then
     echo "友情提示🤝：读取目录文件，未提取到符合条件的文件，即不会往 ${BranchMapAddToJsonFile} 中的 ${BranchMapAddToKey} 属性添加其他值，最终的分支信息只能靠其原有值了"
     exit 0
 fi
 
-log_msg "${YELLOW}正在执行命令(获取json内容)《 ${BLUE}sh ${get_jsonstring_script_file} -arrayString \"${dirFileContentsResult[*]}\" -escape \"true\" ${YELLOW}》${NC}"
+
+
+log_msg "${YELLOW}正在执行命令(获取json内容)《${BLUE} sh ${get_jsonstring_script_file} -arrayString \"${dirFileContentsResult[*]}\" -escape \"true\" ${YELLOW}》${NC}"
 dirFileContentJsonStrings=$(sh ${get_jsonstring_script_file} -arrayString "${dirFileContentsResult[*]}" -escape "false")
 if [ $? != 0 ]; then
     exit 1
@@ -272,6 +282,25 @@ sh "${JsonUpdateFun_script_file_Absolute}" -f "${BranchMapAddToJsonFile}" -k "${
 
 
 # 读取JSON文件内容并提取feature_brances数组中的name2值
+function getUncatchRequestBranchNames() {
+    c2=()  # 创建一个空数组来存储结果
+
+    requestBranchNameCount=${#requestBranchNameArray[@]}
+    for ((i=0;i<requestBranchNameCount;i+=1))
+    {
+        element=${requestBranchNameArray[$i]}
+        # 获取元素的最后一个字段
+        last_field="${element##*/}"
+        
+        # 检查元素是否在name2_values中
+        if ! echo "${hasCatchRequestBranchNameArray[*]}" | grep -wq "${last_field}" &>/dev/null; then
+            c2+=("$element")  # 将元素添加到数组c2中
+        fi
+    }
+
+    echo "${c2[*]}"
+}
+
 name2_values=$(jq -r ".${BranchMapAddToKey}[].name" ${BranchMapAddToJsonFile})
 hasCatchRequestBranchNameArray=($name2_values)
 uncatchRequestBranchNames=$(getUncatchRequestBranchNames)
@@ -279,6 +308,25 @@ if [ -n "${uncatchRequestBranchNames}" ]; then
     echo "${PURPLE}完全匹配失败，结果如下>>>>>\n要查找的数据是:${BLUE} ${requestBranchNameArray[*]}\n${PURPLE}但找不到匹配的分支名是:${RED} ${uncatchRequestBranchNames} ${PURPLE}。${NC}"
     look_detail
     exit 1
+fi
+
+
+# shouldDeleteHasCatchRequestBranchFile="true"
+if [ "${shouldDeleteHasCatchRequestBranchFile}" == true ]; then
+    errorDeleteHasCatchRequestBranchFile=()
+    requiredBranch_FilePaths=(${requiredBranch_FilePathsString})
+    for file in "${requiredBranch_FilePaths[@]}"; do
+        rm "$file"
+        if [ $? != 0 ]; then
+            errorDeleteHasCatchRequestBranchFile[${#errorDeleteHasCatchRequestBranchFile[@]}]=${file}
+        fi
+    done
+
+    if [ ${#errorDeleteHasCatchRequestBranchFile[@]} -gt 0 ]; then 
+        echo "${RED}Error:如果脚本执行成功是否要删除掉已经捕获的文件(一般用于在版本归档时候删除就文件)，删除失败。附删除失败的文件分别如下：${BLUE}\n${errorDeleteHasCatchRequestBranchFile[*]} 。${NC}"
+        look_detail
+        exit 1
+    fi
 fi
 
 look_detail
