@@ -20,6 +20,9 @@ CYAN='\033[0;36m'
 # 获取相对于指定文件的相对目录的绝对路径
 def getAbsPathByFileRelativePath(file_path, rel_path):
     file_dir_abspath=os.path.abspath(file_path)
+    if not os.path.exists(file_dir_abspath):
+        return None
+    
     # 获取当前文件的所在目录
     file_parent_dir_path = os.path.dirname(file_dir_abspath)
     

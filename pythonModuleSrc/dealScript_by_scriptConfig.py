@@ -223,9 +223,9 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
         # 如果是相对目录
         param_value = operateHomeMap['fixedValue']
         dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value)
-        if not os.path.exists(dir_path):
-            print(f"{RED}参数指向的文件获取失败，原因为计算出来的相对目录不存在。请检查您的 {YELLOW}{pack_input_params_file_path}{NC} 中选中的 {BLUE}{json.dumps(operateHomeMap, indent=2)}{NC} 里的 {BLUE}fixedValue{RED} 属性值 {BLUE}{param_value}{RED} 是否正确。（其会导致计算相对于 {YELLOW}{pack_input_params_file_path}{RED} 的该属性值路径 {BLUE}{dir_path}{RED} 不存在)。{NC}")
-            openFile(pack_input_params_file_path)
+        if dir_path == None or not os.path.exists(dir_path):
+            print(f"{RED}参数指向的文件获取失败，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}")
+            # openFile(pack_input_params_file_path)
             
             return None
         else:

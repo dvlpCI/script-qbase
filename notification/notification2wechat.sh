@@ -150,7 +150,7 @@ function notiMessage() {
     #    echo "responseResult=$responseResult"
         responseResultCode=$(echo ${responseResult} | jq  '.errcode') # mac上安装brew后，执行brew install jq安装jq
         #echo "responseResultCode=${responseResultCode}"
-        if [ $responseResultCode = 0 ];then
+        if [ "$responseResultCode" = 0 ];then
             echo "-------- Success: 通知发送成功，继续操作 --------"
         else
             responseErrorMessage=$(echo ${responseResult} | jq  '.errmsg')
