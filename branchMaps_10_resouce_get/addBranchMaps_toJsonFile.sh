@@ -17,6 +17,12 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
     exit 1
 }
 
+CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+CommonFun_HomeDir_Absolute=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
+
+qbase_branchMapFile_checkMap_scriptPath=${CommonFun_HomeDir_Absolute}/branchMaps_11_resouce_check/branchMapFile_checkMap.sh
+
+
 # shell 参数具名化
 while [ -n "$1" ]
 do
@@ -25,6 +31,8 @@ do
                 -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
                 -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
                 -requestBranchNamesString|--requestBranchNamesString) requestBranchNamesString=$2; shift 2;;
+                -checkPropertyInNetwork|--package-network-type) CheckPropertyInNetworkType=$2; shift 2;;
+                -ignoreCheckBranchNames|--ignoreCheck-branchNameArray) ignoreCheckBranchNameArray=$2; shift 2;;
                 -shouldDeleteHasCatchRequestBranchFile|--should-delete-has-catch-request-branch-file) shouldDeleteHasCatchRequestBranchFile=$2; shift 2;; # 如果脚本执行成功是否要删除掉已经捕获的文件(一般用于在版本归档时候删除就文件)
                 --) break ;;
                 *) break ;;
@@ -136,6 +144,37 @@ function get_required_branch_file_paths_from_dir() {
     printf "%s" "${requiredBranch_FilePaths[*]}"
 }
 
+function check_requiredBranchFilePaths() {
+    requiredBranch_FilePaths=($1) #转成数组
+    requiredBranch_FileCount=${#requiredBranch_FilePaths[@]}
+
+    missingPropertyBranchNameArray=()
+    errorMessageArray=()
+    for ((i=0;i<requiredBranch_FileCount;i++))
+    do
+        branchMapFilePath=${requiredBranch_FilePaths[i]}
+        iBranchMap=$(cat ${branchMapFilePath} | jq -r ".") # -r 去除字符串引号
+        branchName=$(echo ${iBranchMap} | jq -r ".name") # -r 去除字符串引号
+
+        errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${iBranchMap}" -pn "${CheckPropertyInNetworkType}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
+        if [ $? != 0 ]; then
+            missingPropertyBranchNameArray[${#missingPropertyBranchNameArray[@]}]=${branchName}
+            iResultMessage=""
+            if [ ${#errorMessageArray[@]} -gt 0 ]; then
+                iResultMessage+="\n"
+            fi
+            iResultMessage+="${RED}$((i+1)).您的${BLUE} ${branchName} ${RED}分支缺失${BLUE} ${errorMessage} ${RED}【详情请查看${BLUE} ${branchMapFilePath} ${RED}。】${RED}"
+            errorMessageArray[${#errorMessageArray[@]}]=${iResultMessage}
+        fi
+    done
+    #echo "缺失分支属性的分支名分别为 missingPropertyBranchNameArray=${missingPropertyBranchNameArray[*]}"
+    if [ "${#missingPropertyBranchNameArray[@]}" -gt 0 ]; then
+        # 【分支类型type，该类型值为hotfix/feature/optimize/other 中一种【分别对应hotfix(线上修复)/feature(产品需求)/optimize(技术优化)/other(其他)】】
+        echo "${RED}Error❌:您有${#missingPropertyBranchNameArray[@]}个分支的json文件有缺失标明的部分，请前往补充后再执行打包。详细缺失信息如下：\n${errorMessageArray[*]} ${RED}。${NC}"
+        echo "${RED}附：若您不想进行以上属性检查的操作，请勿传${BLUE} -checkPropertyInNetwork ${RED}参数即可。${NC}"
+        return 1
+    fi
+}
 
 function read_requiredBranchFilePaths() {
     isReadDirSuccess=true
@@ -250,6 +289,14 @@ requiredBranch_FilePathsString=$(get_required_branch_file_paths_from_dir)
 if [ $? != 0 ]; then
     echo "$requiredBranch_FilePathsString" # 此时值为错误消息
     exit 1
+fi
+
+if [ -n "${CheckPropertyInNetworkType}" ]; then
+    CheckErrorMessage=$(check_requiredBranchFilePaths "${requiredBranch_FilePathsString}")
+    if [ $? != 0 ]; then
+        printf "%s\n" "${CheckErrorMessage}"
+        exit 1
+    fi
 fi
 
 ReadDirErrorMessage=$(read_requiredBranchFilePaths "${requiredBranch_FilePathsString}")

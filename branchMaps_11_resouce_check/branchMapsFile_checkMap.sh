@@ -104,7 +104,7 @@ do
         if [ ${#errorMessageArray[@]} -gt 0 ]; then
             iResultMessage+="\n"
         fi
-        iResultMessage+="${RED}$((i+1)).${BLUE}${branchName} ${RED}缺失 ${errorMessage} ${RED}；"
+        iResultMessage+="${RED}$((i+1)).您的${BLUE} ${branchName} ${RED}分支缺失 ${errorMessage} ${RED}；"
         errorMessageArray[${#errorMessageArray[@]}]=${iResultMessage}
     fi
 done

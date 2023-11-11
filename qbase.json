@@ -216,7 +216,7 @@
                 {
                     "key": "addBranchMaps_toJsonFile",
                     "des": "获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误",
-                    "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"",
+                    "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\"",
                     "value": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh"
                 },
                 {

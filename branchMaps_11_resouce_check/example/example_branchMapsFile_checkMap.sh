@@ -37,6 +37,7 @@ log_title "检查branchMap在各环境下的属性"
 Example_BranchMap_FILE_PATH="${Example_HomeDir_Absolute}/example_branchMapFile_checkMap.json"
 checkBranchMap=$(cat "${Example_BranchMap_FILE_PATH}" | jq '.')
 PackageNetworkType="product"
+ignoreCheckBranchNameArray="(master development dev_publish_out dev_publish_in dev_all)"
 errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${checkBranchMap}" -pn "${PackageNetworkType}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
 if [ $? != 0 ]; then
     echo "${RED}Error:在 ${PackageNetworkType} 环境下缺失 type 或 time 的所有分支信息如下：\n${errorMessage}${NC}"

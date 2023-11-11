@@ -34,12 +34,14 @@ BranceMaps_From_Directory_PATH="${CurrentDIR_Script_Absolute}/featureBrances"
 BranchMapAddToJsonFile="${CurrentDIR_Script_Absolute}/app_branch_info.json"
 BranchMapAddToKey="package_merger_branchs"
 requestBranchNameArray=("chore/branch_get" "optimize/dev_script_pack")
-
-
+CheckPropertyInNetworkType="product"
+ignoreCheckBranchNameArray="(master development dev_publish_out dev_publish_in dev_all)"
+shouldDeleteHasCatchRequestBranchFile=false
+                            
 
 log_title "获取branchMaps"
-echo "${YELLOW}正在执行命令:《 ${BLUE}sh ${addBranchMaps_toJsonFile_script_path} -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" ${YELLOW}》${NC}"
-errorMessage=$(sh ${addBranchMaps_toJsonFile_script_path} -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}")
+echo "${YELLOW}正在执行命令:《 ${BLUE}sh ${addBranchMaps_toJsonFile_script_path} -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNameArray[*]}\" -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\" ${YELLOW}》${NC}"
+errorMessage=$(sh ${addBranchMaps_toJsonFile_script_path} -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNameArray[*]}" -checkPropertyInNetwork "${CheckPropertyInNetworkType}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray}" -shouldDeleteHasCatchRequestBranchFile "${shouldDeleteHasCatchRequestBranchFile}")
 if [ $? != 0 ]; then
     echo "${RED}${errorMessage}${NC}"
     exit 1
