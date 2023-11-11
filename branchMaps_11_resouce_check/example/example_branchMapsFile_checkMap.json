@@ -1,0 +1,139 @@
+{
+    "package_merger_branchs": [
+      {
+        "create_time": "02.09",
+        "submit_test_time": "null",
+        "pass_test_time": "null",
+        "merger_pre_time": "null",
+        "type": "hotfix",
+        "name": "dev_login_err",
+        "des": "详见outlines",
+        "outlines": [
+          {
+            "title": "登录失败错误提示",
+            "url": "https://www.baidu.com/"
+          },
+          {
+            "title": "登录失败错误提示2"
+          }
+        ],
+        "answer": {
+          "name": "producter1"
+        },
+        "tester": {
+          "name": "test1"
+        }
+      },
+      {
+        "create_time": "02.09",
+        "submit_test_time": "02.09",
+        "pass_test_time": "2.16",
+        "merger_pre_time": "null",
+        "type": "hotfix",
+        "name": "dev_login_err",
+        "des": "详见outlines",
+        "outlines": [
+          {
+            "title": "修复提示语"
+          }
+        ],
+        "answer": {
+          "name": "producter1"
+        },
+        "tester": {
+          "name": "test1"
+        }
+      },
+      {
+        "create_time": "02.17",
+        "submit_test_time": "02.17",
+        "pass_test_time": "02.17",
+        "merger_pre_time": "02.17",
+        "type": "feature",
+        "name": "dev_ui_revision",
+        "des": "详见outlines",
+        "outlines": [
+          {
+            "title": "首页UI改版"
+          },
+          {
+            "title": "个人中心UI改版"
+          }
+        ],
+        "answer": {
+          "name": "qian"
+        },
+        "tester": {
+          "name": "qian"
+        }
+      },
+      {
+        "create_time": "02.15",
+        "submit_test_time": "02.15",
+        "pass_test_time": "02.16",
+        "merger_pre_time": "02.16",
+        "type": "feature",
+        "name": "dev_js_game",
+        "des": "详见outlines",
+        "outlines": [
+          {
+            "title": "添加打开app发布愿望单的Bridge"
+          },
+          {
+            "title": "新增H5获取app版本公共信息"
+          },
+          {
+            "title": "新增H5获取app设备埋点公共信息"
+          }
+        ],
+        "answer": {
+          "name": "producter2"
+        },
+        "tester": {
+          "name": "tester2"
+        }
+      },
+      {
+        "create_time": "12.14",
+        "submit_test_time": "12.14",
+        "pass_test_time": "12.22",
+        "merger_pre_time": "12.22",
+        "type": "optimize",
+        "name": "dev_dokit",
+        "des": "Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)",
+        "answer": {
+          "name": "qian"
+        },
+        "tester": {
+          "name": "tester3"
+        }
+      },
+      {
+        "create_time": "02.17",
+        "submit_test_time": "02.17",
+        "pass_test_time": "02.17",
+        "merger_pre_time": "02.17",
+        "type": "feature",
+        "name": "dev_script_pack",
+        "des": "详见outlines",
+        "outlines": [
+          {
+            "title": "修复开发包打包"
+          },
+          {
+            "title": "添加人员信息，打包出错可@对应开发"
+          },
+          {
+            "title": "打包信息添加markdown支持"
+          }
+        ],
+        "answer": {
+          "name": "qian"
+        },
+        "tester": {
+          "name": "qian"
+        }
+      }
+    ]
+  }
+  

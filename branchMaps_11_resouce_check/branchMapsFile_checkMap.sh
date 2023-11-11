@@ -228,6 +228,7 @@ while [ -n "$1" ]
 do
     case "$1" in
         -branchMapsJsonF|--branch-maps-json-file) BranchMaps_JsonFilePath=$2; shift 2;;
+        -branchMapsJsonK|--branch-maps-json-key) BranchMapsInJsonKey=$2; shift 2;;
         -ignoreCheckBranchNames|--ignoreCheck-branchNameArray) ignoreCheckBranchNameArray=$2; shift 2;;
         -pn|--package-network-type) PackageNetworkType=$2; shift 2;;
         --) break ;;
@@ -236,25 +237,25 @@ do
 done
 
 if [ ! -f "${BranchMaps_JsonFilePath}" ]; then
-    echo "${RED}Error❌:缺少 ${BLUE}-branchMapsJsonF ${RED}参数，请检查！${NC}"
+    echo "${RED}Error❌:缺少${BLUE} -branchMapsJsonF ${RED}参数，请检查！${NC}"
     exit 1
 fi
 
 if [ -z "${PackageNetworkType}" ]; then
-    echo "${RED}Error❌:缺少 ${BLUE}-pn ${RED}参数，请检查！${NC}"
+    echo "${RED}Error❌:缺少${BLUE} -pn ${RED}参数，请检查！${NC}"
     exit 1
 fi
 
 
-# echo "${YELLOW}《 ${BLUE}cat \"${BranchMaps_JsonFilePath}\" | ${JQ_EXEC} -r '.package_merger_branchs' ${YELLOW}》${NC}"
-branchMapArray=$(cat "${BranchMaps_JsonFilePath}" | ${JQ_EXEC} -r '.package_merger_branchs') # -r 去除字符串引号
+# echo "${YELLOW}《 ${BLUE}cat \"${BranchMaps_JsonFilePath}\" | ${JQ_EXEC} -r \".${BranchMapsInJsonKey}\" ${YELLOW}》${NC}"
+branchMapArray=$(cat "${BranchMaps_JsonFilePath}" | ${JQ_EXEC} -r ".${BranchMapsInJsonKey}") # -r 去除字符串引号
 if [ $? != 0 ]; then
-    echo "${RED}Error❌:检查分支的详细信息的完整性 失败啦。在文件 ${BLUE}${BranchMaps_JsonFilePath} ${RED}中获取 ${BLUE}package_merger_branchs ${RED}字段的值失败。请检查！${NC}"
+    echo "${RED}Error❌:检查分支的详细信息的完整性失败啦。在文件${BLUE} ${BranchMaps_JsonFilePath} ${RED}中获取${BLUE} ${BranchMapsInJsonKey} ${RED}字段的值失败。请检查！${NC}"
     exit_script
 fi
 # echo "branchMapArray=${branchMapArray}"
 if [ -z "${branchMapArray}" ] || [ "${branchMapArray}" == "null" ]; then
-    echo "${RED}Error❌:检查分支的详细信息的完整性 失败啦。在文件 ${BLUE}${BranchMaps_JsonFilePath} ${RED}中未找到 ${BLUE}package_merger_branchs ${RED}字段的值。请检查！${NC}"
+    echo "${RED}Error❌:未找到要进行分支完整性检查的分支数组，请检查文件${BLUE} ${BranchMaps_JsonFilePath} ${RED}和其${BLUE} ${BranchMapsInJsonKey} ${RED}字段的值！${NC}"
     exit_script
 fi
 

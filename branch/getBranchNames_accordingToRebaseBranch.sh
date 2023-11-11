@@ -27,7 +27,7 @@ do
                 -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
                 --add-value) add_value="$2" shift 2;;
                 --add-type) add_type="$2" shift 2;;
-                -onlyName|--only-name) ONLY_NAME=$2; shift 2;;
+                -onlyName|--only-name) ONLY_NAME=$2; shift 2;; # 名字是否只取最后部分，不为true时候为全名
                 --) break ;;
                 *) break ;;
         esac
