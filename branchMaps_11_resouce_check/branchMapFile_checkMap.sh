@@ -194,11 +194,21 @@ allErrorMessageArray+=("${typeErrorMessageArray[@]}")
 allErrorMessageArray+=("${timeErrorMessageArray[@]}")
 missingPropertyCount=${#allErrorMessageArray[@]}
 if [ "$missingPropertyCount" -gt 0 ]; then
-    ResultMessage="Error:在 ${PackageNetworkType} 环境下缺失 type 或 time 的所有分支信息如下："
+    ResultMessage=""
+    outlineIndexs="①,②,③,④,⑤,⑥,⑦,⑧,⑨,⑩"
+    outlineIndexArray=(${outlineIndexs//,/ }) # 使用,替换空格，并形成数组
     for ((i=0;i<missingPropertyCount;i+=1))
     {
+        if [ $missingPropertyCount -lt ${#outlineIndexArray[@]} ]; then
+            smallIndex=${outlineIndexArray[i]}
+        else
+            smallIndex="⑩"
+        fi
         missingProperty=${allErrorMessageArray[i]}
-        ResultMessage+="\n$((i+1)).${missingProperty}"
+        # if [ $i -gt 0 ]; then
+        #     ResultMessage+="\n"
+        # fi
+        ResultMessage+="${smallIndex}.${missingProperty};"
     }
     printf "%s" "${ResultMessage}"
     exit 1

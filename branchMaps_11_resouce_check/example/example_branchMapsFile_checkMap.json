@@ -25,30 +25,10 @@
         }
       },
       {
-        "create_time": "02.09",
-        "submit_test_time": "02.09",
-        "pass_test_time": "2.16",
-        "merger_pre_time": "null",
-        "type": "hotfix",
-        "name": "dev_login_err",
-        "des": "详见outlines",
-        "outlines": [
-          {
-            "title": "修复提示语"
-          }
-        ],
-        "answer": {
-          "name": "producter1"
-        },
-        "tester": {
-          "name": "test1"
-        }
-      },
-      {
         "create_time": "02.17",
         "submit_test_time": "02.17",
-        "pass_test_time": "02.17",
-        "merger_pre_time": "02.17",
+        "pass_test_time": "null",
+        "merger_pre_time": "null",
         "type": "feature",
         "name": "dev_ui_revision",
         "des": "详见outlines",
@@ -71,8 +51,8 @@
         "create_time": "02.15",
         "submit_test_time": "02.15",
         "pass_test_time": "02.16",
-        "merger_pre_time": "02.16",
-        "type": "feature",
+        "merger_pre_time": "null",
+        "type": "null",
         "name": "dev_js_game",
         "des": "详见outlines",
         "outlines": [
