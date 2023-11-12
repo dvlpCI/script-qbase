@@ -58,7 +58,7 @@ num=${#arr[@]}
 #echo "num=$num"
     
     
-noBranchNames=("HEAD" "->")
+noBranchNames=("HEAD" "origin/HEAD" "->")
 # noBranchNames[${#noBranchNames[@]}]="${currentBranch}"
 #echo "noBranchNames=${noBranchNames[*]}, noBranchNameCount=${#noBranchNames[@]}"
 for ((i=0;i<num;i+=1))

@@ -33,6 +33,18 @@
     ],
     "support_script_path": [
         {
+            "type": "menu",
+            "des": "json 菜单的值获取",
+            "values": [
+                {
+                    "des": "获取 package 的指定 path 或者 cmd 的脚本文件路径",
+                    "key": "package_path_and_cmd_menu",
+                    "value": "./menu/package_path_and_cmd_menu.sh",
+                    "example": "sh xxx.sh -file $packageJsonF -keyType $keyType -key $key"
+                }
+            ]
+        },
+        {
             "type": "foundation",
             "des": "字符串处理(截取)",
             "values": [
@@ -200,7 +212,8 @@
                 {
                     "des": "获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支",
                     "key": "first_commit_info_after_date",
-                    "value": "./branch/first_commit_info_after_date.sh -date \"2022-12-26 10:45:24\""
+                    "value": "./branch/first_commit_info_after_date.sh",
+                    "example": "sh ./branch/first_commit_info_after_date.sh -date \"2022-12-26 10:45:24\""
                 },
                 {
                     "key": "get_merger_recods_after_date",

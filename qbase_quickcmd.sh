@@ -63,6 +63,7 @@ function _verbose_log() {
 
 
 qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
+qbase_package_path_and_cmd_menu_scriptPath=${qbase_homedir_abspath}/menu/package_path_and_cmd_menu.sh
 
 packageArg="qbase"
 qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
@@ -76,28 +77,11 @@ function _logQuickCmd() {
 
 function get_path_quickCmd() {
     specified_value=$1
-    map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[] | select(.cmd == $value)')
-    # echo "${YELLOW}1.查找 quickCmd 的 cmd 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
-    if [ -n "${map}" ] && [ "${map}" != "null" ]; then
-        relpath=$(echo "${map}" | jq -r '.cmd_script')
-    else
-        map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.cmd == $value)')
-        # echo "${YELLOW}2.查找 support_script_path 的 cmd 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
-        if [ -n "${map}" ] && [ "${map}" != "null" ]; then
-            relpath=$(echo "${map}" | jq -r '.value')
-        else
-            map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.value == $value)')
-            # echo "${YELLOW}3.查找 support_script_path 的 value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
-             if [ -n "${map}" ] && [ "${map}" != "null" ]; then
-                relpath=$(echo "${map}" | jq -r '.value')
-            fi
-        fi
-    fi
 
-    if [ -z "${relpath}" ]; then
-        echo "${RED}error: not found specified_value:${BLUE} $specified_value ${NC}"
-        # cat "$qpackageJsonF" | jq '.quickCmd'
-        cat "$qpackageJsonF" | jq '.'
+    # sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -keyType "cmd" -key "${specified_value}" || exit 1 # 测试脚本就退出脚本
+    relpath=$(sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -keyType "cmd" -key "${specified_value}")
+    if [ $? != 0 ]; then
+        echo "$relpath" # 此时此值是错误信息
         exit 1
     fi
     
@@ -131,7 +115,7 @@ function quickCmdExec() {
 
     # get_path_quickCmd "${quickCmdString}" || exit 1 # 测试 get_path_quickCmd 方法完就退出脚本
     quickCmd_script_path=$(get_path_quickCmd "${quickCmdString}")
-    if [ -f "$quickCmd_script_path" ]; then
+    if [ $? == 0 ] && [ -f "$quickCmd_script_path" ]; then
         # _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${quickCmd_script_path} ${quickCmdArgs[*]} ${BLUE}》${NC}"
         sh ${quickCmd_script_path} ${quickCmdArgs[*]}
     else

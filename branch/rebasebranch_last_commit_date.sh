@@ -57,7 +57,7 @@ function getBranchLastCommitDate() {
     debug_log "正在执行命令(获取指定分支的最后一次提交时间)：《 git log -1 --pretty=format:'%Cgreen%cd' --date=format:'%Y-%m-%d %H:%M:%S' ${branchName}  》"
     branchLastCommitDateResult=$(git log -1 --pretty=format:'%Cgreen%cd' --date=format:'%Y-%m-%d %H:%M:%S' ${branchName})
     if [ $? != 0 ]; then
-        echo "${RED}❌Error:获取指定分支的最后一次提交时间发生了错误(如果本地不存在master分支，请使用 origin/master 来替代).执行的命令是《${BLUE} git log -1 --pretty=format:'%Cgreen%cd' --date=format:'%Y-%m-%d %H:%M:%S' ${branchName} ${RED}》${NC}"
+        echo "${RED}❌Error:获取指定分支的最后一次提交时间发生了错误(如果本地不存在 ${branchName} 分支，请使用 origin/${branchName} 来替代).执行的命令是《${BLUE} git log -1 --pretty=format:'%Cgreen%cd' --date=format:'%Y-%m-%d %H:%M:%S' ${branchName} ${RED}》${NC}"
         return 1
     fi
     #branchLastCommitDateResult="2022-10-20 17:19:47"

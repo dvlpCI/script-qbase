@@ -22,7 +22,7 @@ done
 
 # 检查必要参数是否提供
 if [ -z "$searchFromDateString" ] ; then
-    echo "${RED}缺少必要参数，不能不传要从哪个时间开始搜索！${NC}"
+    echo "${RED}缺少 -date 必要参数，不能不传要从哪个时间开始搜索，请补充！${NC}"
     exit 1
 fi
 
