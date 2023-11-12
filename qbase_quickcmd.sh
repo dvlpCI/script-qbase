@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-06 16:10:21
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-11-12 20:24:22
 # @Description:
 ###
 
@@ -77,12 +77,30 @@ function _logQuickCmd() {
 function get_path_quickCmd() {
     specified_value=$1
     map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[] | select(.cmd == $value)')
-    if [ -z "${map}" ]; then
-        echo "${RED}error: not found specified_value: ${BLUE}$specified_value ${NC}"
-        cat "$qpackageJsonF" | jq '.quickCmd'
+    # echo "${YELLOW}1.查找 quickCmd 的 cmd 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
+    if [ -n "${map}" ] && [ "${map}" != "null" ]; then
+        relpath=$(echo "${map}" | jq -r '.cmd_script')
+    else
+        map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.cmd == $value)')
+        # echo "${YELLOW}2.查找 support_script_path 的 cmd 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
+        if [ -n "${map}" ] && [ "${map}" != "null" ]; then
+            relpath=$(echo "${map}" | jq -r '.value')
+        else
+            map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.value == $value)')
+            # echo "${YELLOW}3.查找 support_script_path 的 value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
+             if [ -n "${map}" ] && [ "${map}" != "null" ]; then
+                relpath=$(echo "${map}" | jq -r '.value')
+            fi
+        fi
+    fi
+
+    if [ -z "${relpath}" ]; then
+        echo "${RED}error: not found specified_value:${BLUE} $specified_value ${NC}"
+        # cat "$qpackageJsonF" | jq '.quickCmd'
+        cat "$qpackageJsonF" | jq '.'
         exit 1
     fi
-    relpath=$(echo "${map}" | jq -r '.cmd_script')
+    
     relpath="${relpath//.\//}"  # 去掉开头的 "./"
     echo "$qbase_homedir_abspath/$relpath"
 }
@@ -111,28 +129,13 @@ function quickCmdExec() {
     }
     _verbose_log "✅快捷命令及其所有参数分别为${BLUE} ${quickCmdString}${BLUE}${NC}:${CYAN}${quickCmdArgs[*]} ${CYAN}。${NC}"
 
-    
-
-    if [ "${quickCmdString}" == "getBranchNamesAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        sh ${qbase_homedir_abspath}/branch/getBranchNames_accordingToRebaseBranch.sh ${quickCmdArgs[*]}
-        return $?
-    # elif [ "${quickCmdString}" == "getBranchMapsAccordingToBranchNames" ]; then
-    #     _verbose_log "${YELLOW}正在执行命令(根据分支名,获取并添加分支信息):《 ${BLUE}sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh $quickCmdArgs ${BLUE}》${NC}"
-    #     sh ${qbase_homedir_abspath}/branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh ${quickCmdArgs[*]}
-
-    elif [ "${quickCmdString}" == "getBranchMapsAccordingToRebaseBranch" ]; then
-        _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支信息并通知给你):《${BLUE} sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        sh ${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh ${quickCmdArgs[*]}
-        return $?
-    fi
-
+    # get_path_quickCmd "${quickCmdString}" || exit 1 # 测试 get_path_quickCmd 方法完就退出脚本
     quickCmd_script_path=$(get_path_quickCmd "${quickCmdString}")
     if [ -f "$quickCmd_script_path" ]; then
         # _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${quickCmd_script_path} ${quickCmdArgs[*]} ${BLUE}》${NC}"
         sh ${quickCmd_script_path} ${quickCmdArgs[*]}
-    else 
-        printf "${RED}抱歉：暂不支持 ${BLUE}${quickCmdString} ${RED} 快捷命令，请检查${NC}\n"
+    else
+        printf "${RED}抱歉：暂不支持${BLUE} ${quickCmdString} ${RED} 快捷命令，请检查${NC}\n"
         exit 1
     fi
 }

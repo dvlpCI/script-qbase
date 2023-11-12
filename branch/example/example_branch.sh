@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-09-05 15:31:32
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-11-12 19:29:58
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
  # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
@@ -18,6 +18,9 @@ PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
@@ -29,8 +32,8 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 log_title "1"
-echo "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《 sh ${CurrentDIR_Script_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch \"main\" ${YELLOW}》${NC}"
-lastCommitDate=$(sh ${CurrentDIR_Script_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch "main")
+echo "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《 sh ${CategoryFun_HomeDir_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch \"main\" ${YELLOW}》${NC}"
+lastCommitDate=$(sh ${CategoryFun_HomeDir_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch "main")
 if [ $? != 0 ]; then
     echo "$lastCommitDate" # 此时输出的值是错误信息
     exit 1
@@ -45,8 +48,8 @@ echo "\n"
 log_title "2"
 searchFromDateString=${lastCommitDate}
 
-echo "${YELLOW}正在执行命令(获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支):《 ${PURPLE}sh ${CurrentDIR_Script_Absolute}/first_commit_info_after_date.sh -date \"${lastCommitDate}\" ${YELLOW}》${NC}"
-sourceBranchJson=$(sh ${CurrentDIR_Script_Absolute}/first_commit_info_after_date.sh -date "${lastCommitDate}")
+echo "${YELLOW}正在执行命令(获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支):《 ${PURPLE}sh ${CategoryFun_HomeDir_Absolute}/first_commit_info_after_date.sh -date \"${lastCommitDate}\" ${YELLOW}》${NC}"
+sourceBranchJson=$(sh ${CategoryFun_HomeDir_Absolute}/first_commit_info_after_date.sh -date "${lastCommitDate}")
 if [ $? != 0 ]; then
     error_exit_script
 fi
@@ -63,6 +66,6 @@ echo "\n"
 log_title "3"
 searchFromDateString=${lastCommitDate}
 # searchFromDateString="2023-08-03 11:46:28"
-echo "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString \"${searchFromDateString}\" ${YELLOW}》${NC}"
-mergerRecordResult=$(sh ${CurrentDIR_Script_Absolute}/get_merger_recods_after_date.sh --searchFromDateString "${searchFromDateString}")
+echo "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《 ${BLUE} sh ${CategoryFun_HomeDir_Absolute}/get_merger_recods_after_date.sh --searchFromDateString \"${searchFromDateString}\" ${YELLOW}》${NC}"
+mergerRecordResult=$(sh ${CategoryFun_HomeDir_Absolute}/get_merger_recods_after_date.sh --searchFromDateString "${searchFromDateString}")
 echo "${GREEN}指定日期之后的所有合入记录: ${BLUE}${mergerRecordResult}${NC}"

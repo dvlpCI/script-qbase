@@ -1,44 +1,33 @@
 {
     "quickCmd": [
         {
-            "type": "value",
-            "des": "值的创建、获取、修改",
-            "values": [
-                {
-                    "des": "获取给app的版本号和build号",
-                    "cmd": "getAppVersionAndBuildNumber",
-                    "cmd_script": "./value_create/value_create_app_version_and_build.sh",
-                    "value": "qbase -quick getAppVersionAndBuildNumber"
-                }
-            ]
-        },
-        {
             "type": "branch",
             "des": "分支",
             "values": [
                 {
-                    "des": "获取当前分支【在指定日期后】的所有合入记录",
-                    "cmd": "get_merger_recods_after_date",
-                    "value": "qbase -quick get_merger_recods_after_date \"2022-12-26 10:45:24\""
-                },
-                {
                     "des": "获取当前分支【在rebase指定分支后】的所有分支名",
                     "cmd": "getBranchNamesAccordingToRebaseBranch",
-                    "value": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
+                    "cmd_script": "./branch_quickcmd/getBranchNames_accordingToRebaseBranch.sh",
+                    "example": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
+                },
+                {
+                    "des": "获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误",
+                    "cmd": "getBranchMapsAccordingToBranchNames",
+                    "cmd_script": "./branch_quickcmd/getBranchMapsAccordingToBranchNames.sh",
+                    "example": "qbase -quick getBranchMapsAccordingToBranchNames -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\""
                 },
                 {
                     "des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
                     "cmd": "getBranchMapsInfoAndNotifiction",
                     "cmd_script": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh",
-                    "value": "qbase -quick getBranchMapsInfoAndNotifiction "
+                    "example": "qbase -quick getBranchMapsInfoAndNotifiction "
                 },
                 {
                     "des": "获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中，并进行整理及整理后发送通知",
                     "cmd": "getBranchMapsAccordingToRebaseBranch",
-                    "value": "qbase -quick getBranchMapsAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
+                    "cmd_script": "./branch_quickcmd/getBranchMapsAccordingToRebaseBranch.sh",
+                    "example": "qbase -quick getBranchMapsAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
                 }
-
-                
             ]
         }
     ],
@@ -98,6 +87,18 @@
                     "key": "env_var_add_or_update",
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
                     "value": "./env_variables/env_var_add_or_update.sh"
+                }
+            ]
+        },
+        {
+            "type": "value",
+            "des": "值的创建、获取、修改",
+            "values": [
+                {
+                    "des": "获取给app的版本号和build号",
+                    "cmd": "getAppVersionAndBuildNumber",
+                    "value": "./value_create/value_create_app_version_and_build.sh",
+                    "example": "qbase -quick getAppVersionAndBuildNumber"
                 }
             ]
         },
@@ -193,8 +194,8 @@
                 {
                     "key": "rebasebranch_last_commit_date",
                     "des": "获取当前分支新代码的起始时间",
-                    "example": "sh ./branch/rebasebranch_last_commit_date.sh -rebaseBranch \"master\"",
-                    "value": "./branch/rebasebranch_last_commit_date.sh"
+                    "value": "./branch/rebasebranch_last_commit_date.sh",
+                    "example": "sh ./branch/rebasebranch_last_commit_date.sh -rebaseBranch \"master\""
                 },
                 {
                     "des": "获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支",
@@ -203,9 +204,9 @@
                 },
                 {
                     "key": "get_merger_recods_after_date",
-                    "des": "获取指定日期之后的所有合入记录(已去除 HEAD -> 等)",
-                    "example": "sh ./get_merger_recods_after_date.sh --searchFromDateString \"2022-12-26 10:45:24\"",
-                    "value": "./branch/get_merger_recods_after_date.sh"
+                    "des": "获取当前分支【在指定日期后】的所有合入记录(已去除 HEAD -> 等)",
+                    "value": "./branch/get_merger_recods_after_date.sh",
+                    "example": "sh ./get_merger_recods_after_date.sh --searchFromDateString \"2022-12-26 10:45:24\""
                 }
             ]
         },
@@ -215,21 +216,21 @@
             "values": [
                 {
                     "key": "addBranchMaps_toJsonFile",
-                    "des": "获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误",
-                    "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\"",
-                    "value": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh"
+                    "des": "获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误",
+                    "value": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh",
+                    "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\""
                 },
                 {
                     "key": "branchMapsFile_checkMap",
                     "des": "检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值",
-                    "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\"",
-                    "value": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh"
+                    "value": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh",
+                    "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\""
                 },
                 {
                     "key": "get20_branchMapsInfo_byHisJsonFile",
                     "des": "获取branchMaps整理后的分支信息",
-                    "example": "sh ./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\"",
-                    "value": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
+                    "value": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh",
+                    "example": "sh ./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\""
                 }
             ]
         },

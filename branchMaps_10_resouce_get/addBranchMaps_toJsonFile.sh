@@ -1,6 +1,6 @@
 #!/bin/bash
 : <<!
-获取所有指定分支名的branchMaps输出到指定文件中，如有缺失输出缺失错误
+获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误
 sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}" -requestBranchNamesString "${requestBranchNamesString}"
 !
 
