@@ -30,7 +30,7 @@ do
                 -branchMapsFromDir|--branchMaps-is-from-dir-path) BranceMaps_From_Directory_PATH=$2; shift 2;; # 获取分支信息的文件源，请确保该文件夹内的json文件都是合规的
                 -branchMapsAddToJsonF|--branchMaps-add-to-json-file) BranchMapAddToJsonFile=$2; shift 2;;
                 -branchMapsAddToKey|--branchMaps-add-to-key) BranchMapAddToKey=$2; shift 2;;
-                -requestBranchNamesString|--requestBranchNamesString) requestBranchNamesString=$2; shift 2;;
+                -requestBranchNamesString|--requestBranchNamesString) requestBranchNamesString=$2; shift 2;;    # 要添加信息的是哪些分支名
                 -checkPropertyInNetwork|--package-network-type) CheckPropertyInNetworkType=$2; shift 2;;
                 -ignoreCheckBranchNames|--ignoreCheck-branchNameArray) ignoreCheckBranchNameArray=$2; shift 2;;
                 -shouldDeleteHasCatchRequestBranchFile|--should-delete-has-catch-request-branch-file) shouldDeleteHasCatchRequestBranchFile=$2; shift 2;; # 如果脚本执行成功是否要删除掉已经捕获的文件(一般用于在版本归档时候删除就文件)
@@ -58,6 +58,10 @@ if [ ! -f "${BranchMapAddToJsonFile}" ]; then
     exit_script
 fi
 
+if [ -z "${requestBranchNamesString}" ]; then
+    echo "Error❌:您的 -requestBranchNames 指向的'要添加信息的是哪些分支名'的参数值不能为空，请检查！"
+    exit_script
+fi
 requestBranchNameArray=($requestBranchNamesString)
 
 function look_detail() {
@@ -129,9 +133,10 @@ function get_required_branch_file_paths_from_dir() {
         branchNameFileJsonString='{
             
         }'
-        branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
 
         requestBranchName=${requestBranchNameArray[i]}
+        branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
+
         mappingBrancName_FilePaths=$(get_filePath_mapping_branchName_from_dir "${requestBranchName}")
         if [ $? != 0 ]; then
             mappingBrancName_FilePaths="null"
@@ -160,7 +165,7 @@ function get_required_branch_file_paths_from_dir() {
     
         missingFile_BranchNameArray=($missingFile_BranchNames)
         missingFile_BranchNameCount=${#missingFile_BranchNameArray[@]}
-        printf "%s" "${RED}Error:您有${missingFile_BranchNameCount}个分支，在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中没找到描述其分支信息的文件，请进入该目录补充以下分支名的分支信息文件:${BLUE} ${missingFile_BranchNames} ${RED}。${NC}"
+        printf "%s" "${RED}Error:您有${missingFile_BranchNameCount}/${requestBranchNameCount}个分支，在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中没找到描述其分支信息的文件，请进入该目录补充以下分支名的分支信息文件:${BLUE} ${missingFile_BranchNames} ${RED}。\n【附：当前所有分支的路径匹配信息如下:${BLUE}\n${missingBranchFileMaps} ${RED}\n】。${NC}"
         return 1
     fi
 }
