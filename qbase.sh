@@ -317,9 +317,6 @@ elif [ "${firstArg}" == "-path" ]; then
     get_path $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
     sh $qbase_homedir_abspath/qbase_quickcmd.sh $allArgsExceptFirstArg
-    if [ $? -ne 0 ]; then
-        _logQuickCmd
-    fi
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
     echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'

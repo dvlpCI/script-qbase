@@ -117,6 +117,10 @@ fi
 
 _verbose_log "${YELLOW}正在执行命令(获取指定日期之后的所有合入记录(已去除 HEAD -> 等)):《${BLUE} sh ${qbase_get_merger_recods_after_date_scriptPath} --searchFromDateString \"${searchFromDateString}\" ${YELLOW}》${NC}"
 mergerRecordResult=$(sh ${qbase_get_merger_recods_after_date_scriptPath} --searchFromDateString "${searchFromDateString}")
+if [ $? != 0 ]; then
+    echo "${mergerRecordResult}"    # 此时此值是错误信息
+    exit 1
+fi
 if [ -z "$mergerRecordResult" ]; then  # 没有新commit,提前结束 
     _verbose_log "${GREEN}恭喜获得:指定日期之后的所有合入记录:${BLUE} 没有新的提交记录，更不用说分支了 ${GREEN}。${NC}"
 else
