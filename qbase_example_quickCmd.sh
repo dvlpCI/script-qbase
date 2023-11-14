@@ -43,17 +43,3 @@ log_title "getBranchNamesAccordingToRebaseBranch"
 echo "${YELLOW}正在执行命令:《${BLUE} sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true test --verbose ${YELLOW}》${NC}"
 resultBranchNames=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true)
 echo "${GREEN}《获取当前分支【在rebase指定分支后】的所有分支名》的结果如下：${BLUE} $resultBranchNames ${NC}"
-
-
-echo "\n"
-log_title "getBranchMapsAccordingToRebaseBranch"
-workspace="~/Project/XXX/mobile_flutter_wish"
-if [[ $workspace =~ ^~.* ]]; then
-    # 如果 $workspace 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
-    workspace="${HOME}${workspace:1}"
-fi
-BranceMaps_From_Directory_PATH="${workspace}/bulidScript/featureBrances"
-BranchMapAddToJsonFile="${workspace}/bulidScript/app_branch_info.json"
-BranchMapAddToKey="feature_brances"
-sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchMapsAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true -branchMapsFromDir "${BranceMaps_From_Directory_PATH}" -branchMapsAddToJsonF "${BranchMapAddToJsonFile}" -branchMapsAddToKey "${BranchMapAddToKey}"
-echo "${GREEN}《获取当前分支【在rebase指定分支后】的所有分支信息合入指定文件中》的结果如下：${BLUE} $(cat $BranchMapAddToJsonFile | jq .) ${NC}"

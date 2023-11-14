@@ -112,37 +112,112 @@ JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_i
 #exit
 
 
+# responseJsonString='{
+#     "code": 0
+# }'
+# responseJsonString=$(printf "%s" "$responseJsonString" | jq --arg message "$message" '. + { "message": $message }')
+# printf "%s" "${responseJsonString}"
+
 function get_required_branch_file_paths_from_dir() {
-    isReadDirSuccess=true
-    ReadDirErrorMessage=""
-    dirFileContentsResult=""
+    requestBranchNameCount=${#requestBranchNameArray[@]}
+
+    responseJsonString='{
+
+    }'
+    for ((i=0;i<requestBranchNameCount;i++))
+    do
+        branchNameFileJsonString='{
+            
+        }'
+        branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
+
+        requestBranchName=${requestBranchNameArray[i]}
+        mappingBrancName_FilePaths=$(get_filePath_mapping_branchName_from_dir "${requestBranchName}")
+        if [ $? != 0 ]; then
+            mappingBrancName_FilePaths="null"
+        fi
+        branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchFile "$mappingBrancName_FilePaths" '. + { "branchFile": $branchFile }')
+        # printf "%s" "$branchNameFileJsonString" | jq -r .
+
+        # 注意下面是 jq --argjson element  而不是 jq --arg element
+        responseJsonString=$(printf "%s" "$responseJsonString" | jq --argjson element "$branchNameFileJsonString" '.values += [$element]')
+        # printf "%s" "$responseJsonString" | jq -r .
+        # exit 1
+    done
+
+
+    # aaa=$(printf "%s" "${responseJsonString}" | jq -r .)
+    # echo "${CYAN}温馨提示:您的分支名和文件的映射关系如下:${BLUE}\n${aaa}\n${NC}"
+
+
+    # specified_value=version/v1.7.2_1114
+    # map=$(printf "%s" "${responseJsonString}" | jq --arg value "$specified_value" '.values | map(select(.branchName == $value))')
+    
+    specified_value="null"
+    missingBranchFileMaps=$(printf "%s" "${responseJsonString}" | jq --arg value "$specified_value" '.values | map(select(.branchFile == $value))')
+    if [ -n "${missingBranchFileMaps}" ] && [ "${missingBranchFileMaps}" != "null" ]; then
+        missingFile_BranchNames=$(printf "%s" "${missingBranchFileMaps}" | jq -r '.[].branchName')
+    
+        missingFile_BranchNameArray=($missingFile_BranchNames)
+        missingFile_BranchNameCount=${#missingFile_BranchNameArray[@]}
+        printf "%s" "${RED}Error:您有${missingFile_BranchNameCount}个分支，在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中没找到描述其分支信息的文件，请进入该目录补充以下分支名的分支信息文件:${BLUE} ${missingFile_BranchNames} ${RED}。${NC}"
+        return 1
+    fi
+}
+
+# 在指定目录下获取符合分支名指向的文件
+function get_filePath_mapping_branchName_from_dir() {
+    mappingName=$1
+
+    mappingBrancName_FilePaths=()
     for file in "${BranceMaps_From_Directory_PATH}"/*; do
         if [ ! -f "$file" ]; then
             continue
         fi
         
-        shouldAdd=$(isBranchFileInBranchNames "$file")
+        shouldAdd=$(isFileMappingBranchName "$file" "$mappingName")
         if [ $? != 0 ]; then
-            isReadDirSuccess=false
-            ReadDirErrorMessage=$shouldAdd
-            echo "$shouldAdd" # 此时值为错误原因
+            echo "$shouldAdd" # 此时此值是错误信息
             return 1
         fi
+
         if [ "${shouldAdd}" != "true" ]; then
             continue
         fi
         
-        requiredBranch_FilePaths[${#requiredBranch_FilePaths[@]}]=${file}
+        mappingBrancName_FilePaths[${#mappingBrancName_FilePaths[@]}]=${file}
     done
 
 
-    if [ "${isReadDirSuccess}" != "true" ]; then
-        echo "${ReadDirErrorMessage}"
+    if [ "${#mappingBrancName_FilePaths[@]}" == 0 ]; then
+        echo "很遗憾：【未找到任何】符合分支名是 ${mappingName} 的文件，请检查 ${BranceMaps_From_Directory_PATH}。"
         return 1
     fi
 
-    printf "%s" "${requiredBranch_FilePaths[*]}"
+    if [ "${#mappingBrancName_FilePaths[@]}" -gt 1 ]; then
+        echo "发生异常：【找到多个】符合分支名是 ${mappingName} 的文件，请检查 ${BranceMaps_From_Directory_PATH}。"
+        return 1
+    fi
+
+    printf "%s" "${mappingBrancName_FilePaths[*]}"
 }
+
+# 判断文件是否映射到指定的分支名
+function isFileMappingBranchName() {
+    branchAbsoluteFilePath=$1
+    mappingName=$2
+    branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
+    if [ $? != 0 ]; then
+        echo "${RED}Error❌:获取文件${BLUE} ${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
+        return 1
+    fi
+    # last_field="${mappingName##*/}" # 获取元素的最后一个字段
+    if [ "$mappingName" != "$branchName" ]; then
+        return 1
+    fi
+}
+
+
 
 function check_requiredBranchFilePaths() {
     requiredBranch_FilePaths=($1) #转成数组
@@ -211,11 +286,11 @@ function read_requiredBranchFilePaths() {
 
 
 # 获取branch文件是否应该被添加，并返回true或false
-function isBranchFileInBranchNames() {
+function isRequiredBranchFileInBranchNames() {
     branchAbsoluteFilePath=$1
     branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
     if [ $? != 0 ]; then
-        echo "${RED}Error❌:获取文件 ${BLUE}${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹 ${BLUE}$BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
+        echo "${RED}Error❌:获取文件${BLUE} ${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
         return 1
     fi
     # 判断是否在数组中
@@ -283,7 +358,7 @@ function getLastCommitAuthorByBranchFile() {
 }
 
 
-# isBranchFileInBranchNames "/Users/lichaoqian/Project/CQCI/script-qbase/branchMaps_10_resouce_get/example/featureBrances/dev_demo.json" || exit # 测试代码
+# isRequiredBranchFileInBranchNames "/Users/lichaoqian/Project/CQCI/script-qbase/branchMaps_10_resouce_get/example/featureBrances/dev_demo.json" || exit # 测试代码
 # read_dir_path || exit # 测试代码
 requiredBranch_FilePathsString=$(get_required_branch_file_paths_from_dir)
 if [ $? != 0 ]; then
@@ -299,6 +374,8 @@ if [ -n "${CheckPropertyInNetworkType}" ]; then
     fi
 fi
 
+# read_requiredBranchFilePaths "${requiredBranch_FilePathsString}"
+# exit 1
 ReadDirErrorMessage=$(read_requiredBranchFilePaths "${requiredBranch_FilePathsString}")
 if [ $? != 0 ]; then
     echo "执行命令(读取目录下的文件)发生错误如下:\n${ReadDirErrorMessage}"
