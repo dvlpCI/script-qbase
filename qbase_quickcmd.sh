@@ -98,58 +98,72 @@ function _logQuickPathKeys() {
 # allArgsForQuickCmd="$@"
 # _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${allArgsForQuickCmd}${BLUE} ${NC}"
 
-packagePathAction=""
-packagePathKey=""
-quickCmdArgs=()
-allArgArray=($@)
-# _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
-allArgCount=${#allArgArray[@]}
-for ((i=0;i<allArgCount;i+=1))
-{
-    if [ $i -eq 0 ]; then
-        qpackage_homedir_abspath=${allArgArray[i]}
-        # packageArg=${qpackage_homedir_abspath##*/} # 取最后的component
-    elif [ $i -eq 1 ]; then
-        packageArg=${allArgArray[i]}
-    elif [ $i -eq 2 ]; then
-        packagePathAction=${allArgArray[i]}
-    elif [ $i -eq 3 ]; then
-        packagePathKey=${allArgArray[i]}
-    else
-        currentArg=${allArgArray[i]}
-        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
-    fi
-}
+
 # 检查参数
+qpackage_homedir_abspath=$1
 if [ ! -d "${qpackage_homedir_abspath}" ]; then
     echo "${RED}❌Error:错误提示如下:\n第一个参数必须是package的根目录，但当前是${qpackage_homedir_abspath} ，请检查 ${NC}"
     exit 1
 fi
+# packageArg=${qpackage_homedir_abspath##*/} # 取最后的component
+shift 1
 
+packageArg=$1
 qpackageJsonF="$qpackage_homedir_abspath/$packageArg.json"
 if [ ! -f "${qpackageJsonF}" ]; then
     echo "${RED}Error:您的第二个参数 ${packageArg} 中缺少 json 文件，请检查。${NC}"
     exit 1
 fi
+shift 1
 
+packagePathAction=$1
 packagePathActionTip="packagePathAction 只能为 getPath 或 execCmd 中的一个"
 if [ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]; then
     echo "${RED}❌Error:第三个参数 ${packagePathActionTip} ，当前是${packagePathAction}。${NC}"
     exit 1
 fi
+shift 1
 
+packagePathKey=$1
 packagePathKeyTip="packagePathKey 只能为以下内容中的值"
 if [ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]; then
     echo "${RED}❌Error:第三个参数 ${packagePathKeyTip} ，当前是${packagePathKey}。${NC}"
     _logQuickPathKeys
     exit 1
 fi
+shift 1
 
 # 获取路径(对 home 进行特殊处理)
 if [ "${packagePathKey}" == "home" ]; then
     printf "%s" "${qpackage_homedir_abspath}"
     exit 0
 fi
+
+if [ "$1" == "-argsJsonString" ]; then
+    shift 1 # 去除 -argsJsonString
+    argsJsonString="$@"
+
+    _verbose_log "✅ $packagePathKey 的参数分别如下:"
+    # 🚗📢:使用下面的方法会丢失空元素，详情可看 foundation/string2array_example.sh 进行错误示例的查看
+    # argArray=($(sh $qbase_homedir_abspath/foundation/json2array.sh "${argsJsonString}"))
+    # 所以，直接使用源码来处理
+    argArray=()
+    count=$(printf "%s" "$argsJsonString" | jq -r '.|length')
+    for ((i=0;i<count;i++))
+    do
+        element=$(printf "%s" "$argsJsonString" | jq -r ".[$((i))]") # -r 去除字符串引号
+        # echo "✅ $((i+1)). element=${element}"
+        if [ -z "$element" ] || [ "$element" == " " ]; then
+            element="null"
+        fi
+        argArray[${#argArray[@]}]=${element}
+    done
+    argsString=${argArray[*]}
+    # echo "1.解析json字符串 ${argsJsonString} 得到的结果是===============argsString=${argsString}"
+else
+    argsString="$@"
+fi
+_verbose_log "✅ $packagePathKey 的参数分别如下:${argsString}"
 
 specified_value=${packagePathKey}
 _verbose_log "${YELLOW}正在执行命令(获取脚本的相对路径):《${BLUE} sh $qbase_package_path_and_cmd_menu_scriptPath -file \"${qpackageJsonF}\" -key \"${specified_value}\" ${YELLOW}》${NC}"
@@ -167,8 +181,8 @@ if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
 fi
 
 if [ "${packagePathAction}" == "execCmd" ]; then
-    _verbose_log "正在执行命令(根据rebase,获取分支名):《 sh ${quickCmd_script_path} ${quickCmdArgs[*]} 》"
-    sh ${quickCmd_script_path} ${quickCmdArgs[*]}
+    _verbose_log "正在执行命令(根据rebase,获取分支名):《 sh ${quickCmd_script_path} ${argsString} 》"
+    sh ${quickCmd_script_path} ${argsString}
 else
     echo "$quickCmd_script_path"
 fi

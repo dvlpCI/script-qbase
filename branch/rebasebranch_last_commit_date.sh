@@ -50,6 +50,11 @@ if [ -z "${REBASE_BRANCH}" ]; then
     exit 1
 fi
 
+if [ "${REBASE_BRANCH}" == "null" ]; then
+    echo "❌Error:您的 -rebaseBranch 参数不能为 null ,请先检查。"
+    exit 1
+fi
+
 # 获取指定分支的最后一次提交时间
 function getBranchLastCommitDate() {
     branchName=$1

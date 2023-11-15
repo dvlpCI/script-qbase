@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-15 21:11:32
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-15 21:21:34
+ # @LastEditTime: 2023-11-16 00:18:53
  # @FilePath: ./foundation/json2array.sh
  # @Description: 将 json 字符串转为 array 数组
 ### 
@@ -44,7 +44,18 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
 #     }
 # ]
 # '
+# jsonString='
+# [
+#     "abc",
+#     "",
+#     "./branch_quickcmd/getBranchMapsAccordingToBranchNames.sh", 
+#     "efg"
+# ]
+# '
 jsonString=$1
+
+# jsonDump=$(printf "%s" "$jsonString" | jq -r '.')
+# printf "您要处理的数据是如下:\n%s\n" "$jsonDump" && exit 1
 
 array=()
 count=$(printf "%s" "$jsonString" | jq -r '.|length')
