@@ -200,17 +200,12 @@ function get_required_branch_file_paths_from_dir() {
     # echo "🚴🏻 missingBranchFileMaps=${missingBranchFileMaps}"
     if [ -n "${missingBranchFileMaps}" ] && [ "${missingBranchFileMaps}" != "null" ] && [ "${missingBranchFileMaps}" != "[]" ]; then
         missingFile_BranchNames=$(printf "%s" "${missingBranchFileMaps}" | jq -r '.[].branchName')
-    
-        missingFile_BranchNameArray=()
-        missingFile_BranchNameCount=$(printf "%s" "$missingFile_BranchNames" | jq -r '.|length')
-        for ((i=0;i<missingFile_BranchNameCount;i++))
-        do
-            iMissingFile_BranchName=$(printf "%s" "$missingFile_BranchNames" | jq -r ".[$((i))]") # -r 去除字符串引号
-            # echo "✅ $((i+1)). iMissingFile_BranchName=${iMissingFile_BranchName}"
-            missingFile_BranchNameArray[${#missingFile_BranchNameArray[@]}]=${iMissingFile_BranchName}
-        done
-
-        missingFile_BranchNameCount=${#missingFile_BranchNameArray[@]}
+        # echo "☎️☎️☎️☎️☎️☎️☎️☎️ missingFile_BranchNames=${missingFile_BranchNames}"
+        # 获取branchName的个数方法1：
+        missingFile_BranchNameCount=$(printf "%s" "${missingBranchFileMaps}" | jq -r '.|length')
+        # 获取branchName的个数方法2：
+        # missingFile_BranchNames=($missingFile_BranchNames) # 因为上面取出来的是断开的，所以不是json字符串
+        # missingFile_BranchNameCount=${#missingFile_BranchNames[@]}
         printf "%s" "${RED}Error:您有${missingFile_BranchNameCount}/${requestBranchNameCount}个分支，在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中没找到描述其分支信息的文件，请进入该目录补充以下分支名的分支信息文件:${BLUE} ${missingFile_BranchNames} ${RED}。\n【附：当前所有分支的路径匹配信息如下:${BLUE}\n${missingBranchFileMaps} ${RED}\n】。${NC}"
         return 1
     fi
