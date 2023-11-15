@@ -201,7 +201,15 @@ function get_required_branch_file_paths_from_dir() {
     if [ -n "${missingBranchFileMaps}" ] && [ "${missingBranchFileMaps}" != "null" ] && [ "${missingBranchFileMaps}" != "[]" ]; then
         missingFile_BranchNames=$(printf "%s" "${missingBranchFileMaps}" | jq -r '.[].branchName')
     
-        missingFile_BranchNameArray=($missingFile_BranchNames)
+        missingFile_BranchNameArray=()
+        missingFile_BranchNameCount=$(printf "%s" "$missingFile_BranchNames" | jq -r '.|length')
+        for ((i=0;i<missingFile_BranchNameCount;i++))
+        do
+            iMissingFile_BranchName=$(printf "%s" "$missingFile_BranchNames" | jq -r ".[$((i))]") # -r 去除字符串引号
+            # echo "✅ $((i+1)). iMissingFile_BranchName=${iMissingFile_BranchName}"
+            missingFile_BranchNameArray[${#missingFile_BranchNameArray[@]}]=${iMissingFile_BranchName}
+        done
+
         missingFile_BranchNameCount=${#missingFile_BranchNameArray[@]}
         printf "%s" "${RED}Error:您有${missingFile_BranchNameCount}/${requestBranchNameCount}个分支，在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中没找到描述其分支信息的文件，请进入该目录补充以下分支名的分支信息文件:${BLUE} ${missingFile_BranchNames} ${RED}。\n【附：当前所有分支的路径匹配信息如下:${BLUE}\n${missingBranchFileMaps} ${RED}\n】。${NC}"
         return 1
@@ -210,46 +218,42 @@ function get_required_branch_file_paths_from_dir() {
 
     
     specified_value="[]"
-    mayResultBranchFileMaps=$(printf "%s" "${responseJsonString}" | jq --argjson value "$specified_value" '.values | map(select(.branchFiles != $value))')
-    # echo "🚴🏻 mayResultBranchFileMaps=${mayResultBranchFileMaps}"
-    if [ -z "${mayResultBranchFileMaps}" ] || [ "${mayResultBranchFileMaps}" == "null" ] || [ "${mayResultBranchFileMaps}" == "[]" ]; then
+    mayResultMaps=$(printf "%s" "${responseJsonString}" | jq --argjson value "$specified_value" '.values | map(select(.branchFiles != $value))')
+    # echo "🚴🏻 mayResultMaps=${mayResultMaps}"
+    if [ -z "${mayResultMaps}" ] || [ "${mayResultMaps}" == "null" ] || [ "${mayResultMaps}" == "[]" ]; then
         echo "${RED}❌Error:您所要进行获取的分支(${BLUE} ${requestBranchNameArray[*]} ${RED})在${BLUE} ${BranceMaps_From_Directory_PATH} ${RED}中都未找到描述其分支的信息文件，请检查。${NC}"
         return 1
     fi
-
-    mayResultFile_BranchNames=$(printf "%s" "${mayResultBranchFileMaps}" | jq -r '.[].branchName')
-    mayResultFile_FilePathString=$(printf "%s" "${mayResultBranchFileMaps}" | jq -r '.[].branchFiles' | sed 's/\"//g') # 为了去除双引号加的sed
-    # mayResultFile_FilePathCount=$(echo "$mayResultFile_FilePathString" | jq -r 'length')
-    # echo "🚗🚗🚗🚗 %s 🚗🚗🚗🚗 mayResultFile_FilePathString=${mayResultFile_FilePathString}"
-    # return 1
-
-    mayResultFile_FilePathArray="${mayResultFile_FilePathString#?}"  # 去除第一位
-    mayResultFile_FilePathArray="${mayResultFile_FilePathArray%?}"  # 去除最后一位
-    mayResultFile_FilePathArray=($mayResultFile_FilePathArray)
-    mayResultFile_FilePathCount=${#mayResultFile_FilePathArray[@]}
-    # echo "📢📢📢📢📢📢📢📢📢 mayResultFile_FilePathArray=${mayResultFile_FilePathCount}  个 ${mayResultFile_FilePathArray[*]}"
-    
+    # echo "✅ mayResultMaps=${mayResultMaps}"
 
     resultBranchFilePaths=()
-    resultBranchFilePaths_ErrorPaths=()
-    for ((i=0;i<mayResultFile_FilePathCount;i++))
+    mayResultMapCount=$(printf "%s" "$mayResultMaps" | jq -r '.|length')
+    # echo "✅ mayResultMapCount=${mayResultMapCount}个"
+    for ((i=0;i<mayResultMapCount;i++))
     do
-        iFilePath=${mayResultFile_FilePathArray[i]}
-        iFilePath=$(printf "%s" "$iFilePath" | sed 's/,$//') # 如果字符串最后一位是逗号，则去除最后一位
-        if [ ! -f "${iFilePath}" ]; then
-            resultBranchFilePaths_ErrorPaths[${#resultBranchFilePaths_ErrorPaths[@]}]=${iFilePath}
-        else
-            resultBranchFilePaths[${#resultBranchFilePaths[@]}]=${iFilePath}
-        fi
+        iMayResultMap=$(printf "%s" "$mayResultMaps" | jq -r ".[$((i))]") # -r 去除字符串引号
+        # echo "✅ $((i+1)). iMayResultMap=${iMayResultMap}"
+
+        iMayResultBranchFileArray=$(printf "%s" "${iMayResultMap}" | jq -r '.branchFiles') # 为了去除双引号加的sed
+        iMayResultBranchFileCount=$(printf "%s" "$iMayResultBranchFileArray" | jq -r '.|length')
+        # echo "✅ $((i+1)). iMayResultBranchFileCount=${iMayResultBranchFileCount}个"
+        for ((j=0;j<iMayResultBranchFileCount;j++))
+        do
+            jFilePath=$(printf "%s" "$iMayResultBranchFileArray" | jq -r ".[$((j))]") # -r 去除字符串引号
+            # echo "✅ $((j+1)). jFilePath=${jFilePath}"
+
+            # iMayResultBranchFileArray=$(printf "%s" "${iMayResultMap}" | jq -r '.branchFiles') # 为了去除双引号加的sed
+            # iMayResultBranchFileCount=$(printf "%s" "$iMayResultBranchFileArray" | jq -r '.|length')
+            # echo "✅ $((i+1)). 内共有 ${iMayResultBranchFileCount}个元素，分别是 iMayResultBranchFileArray=${iMayResultBranchFileArray}"
+            if [ ! -f "${jFilePath}" ]; then
+                resultBranchFilePaths_ErrorPaths[${#resultBranchFilePaths_ErrorPaths[@]}]=${jFilePath}
+            else
+                resultBranchFilePaths[${#resultBranchFilePaths[@]}]=${jFilePath}
+            fi
+
+        done
     done
 
-    if [ "${#resultBranchFilePaths_ErrorPaths[@]}" -gt 0 ]; then
-        printf "%s" "❌Error:您的脚本自身发生错误,从 ${mayResultFile_FilePathString} 中提取路径失败，请检查是不是末尾多了逗号或者其他问题。附所提取出来的【不是正确路径格式】的异常值分别为: ${resultBranchFilePaths_ErrorPaths[*]}"
-        return 1
-    fi
-
-    
-    # resultBranchFilePaths+=${mayResultFile_FilePathArray[*]}
     # printf "🚗🚗🚗🚗 %s 🚗🚗🚗🚗" "${resultBranchFilePaths[*]}"
     # return 1
     printf "%s" "${resultBranchFilePaths[*]}"

@@ -43,6 +43,12 @@
             "des": "字符串处理(截取)",
             "values": [
                 {
+                    "des": "将 json 字符串转为 array 数组",
+                    "key": "json2array",
+                    "rel_path": "./foundation/json2array.sh",
+                    "example": "sh xxx.sh \"$jsonString\""
+                },
+                {
                     "des": "字符串长度截取",
                     "key": "intercept_string",
                     "rel_path": "./foundation/intercept_string.sh",
