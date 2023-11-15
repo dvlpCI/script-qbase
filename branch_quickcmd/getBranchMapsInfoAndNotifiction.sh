@@ -18,9 +18,9 @@ if [ $argCount -ge 1 ]; then
 fi
 # echo "========       last_arg=${last_arg}"
 
-verboseStrings=("--verbose" "-verbose") # 输入哪些字符串算是想要日志
+verboseStrings=("verbose" "-verbose" "--verbose") # 输入哪些字符串算是想要日志
 # 判断最后一个参数是否是 verbose
-if echo "${verboseStrings[@]}" | grep -wq -- "$last_arg"; then
+if [[ " ${verboseStrings[*]} " == *" $last_arg "* ]]; then
     verbose=true
 else # 最后一个元素不是 verbose
     verbose=false

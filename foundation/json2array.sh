@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-15 21:11:32
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-16 00:18:53
+ # @LastEditTime: 2023-11-16 02:24:15
  # @FilePath: ./foundation/json2array.sh
  # @Description: 将 json 字符串转为 array 数组
 ### 
@@ -21,7 +21,32 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
     exit 1
 }
 
+# oldDate="2020-11-16 02:20:56"
+# add_value="100"
+# 写法1
+# jsonString='
+# [
+#     "--old-date",
+#     "'"$oldDate"'",
+#     "--add-value",
+#     "'"$add_value"'",
+#     "--add-type",
+#     "second"
+# ]
+# '
+# 写法2
+# jsonString="
+# [
+#     \"--old-date\",
+#     \"$oldDate\",
+#     \"--add-value\",
+#     \"$add_value\",
+#     \"--add-type\",
+#     \"second\"
+# ]
+# "
 
+# 写法3
 # jsonString='
 # [
 #     {

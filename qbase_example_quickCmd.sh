@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-15 17:22:28
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-11-16 02:31:21
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
  # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
@@ -36,12 +36,30 @@ key="getPath calculate_newdate"
 key="$qbase_HomeDir_Absolute qbase execCmd calculate_newdate"
 oldDate=$(date "+%Y-%m-%d %H:%M:%S")
 add_value=10
-args="--old-date \"${oldDate}\" --add-value \"${add_value}\" --add-type \"second\""
-echo "${YELLOW}正在执行测试命令(获取key指向的脚本文件，并进行不同处理):《${BLUE} sh $qbase_qbase_quickcmd_scriptPath $key $args ${YELLOW}》${NC}"
-# searchFromDateString=$($qbase_qbase_quickcmd_scriptPath $key $args) # 📢：此方法❌，因为使用 $args 会无法精确有空格的字符串
+
+echo "------------qbase_quickCmd------------1"
+echo "${YELLOW}正在执行测试命令(测试qbase_quickcmd)...《${BLUE} $qbase_qbase_quickcmd_scriptPath $key -old-date \"$oldDate\" --add-value \"$add_value\" ${YELLOW}》${NC}"
 searchFromDateString=$($qbase_qbase_quickcmd_scriptPath $key -old-date "$oldDate" --add-value "$add_value")
-# qbase_calculate_newdate_scriptPath=$(sh $qbase_qbase_quickcmd_scriptPath getPath calculate_newdate)
-# searchFromDateString=$(sh ${qbase_calculate_newdate_scriptPath} --old-date "$oldDate" --add-value "$add_value")
+if [ $? != 0 ]; then
+    echo "${RED}${searchFromDateString}${NC}"
+    exit 1
+fi
+echo "${searchFromDateString}"
+
+echo "------------qbase_quickCmd------------2"
+# 此写法详见 foundation/json2array.sh 中的部分示例
+argsJsonString='
+[
+    "--old-date",
+    "'"$oldDate"'",
+    "--add-value",
+    "'"$add_value"'",
+    "--add-type",
+    "second"
+]
+'
+echo "${YELLOW}正在执行测试命令(测试qbase_quickcmd带-argsJsonString)...《${BLUE} sh $qbase_qbase_quickcmd_scriptPath ${key} -argsJsonString \"${argsJsonString}\" ${YELLOW}》${NC}"
+searchFromDateString=$(sh $qbase_qbase_quickcmd_scriptPath ${key} -argsJsonString "${argsJsonString}")
 if [ $? != 0 ]; then
     echo "${RED}${searchFromDateString}${NC}"
     exit 1

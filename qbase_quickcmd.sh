@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-12 20:24:22
+ # @LastEditTime: 2023-11-16 02:16:08
 # @Description:
 ###
 
@@ -43,9 +43,10 @@ fi
 # echo "========second_last_arg=${second_last_arg}"
 # echo "========       last_arg=${last_arg}"
 
-verboseStrings=("--verbose" "-verbose") # 输入哪些字符串算是想要日志
+verboseStrings=("verbose" "-verbose" "--verbose") # 输入哪些字符串算是想要日志
 # 判断最后一个参数是否是 verbose
-if echo "${verboseStrings[@]}" | grep -wq -- "$last_arg"; then
+if [[ " ${verboseStrings[*]} " == *" $last_arg "* ]]; then
+    # echo "verbose✅:${last_arg}"
     verbose=true
     if [ "$second_last_arg" == "test" ]; then
         isTestingScript=true
@@ -53,6 +54,7 @@ if echo "${verboseStrings[@]}" | grep -wq -- "$last_arg"; then
         isTestingScript=false
     fi
 else # 最后一个元素不是 verbose
+    # echo "verbose❌:${last_arg}"
     verbose=false
     if [ "$last_arg" == "test" ]; then
         isTestingScript=true

@@ -32,7 +32,7 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 log_title "1"
-echo "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《 sh ${CategoryFun_HomeDir_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch \"main\" ${YELLOW}》${NC}"
+echo "${YELLOW}正在执行测试命令(获取分支最后一次提交commit的时间)：《 sh ${CategoryFun_HomeDir_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch \"main\" ${YELLOW}》${NC}"
 lastCommitDate=$(sh ${CategoryFun_HomeDir_Absolute}/rebasebranch_last_commit_date.sh -rebaseBranch "main")
 if [ $? != 0 ]; then
     echo "$lastCommitDate" # 此时输出的值是错误信息
