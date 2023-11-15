@@ -45,11 +45,13 @@ if [ ! -f "${qpackageJsonF}" ]; then
 fi
 
 
-
+qpackageJsonFileName=$(basename "$qpackageJsonF")
+qpackageName="${qpackageJsonFileName%.*}"
+debug_log "${YELLOW}正在执行命令(从 ${qpackageJsonF} 中获取 key 为 $specified_value 的map)《${BLUE} cat \"$qpackageJsonF\" | jq --arg value \"$specified_value\" '.quickCmd[].values[], .support_script_path[].values[] | select(.key == \$value)' ${YELLOW}》${NC}"
 map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[], .support_script_path[].values[] | select(.key == $value)')
-debug_log "${YELLOW}1.从 quickCmd 和 support_script_path 中查找 key 为 $specified_value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
+debug_log "${YELLOW}1.从 ${qpackageName} 库的 quickCmd 和 support_script_path 中查找 key 为 $specified_value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
 if [ -z "${map}" ] || [ "${map}" == "null" ]; then
-    echo "${RED}Error:在 quickCmd 和 support_script_path 的 values 下都没有 key 为${BLUE} $specified_value ${RED}的map,请检查。 ${NC}"
+    echo "${RED}Error:在 ${qpackageName} 库的 quickCmd 和 support_script_path 的 values 下都没有 key 为${BLUE} $specified_value ${RED}的map,请检查。 ${NC}"
     exit 1
 fi
 

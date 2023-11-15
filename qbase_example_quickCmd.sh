@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-11 03:20:19
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-11-15 17:22:28
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
  # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
@@ -33,7 +33,7 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 log_title "qbase_quickCmd"
 qbase_qbase_quickcmd_scriptPath=$qbase_HomeDir_Absolute/qbase_quickCmd.sh
 key="getPath calculate_newdate"
-key="execCmd calculate_newdate"
+key="$qbase_HomeDir_Absolute qbase execCmd calculate_newdate"
 oldDate=$(date "+%Y-%m-%d %H:%M:%S")
 add_value=10
 args="--old-date \"${oldDate}\" --add-value \"${add_value}\" --add-type \"second\""

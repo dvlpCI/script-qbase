@@ -16,6 +16,20 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+# qpackageJsonF=$1
+# if [ ! -f "${qpackageJsonF}" ]; then
+#     qpackageJsonFileName=$(basename "$qpackageJsonF")
+#     packageArg="${qpackageJsonFileName%.*}"
+#     echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+#     exit 1
+# fi
+# packagePathKey=$2
+# if [ -z "${packagePathKey}" ]; then
+#     echo "${RED}Error:您的 packagePathKey 的值 ${packagePathKey} 不能为空，请检查。${NC}"
+#     exit 1
+# fi
+# shift 2
+
 # 计算倒数第一个参数的位置
 argCount=$#
 if [ $argCount -ge 1 ]; then
@@ -67,12 +81,6 @@ function _verbose_log() {
 qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 qbase_package_path_and_cmd_menu_scriptPath=${qbase_homedir_abspath}/menu/package_path_and_cmd_menu.sh
 
-packageArg="qbase"
-qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
-if [ ! -f "${qpackageJsonF}" ]; then
-    echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
-    exit 1
-fi
 function _logQuickPathKeys() {
     # cat "$qpackageJsonF" | jq '.quickCmd'
 
@@ -99,23 +107,49 @@ allArgCount=${#allArgArray[@]}
 for ((i=0;i<allArgCount;i+=1))
 {
     if [ $i -eq 0 ]; then
-        packagePathAction=${allArgArray[i]}
+        qpackage_homedir_abspath=${allArgArray[i]}
+        # packageArg=${qpackage_homedir_abspath##*/} # 取最后的component
     elif [ $i -eq 1 ]; then
+        packageArg=${allArgArray[i]}
+    elif [ $i -eq 2 ]; then
+        packagePathAction=${allArgArray[i]}
+    elif [ $i -eq 3 ]; then
         packagePathKey=${allArgArray[i]}
     else
         currentArg=${allArgArray[i]}
         quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
     fi
 }
+# 检查参数
+if [ ! -d "${qpackage_homedir_abspath}" ]; then
+    echo "${RED}❌Error:错误提示如下:\n第一个参数必须是package的根目录，但当前是${qpackage_homedir_abspath} ，请检查 ${NC}"
+    exit 1
+fi
 
-packagePathActionTip="packagePathAction 只能为 getPath 和 execCmd 中的一个"
+qpackageJsonF="$qpackage_homedir_abspath/$packageArg.json"
+if [ ! -f "${qpackageJsonF}" ]; then
+    echo "${RED}Error:您的第二个参数 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+    exit 1
+fi
+
+packagePathActionTip="packagePathAction 只能为 getPath 或 execCmd 中的一个"
+if [ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]; then
+    echo "${RED}❌Error:第三个参数 ${packagePathActionTip} ，当前是${packagePathAction}。${NC}"
+    exit 1
+fi
+
 packagePathKeyTip="packagePathKey 只能为以下内容中的值"
-if [ "${allArgCount}" -lt 2 ] || ([ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]); then
-    echo "${RED}❌Error:错误提示如下:\n第一个参数当前是$1，${packagePathActionTip}，\n第二个参数当前是$2。${packagePathKeyTip}${NC}"
+if [ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]; then
+    echo "${RED}❌Error:第三个参数 ${packagePathKeyTip} ，当前是${packagePathKey}。${NC}"
     _logQuickPathKeys
     exit 1
 fi
 
+# 获取路径(对 home 进行特殊处理)
+if [ "${packagePathKey}" == "home" ]; then
+    printf "%s" "${qpackage_homedir_abspath}"
+    exit 0
+fi
 
 specified_value=${packagePathKey}
 _verbose_log "${YELLOW}正在执行命令(获取脚本的相对路径):《${BLUE} sh $qbase_package_path_and_cmd_menu_scriptPath -file \"${qpackageJsonF}\" -key \"${specified_value}\" ${YELLOW}》${NC}"
@@ -125,9 +159,8 @@ if [ $? != 0 ]; then
     echo "$relpath" # 此时此值是错误信息
     exit 1
 fi
-
 relpath="${relpath//.\//}"  # 去掉开头的 "./"
-quickCmd_script_path="$qbase_homedir_abspath/$relpath"
+quickCmd_script_path="$qpackage_homedir_abspath/$relpath"
 if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
     echo "抱歉：暂不支持 ${packagePathAction} ${packagePathKey} 快捷命令，请检查。"
     exit 1

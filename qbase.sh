@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-15 15:22:20
+ # @LastEditTime: 2023-11-15 17:24:20
 # @Description:
 ###
 
@@ -168,6 +168,11 @@ else
         exit 1
     fi
 fi
+if [ ! -d "${qbase_homedir_abspath}" ]; then
+    echo "您的 ${packageArg} 库的根目录 ${qbase_homedir_abspath} 计算错误，请检查"
+    exit 1
+fi
+
 qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
 if [ ! -f "${qpackageJsonF}" ]; then
     echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
@@ -295,11 +300,11 @@ helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 elif [ "${firstArg}" == "-path" ]; then
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh getPath $allArgsExceptFirstArg 》"
-    sh $qbase_homedir_abspath/qbase_quickcmd.sh getPath $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh execCmd $allArgsExceptFirstArg 》"
-    sh $qbase_homedir_abspath/qbase_quickcmd.sh execCmd $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
     echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'
