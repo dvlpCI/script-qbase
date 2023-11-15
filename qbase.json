@@ -6,20 +6,20 @@
             "values": [
                 {
                     "des": "获取当前分支【在rebase指定分支后】的所有分支名",
-                    "cmd": "getBranchNamesAccordingToRebaseBranch",
-                    "cmd_script": "./branch_quickcmd/getBranchNames_accordingToRebaseBranch.sh",
-                    "example": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 -onlyName true --verbose"
+                    "key": "getBranchNamesAccordingToRebaseBranch",
+                    "rel_path": "./branch_quickcmd/getBranchNames_accordingToRebaseBranch.sh",
+                    "example": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-rel_path 1 -onlyName true --verbose"
                 },
                 {
                     "des": "获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误",
-                    "cmd": "getBranchMapsAccordingToBranchNames",
-                    "cmd_script": "./branch_quickcmd/getBranchMapsAccordingToBranchNames.sh",
+                    "key": "getBranchMapsAccordingToBranchNames",
+                    "rel_path": "./branch_quickcmd/getBranchMapsAccordingToBranchNames.sh",
                     "example": "qbase -quick getBranchMapsAccordingToBranchNames -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\""
                 },
                 {
                     "des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
-                    "cmd": "getBranchMapsInfoAndNotifiction",
-                    "cmd_script": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh",
+                    "key": "getBranchMapsInfoAndNotifiction",
+                    "rel_path": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh",
                     "example": "qbase -quick getBranchMapsInfoAndNotifiction "
                 }
             ]
@@ -31,9 +31,9 @@
             "des": "json 菜单的值获取",
             "values": [
                 {
-                    "des": "获取 package 的指定 path 或者 cmd 的脚本文件路径",
+                    "des": "获取 package 的指定 key 的脚本文件路径",
                     "key": "package_path_and_cmd_menu",
-                    "value": "./menu/package_path_and_cmd_menu.sh",
+                    "rel_path": "./menu/package_path_and_cmd_menu.sh",
                     "example": "sh xxx.sh -file $packageJsonF -keyType $keyType -key $key"
                 }
             ]
@@ -45,7 +45,7 @@
                 {
                     "des": "字符串长度截取",
                     "key": "intercept_string",
-                    "value": "./foundation/intercept_string.sh",
+                    "rel_path": "./foundation/intercept_string.sh",
                     "example": "sh xxx.sh -string \"$string3\" -maxLength 30"
                 }
             ]
@@ -57,13 +57,13 @@
                 {
                     "des": "企业微信的通知发送--字符串",
                     "key": "notification2wechat",
-                    "value": "./notification/notification2wechat.sh",
+                    "rel_path": "./notification/notification2wechat.sh",
                     "example": "sh xxx.sh -robot \"${FILE_ROBOT_URL}\" -content \"${CONTENT}\" -at \"${atMiddleBracketIdsString}\" -msgtype \"${msgtype}\""
                 },
                 {
                     "des": "企业微信的通知发送--字符串数组",
                     "key": "notification_strings_to_wechat",
-                    "value": "./notification/notification_strings_to_wechat.sh",
+                    "rel_path": "./notification/notification_strings_to_wechat.sh",
                     "example": "sh xxx.sh -robot \"${TEST_ROBOT_URL}\" -headerText \"${HEADER_TEXT}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentJsonKey \"${CONTENTS_JSON_KEY}\" -footerText \"${FOOTER_TEXT}\" -at \"${atMiddleBracketIdsString}\" -msgtype \"${msgtype}\""
                 }
             ]
@@ -75,7 +75,7 @@
                 {
                     "des": "将信息打印到控制台",
                     "key": "function_log_msg",
-                    "value": "./log/function_log_msg.sh",
+                    "rel_path": "./log/function_log_msg.sh",
                     "example": "source xxx & yyy"
                 }
             ]
@@ -87,23 +87,23 @@
                 {
                     "des": "环境变量文件的操作(生效环境变量文件、打开环境变量文件)",
                     "key": "env_var_effective_or_open",
-                    "value": "./env_variables/env_var_effective_or_open.sh"
+                    "rel_path": "./env_variables/env_var_effective_or_open.sh"
                 },
                 {
                     "key": "env_var_add_or_update",
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
-                    "value": "./env_variables/env_var_add_or_update.sh"
+                    "rel_path": "./env_variables/env_var_add_or_update.sh"
                 }
             ]
         },
         {
-            "type": "value",
+            "type": "rel_path",
             "des": "值的创建、获取、修改",
             "values": [
                 {
                     "des": "获取给app的版本号和build号",
-                    "cmd": "getAppVersionAndBuildNumber",
-                    "value": "./value_create/value_create_app_version_and_build.sh",
+                    "key": "getAppVersionAndBuildNumber",
+                    "rel_path": "./value_create/value_create_app_version_and_build.sh",
                     "example": "qbase -quick getAppVersionAndBuildNumber"
                 }
             ]
@@ -115,12 +115,12 @@
                 {
                     "key": "get_package_util",
                     "des": "脚本包的信息获取(版本号、根目录信息)",
-                    "value": "./package/get_package_info.sh"
+                    "rel_path": "./package/get_package_info.sh"
                 },
                 {
                     "key": "install_package",
                     "des": "检查安装环境，且未安装时候需要进行安装",
-                    "value": "./package/install_package.sh"
+                    "rel_path": "./package/install_package.sh"
                 }
             ]
         },
@@ -131,17 +131,17 @@
                 {
                     "key": "sedtext",
                     "des": "任意文件中的值的更新，根据值的位置",
-                    "value": "./value_update_in_file/sed_text.sh"
+                    "rel_path": "./value_update_in_file/sed_text.sh"
                 },
                 {
                     "key": "update_json_file_singleString",
                     "des": "json文件中的值的更新，根据指定key的位置",
-                    "value": "./value_update_in_file/update_json_file_singleString.sh"
+                    "rel_path": "./value_update_in_file/update_json_file_singleString.sh"
                 },
                 {
                     "key": "py_update_json_file",
                     "des": "json文件中的值的更新，使用python实现",
-                    "value": "./value_update_in_file/update_json_file.py"
+                    "rel_path": "./value_update_in_file/update_json_file.py"
                 }
             ]
         },
@@ -153,13 +153,13 @@
                     "key": "join_paths",
                     "des": "拼接字符串",
                     "example": "./join_paths.sh --path_a \"/path/to/dir_a\" --path_b \"sub_dir_b\" --create_ifNoExsit \"true\"",
-                    "value": "./path_util/join_paths.sh"
+                    "rel_path": "./path_util/join_paths.sh"
                 },
                 {
                     "key": "get_dirpath_by_relpath",
                     "des": "获取相对于指定文件/目录的相对目录的绝对路径",
                     "example": "./get_dirpath_by_relpath.sh --file_or_dir_path \"/path/to/file_a\" --rel_path \"sub_dir_b\"",
-                    "value": "./path_util/get_dirpath_by_relpath.sh"
+                    "rel_path": "./path_util/get_dirpath_by_relpath.sh"
                 }
             ]
         },
@@ -171,13 +171,13 @@
                     "key": "days_cur_to_MdDate",
                     "des": "日期的相关计算方法--用来计算提测过程中的各个日期,与当前时间的天数间隔",
                     "example": "sh ./date/days_cur_to_MdDate.sh --Md_date \"12.09\"",
-                    "value": "./date/days_cur_to_MdDate.sh"
+                    "rel_path": "./date/days_cur_to_MdDate.sh"
                 },
                 {
                     "key": "calculate_newdate",
                     "des": "日期的相关计算方法--用来获取新时间(通过旧时间的加减)",
-                    "example": "sh ./date/calculate_newdate.sh --old-date $old_date --add-value \"1\" --add-type \"second\"",
-                    "value": "./date/calculate_newdate.sh"
+                    "example": "sh ./date/calculate_newdate.sh --old-date $old_date --add-rel_path \"1\" --add-type \"second\"",
+                    "rel_path": "./date/calculate_newdate.sh"
                 }
             ]
         },
@@ -188,7 +188,7 @@
                 {
                     "des": "环境变量文件的操作(生效环境变量文件、打开环境变量文件)",
                     "key": "json_file_check",
-                    "value": "./json_check/json_file_check.sh",
+                    "rel_path": "./json_check/json_file_check.sh",
                     "example": "sh ./json_file_check.sh -checkedJsonF \"${Checked_JSON_FILE_PATH}\" -scriptResultJsonF \"${SCRIPT_RESULT_JSON_FILE}\""
                 }
             ]
@@ -200,19 +200,19 @@
                 {
                     "key": "rebasebranch_last_commit_date",
                     "des": "获取当前分支新代码的起始时间",
-                    "value": "./branch/rebasebranch_last_commit_date.sh",
+                    "rel_path": "./branch/rebasebranch_last_commit_date.sh",
                     "example": "sh ./branch/rebasebranch_last_commit_date.sh -rebaseBranch \"master\""
                 },
                 {
                     "des": "获取执行此脚本的分支在指定日期后的第一条提交记录及其所属的所有分支",
                     "key": "first_commit_info_after_date",
-                    "value": "./branch/first_commit_info_after_date.sh",
+                    "rel_path": "./branch/first_commit_info_after_date.sh",
                     "example": "sh ./branch/first_commit_info_after_date.sh -date \"2022-12-26 10:45:24\""
                 },
                 {
                     "key": "get_merger_recods_after_date",
                     "des": "获取当前分支【在指定日期后】的所有合入记录(已去除 HEAD -> 等)",
-                    "value": "./branch/get_merger_recods_after_date.sh",
+                    "rel_path": "./branch/get_merger_recods_after_date.sh",
                     "example": "sh ./get_merger_recods_after_date.sh --searchFromDateString \"2022-12-26 10:45:24\""
                 }
             ]
@@ -224,19 +224,19 @@
                 {
                     "key": "addBranchMaps_toJsonFile",
                     "des": "获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误",
-                    "value": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh",
+                    "rel_path": "./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh",
                     "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\""
                 },
                 {
                     "key": "branchMapsFile_checkMap",
                     "des": "检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值",
-                    "value": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh",
+                    "rel_path": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh",
                     "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\""
                 },
                 {
                     "key": "get20_branchMapsInfo_byHisJsonFile",
                     "des": "获取branchMaps整理后的分支信息",
-                    "value": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh",
+                    "rel_path": "./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh",
                     "example": "sh ./branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh -branchMapsInJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsInKey \".package_merger_branchs\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\""
                 }
             ]
@@ -248,19 +248,19 @@
                 {
                     "des": "上传安装包到 蒲公英xcxwo（可设置渠道） (同时使用于iOS 和 Android)",
                     "key": "upload_app_to_pgyer",
-                    "value": "./upload_app/upload_app_to_pgyer.sh",
+                    "rel_path": "./upload_app/upload_app_to_pgyer.sh",
                     "example": "sh xxx.sh -f \"${ipa_file_path}\" -k \"${pgyer_api_key_VALUE}\" -c \"${buildChannelShortcut}\" -d \"${UpdateDescription}\" --should-upload-fast \"${ShouldUploadFast}\""
                 },
                 {
                     "des": "上传安装包到 testFlight (只使用于iOS)",
                     "key": "upload_app_to_testflight",
-                    "value": "./upload_app/upload_app_to_testflight.sh",
+                    "rel_path": "./upload_app/upload_app_to_testflight.sh",
                     "example": "sh xxx.sh -ipa \"${ipa_file_path}\" -TransporterUserName \"${TransporterUserName}\" -TransporterPassword \"${TransporterPassword}\""
                 },
                 {
                     "des": "上传安装包到 各个平台(pgyer、cos、testFlight)",
                     "key": "upload_app_to_all",
-                    "value": "./upload_app/upload_app_to_all.sh",
+                    "rel_path": "./upload_app/upload_app_to_all.sh",
                     "example": "responseJsonString=$(sh xxx/upload_app_to_all.sh -ipa \"${ipa_file_path}\" -updateDesString \"${updateDesString}\" -updateDesFromFilePath \"${updateDesFromFilePath}\" -updateDesFromFileKey \"${updateDesFromFileKey}\" -pgyerHelpOwner \"${pgyerOwner}\" -pgyerHelpChannelKey \"${pgyerChannelKey}\" -pgyerApiKey \"${pgyerApiKey}\" -pgyerChannelShortcut \"${pgyerChannelShortcut}\" -pgyerShouldUploadFast \"${pgyerShouldUploadFast}\" -CosREGION \"${CosUploadToREGION}\" -CosBUCKETName \"${CosUploadToBUCKETName}\" -CosBUCKETDir \"${CosUploadToBUCKETDir}\" -CosResultHostUrl \"${CosResultHostUrl}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" -LogPostToRobotUrl \"${LogPostToRobotUrl}\" -LogPostTextHeader \"${LogPostTextHeader}\")"
                 }
             ]
@@ -272,7 +272,7 @@
                 {
                     "des": "获取文本中的某些文本(eg:toast文本等)",
                     "key": "get_file_some_text",
-                    "value": "./get_file_text/get_file_some_text.py",
+                    "rel_path": "./get_file_text/get_file_some_text.py",
                     "example": "python3.9 xxx.py -codeDir \"$codeDir\" -codeSuffixsString \"$codeSuffixsString\" -toastCodePrefixSuffixsString \"$toastCodePrefixSuffixsString\" -resultSaveToSheetFilePath \"$resultSaveToSheetFilePath\""
                 }
             ]
@@ -284,7 +284,7 @@
                 {
                     "des": "excel 行数据的比较",
                     "key": "excel_row_data_compare",
-                    "value": "./excel_data_compare/excel_row_data_compare.py",
+                    "rel_path": "./excel_data_compare/excel_row_data_compare.py",
                     "example": "python3.9 xxx.py -filePath \"$filePath\" -startRowNo \"$startRowNo\" -idColumnNo \"$idColumnNo\" -valueColumnNo \"$valueColumnNo\" -valueDiffColumnNo \"$valueDiffColumnNo\" -successMS \"$successMS\" -failureMS \"$failureMS\" -resultSaveToFilePath \"$resultSaveToFilePath\""
                 }
             ]
@@ -296,7 +296,7 @@
                 {
                     "des": "执行配置文件：自动根据配置文件，执行指定的脚本及其配置参数",
                     "key": "execScript_by_configJsonFile",
-                    "value": "./pythonModuleSrc/dealScript_by_scriptConfig.py",
+                    "rel_path": "./pythonModuleSrc/dealScript_by_scriptConfig.py",
                     "example": "python3 xxx.py \"${script_json_file_path}\""
                 }
             ]

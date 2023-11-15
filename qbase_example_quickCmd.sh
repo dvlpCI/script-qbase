@@ -30,7 +30,26 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     exit 1
 }
 
+log_title "qbase_quickCmd"
+qbase_qbase_quickcmd_scriptPath=$qbase_HomeDir_Absolute/qbase_quickCmd.sh
+key="getPath calculate_newdate"
+key="execCmd calculate_newdate"
+oldDate=$(date "+%Y-%m-%d %H:%M:%S")
+add_value=10
+args="--old-date \"${oldDate}\" --add-value \"${add_value}\" --add-type \"second\""
+echo "${YELLOW}正在执行测试命令(获取key指向的脚本文件，并进行不同处理):《${BLUE} sh $qbase_qbase_quickcmd_scriptPath $key $args ${YELLOW}》${NC}"
+# searchFromDateString=$($qbase_qbase_quickcmd_scriptPath $key $args) # 📢：此方法❌，因为使用 $args 会无法精确有空格的字符串
+searchFromDateString=$($qbase_qbase_quickcmd_scriptPath $key -old-date "$oldDate" --add-value "$add_value")
+# qbase_calculate_newdate_scriptPath=$(sh $qbase_qbase_quickcmd_scriptPath getPath calculate_newdate)
+# searchFromDateString=$(sh ${qbase_calculate_newdate_scriptPath} --old-date "$oldDate" --add-value "$add_value")
+if [ $? != 0 ]; then
+    echo "${RED}${searchFromDateString}${NC}"
+    exit 1
+fi
+echo "${searchFromDateString}"
 
+
+echo "\n"
 log_title "getAppVersionAndBuildNumber"
 resultBranchNames=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getAppVersionAndBuildNumber test)
 echo "${GREEN}《给app的版本号和build号》的结果如下：${BLUE} $resultBranchNames ${NC}"

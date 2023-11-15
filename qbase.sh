@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-01 11:23:03
+ # @LastEditTime: 2023-11-15 15:22:20
 # @Description:
 ###
 
@@ -148,7 +148,11 @@ function getqscript_allVersionHomeDir_abspath() {
     echo "${qscript_allVersion_homedir}"
 }
 
-if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
+# CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+CurrentScript_absolute_path=$(realpath "$0")
+# echo "$0 🆚 ${CurrentScript_absolute_path}"
+if [ "$0" == "${CurrentScript_absolute_path}" ]; then
+# if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
     qbase_latest_version="local_qbase"
     qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 else
@@ -262,29 +266,6 @@ function _logQuickCmd() {
 }
 
 
-function get_path() {
-    if [ -z "$1" ]; then
-        echo "$qbase_homedir_abspath"
-        return
-    fi
-
-    if [ "$1" == "home" ]; then
-        echo "$qbase_homedir_abspath"
-    else
-        specified_value=$1
-        map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.support_script_path[].values[] | select(.key == $value)')
-        if [ -z "${map}" ]; then
-            echo "${RED}error: not found specified_value: ${BLUE}$specified_value ${NC}"
-            cat "$qpackageJsonF" | jq '.support_script_path'
-            exit 1
-        fi
-        relpath=$(echo "${map}" | jq -r '.value')
-        relpath="${relpath//.\//}"  # 去掉开头的 "./"
-        echo "$qbase_homedir_abspath/$relpath"
-
-    fi
-}
-
 # 输出sh的所有参数
 # echo "传递给脚本的参数列表："
 # echo "$@"
@@ -314,9 +295,11 @@ helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 elif [ "${firstArg}" == "-path" ]; then
-    get_path $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh getPath $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh getPath $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
-    sh $qbase_homedir_abspath/qbase_quickcmd.sh $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh execCmd $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
     echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'

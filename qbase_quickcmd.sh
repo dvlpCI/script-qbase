@@ -61,6 +61,8 @@ function _verbose_log() {
     fi
 }
 
+# echo "✅✅✅✅✅✅✅ last_arg=$last_arg, verbose=${verbose}"
+
 
 qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 qbase_package_path_and_cmd_menu_scriptPath=${qbase_homedir_abspath}/menu/package_path_and_cmd_menu.sh
@@ -71,64 +73,69 @@ if [ ! -f "${qpackageJsonF}" ]; then
     echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
     exit 1
 fi
-function _logQuickCmd() {
-    cat "$qpackageJsonF" | jq '.quickCmd'
+function _logQuickPathKeys() {
+    # cat "$qpackageJsonF" | jq '.quickCmd'
+
+    # 第一个提取为空的时候，取第二个
+    # cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[].key // .support_script_path[].values[].key'
+    # 第一个和第二个都提取
+    cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[].key, .support_script_path[].values[].key'
 }
-
-function get_path_quickCmd() {
-    specified_value=$1
-
-    # sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -keyType "cmd" -key "${specified_value}" || exit 1 # 测试脚本就退出脚本
-    relpath=$(sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -keyType "cmd" -key "${specified_value}")
-    if [ $? != 0 ]; then
-        echo "$relpath" # 此时此值是错误信息
-        exit 1
-    fi
-    
-    relpath="${relpath//.\//}"  # 去掉开头的 "./"
-    echo "$qbase_homedir_abspath/$relpath"
-}
-
-
-function quickCmdExec() {
-    # allArgsForQuickCmd="$@"
-    # _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${allArgsForQuickCmd}${BLUE} ${NC}"
-    if [ -z "$1" ]; then
-         printf "${YELLOW}提示：您未设置要执行的快捷命令。附:所有支持的快捷命令如下：${NC}\n"
-        _logQuickCmd
-        return
-    fi
-
-    quickCmdString=$1
-    allArgArray=($@)
-    # _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
-    allArgCount=${#allArgArray[@]}
-    for ((i=0;i<allArgCount;i+=1))
-    {
-        if [ $i -eq 0 ]; then
-            continue
-        fi
-        currentArg=${allArgArray[i]}
-        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
-    }
-    _verbose_log "✅快捷命令及其所有参数分别为${BLUE} ${quickCmdString}${BLUE}${NC}:${CYAN}${quickCmdArgs[*]} ${CYAN}。${NC}"
-
-    # get_path_quickCmd "${quickCmdString}" || exit 1 # 测试 get_path_quickCmd 方法完就退出脚本
-    quickCmd_script_path=$(get_path_quickCmd "${quickCmdString}")
-    if [ $? == 0 ] && [ -f "$quickCmd_script_path" ]; then
-        # _verbose_log "${YELLOW}正在执行命令(根据rebase,获取分支名):《${BLUE} sh ${quickCmd_script_path} ${quickCmdArgs[*]} ${BLUE}》${NC}"
-        sh ${quickCmd_script_path} ${quickCmdArgs[*]}
-    else
-        printf "${RED}抱歉：暂不支持${BLUE} ${quickCmdString} ${RED} 快捷命令，请检查${NC}\n"
-        exit 1
-    fi
-}
-
-
 
 
 # 输出sh的所有参数
 # echo "传递给脚本的参数列表："
 # echo "$@"
 
-quickCmdExec "$@"
+# allArgsForQuickCmd="$@"
+# _verbose_log "✅快捷命令及其所有参数分别为 ${BLUE}${allArgsForQuickCmd}${BLUE} ${NC}"
+
+packagePathAction=""
+packagePathKey=""
+quickCmdArgs=()
+allArgArray=($@)
+# _verbose_log "😄😄😄哈哈哈 ${allArgArray[*]}"
+allArgCount=${#allArgArray[@]}
+for ((i=0;i<allArgCount;i+=1))
+{
+    if [ $i -eq 0 ]; then
+        packagePathAction=${allArgArray[i]}
+    elif [ $i -eq 1 ]; then
+        packagePathKey=${allArgArray[i]}
+    else
+        currentArg=${allArgArray[i]}
+        quickCmdArgs[${#quickCmdArgs[@]}]=${currentArg}
+    fi
+}
+
+packagePathActionTip="packagePathAction 只能为 getPath 和 execCmd 中的一个"
+packagePathKeyTip="packagePathKey 只能为以下内容中的值"
+if [ "${allArgCount}" -lt 2 ] || ([ "${packagePathAction}" != "execCmd" ] && [ "${packagePathAction}" != "getPath" ]); then
+    echo "${RED}❌Error:错误提示如下:\n第一个参数当前是$1，${packagePathActionTip}，\n第二个参数当前是$2。${packagePathKeyTip}${NC}"
+    _logQuickPathKeys
+    exit 1
+fi
+
+
+specified_value=${packagePathKey}
+_verbose_log "${YELLOW}正在执行命令(获取脚本的相对路径):《${BLUE} sh $qbase_package_path_and_cmd_menu_scriptPath -file \"${qpackageJsonF}\" -key \"${specified_value}\" ${YELLOW}》${NC}"
+# sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -key "${specified_value}" && exit 1 # 测试脚本就退出脚本
+relpath=$(sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -key "${specified_value}")
+if [ $? != 0 ]; then
+    echo "$relpath" # 此时此值是错误信息
+    exit 1
+fi
+
+relpath="${relpath//.\//}"  # 去掉开头的 "./"
+quickCmd_script_path="$qbase_homedir_abspath/$relpath"
+if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
+    echo "抱歉：暂不支持 ${packagePathAction} ${packagePathKey} 快捷命令，请检查。"
+    exit 1
+fi
+
+if [ "${packagePathAction}" == "execCmd" ]; then
+    _verbose_log "正在执行命令(根据rebase,获取分支名):《 sh ${quickCmd_script_path} ${quickCmdArgs[*]} 》"
+    sh ${quickCmd_script_path} ${quickCmdArgs[*]}
+else
+    echo "$quickCmd_script_path"
+fi
