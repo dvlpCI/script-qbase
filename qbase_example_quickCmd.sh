@@ -30,6 +30,17 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     exit 1
 }
 
+qbase_cmd=${qbase_HomeDir_Absolute}/qbase.sh
+$qbase_cmd -package qbase -packageCodeDirName bin -path "get_package_util"
+if [ $? != 0 ]; then
+    error_exit_script
+fi
+$qbase_cmd -package qtool -packageCodeDirName lib -path "branchCheck_selfName"
+if [ $? != 0 ]; then
+    error_exit_script
+fi
+
+
 log_title "qbase_quickCmd"
 qbase_qbase_quickcmd_scriptPath=$qbase_HomeDir_Absolute/qbase_quickCmd.sh
 key="getPath calculate_newdate"

@@ -113,7 +113,7 @@ shift 1
 packageArg=$1
 qpackageJsonF="$qpackage_homedir_abspath/$packageArg.json"
 if [ ! -f "${qpackageJsonF}" ]; then
-    echo "${RED}Error:您的第二个参数 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+    echo "${RED}❌Error:您的第二个参数 ${packageArg} 中缺少 json 文件，请检查。如果本脚本是被qbase调用的，请检查您在qbase脚本中传入的 -package 和 -packageCodeDirName 的参数值。${NC}"
     exit 1
 fi
 shift 1

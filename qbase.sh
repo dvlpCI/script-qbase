@@ -2,12 +2,12 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-16 10:50:29
-# @Description:
+# @LastEditors: dvlproad
+# @LastEditTime: 2023-11-16 11:27:17
+# @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 ###
 
-# 定义颜色常量
+# 定义颜色常量(qbase 不是所要执行的直接脚本，所以不要使用颜色)
 NC="\033[0m" # No Color
 RED="\033[31m"
 GREEN="\033[32m"
@@ -16,6 +16,7 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+# -package 的测试，详见 qbase_example_quickCmd.sh
 if [ "$1" == "-package" ]; then
     packageArg=$2 # 去除第一个参数之前，先保留下来
     shift 2  # 去除前两个个参数
@@ -195,13 +196,13 @@ if [ $? != 0 ]; then
     exit 1
 fi
 if [ ! -d "${qtarget_homedir_abspath}" ]; then
-    echo "您的 ${packageArg} 库的根目录 ${qtarget_homedir_abspath} 计算错误，请检查"
+    echo "❌Error:您的 ${packageArg} 库的根目录 ${qtarget_homedir_abspath} 计算错误，请检查"
     exit 1
 fi
 
 qpackageJsonF="$qtarget_homedir_abspath/${packageArg}.json"
 if [ ! -f "${qpackageJsonF}" ]; then
-    echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
+    echo "❌Error:您的 ${packageArg} 中缺少 json 文件，请检查您在qbase脚本中传入的 -package 和 -packageCodeDirName 的参数值，即: ${packageArg} 和 ${packageCodeNameArg} 。"
     exit 1
 fi
 
@@ -220,7 +221,7 @@ function get_path_json() {
     requestCategoryKey="support_script_path"
     categoryMaps=$(echo "$content" | jq -r ".${requestCategoryKey}")
     if [ -z "${categoryMaps}" ] || [ "${categoryMaps}" == "null" ]; then
-        printf "${RED}请先在 ${target_category_file_abspath} 文件中设置 .${requestCategoryKey} ${NC}\n"
+        echo "❌Error:请先在 ${target_category_file_abspath} 文件中设置 .${requestCategoryKey} "
         exit 1
     fi
 
@@ -244,7 +245,7 @@ function get_path_json() {
         markdownString+="| $(printf '%-4s' "序号") | $(printf '%-8s' "标记") | $(printf '%-17s' "模块") | $(printf '%-4s' "功能") | $(printf '%-10s' "初始者") | $(printf '%-10s' "主开发") | $(printf '%-10s' "二开发") |\n"
         markdownString+="| ---- | -------- | ----------------- | ---- | ---------- | ---------- | ---------- |\n"
 
-        printf "${NC}正在计算md内容，请耐心等待(预计需要5s)....${NC}\n"
+        printf "正在计算md内容，请耐心等待(预计需要5s)....\n"
     fi
 
     # 创建一个空数组
