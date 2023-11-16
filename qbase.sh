@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-15 17:24:20
+ # @LastEditTime: 2023-11-16 10:50:29
 # @Description:
 ###
 
@@ -23,7 +23,7 @@ if [ "$1" == "-package" ]; then
         packageCodeNameArg=$2 # 去除第一个参数之前，先保留下来
         shift 2  # 去除前两个个参数
     else
-        echo "${RED}您当前的 ${packageArg} 库，需要添加其代码所在目录的名称，即 -packageCodeDirName bin或者lib ,否则等下找不到代码。${NC}"
+        echo "请在 -package 后添加 -packageCodeDirName 参数(常为bin或者lib), 否则无法知道您当前的 ${packageArg} 库的代码所在目录。"
         exit 1
     fi
 else
@@ -115,18 +115,20 @@ function getHomeDir_abspath_byVersion() {
     # 指定目录
     dir_path="$1"
     latest_version="$2"
+    packageCodeName="$3"
 
     # 输出最新版本的路径
-    curretnVersionDir_abspath="$dir_path/$latest_version/$packageCodeNameArg" # 一般放在bin或者lib目录下
+    curretnVersionDir_abspath="$dir_path/$latest_version/$packageCodeName" # 一般放在bin或者lib目录下
     if [[ $curretnVersionDir_abspath =~ ^~.* ]]; then
         # 如果 $curretnVersionDir_abspath 以 "~/" 开头，则将波浪线替换为当前用户的 home 目录
         curretnVersionDir_abspath="${HOME}${curretnVersionDir_abspath:1}"
     fi
-    echo "$curretnVersionDir_abspath"
-
+    
     if [ ! -d "${curretnVersionDir_abspath}" ]; then
+        echo "Error❌:你脚本方法 $FUNCNAME 计算出来的 $curretnVersionDir_abspath 指向的目录不存在，请检查"
         return 1
     fi
+    echo "$curretnVersionDir_abspath"
 }
 function getqscript_allVersionHomeDir_abspath() {
     requstQScript=$1
@@ -156,24 +158,48 @@ if [ "$0" == "${CurrentScript_absolute_path}" ]; then
     qbase_latest_version="local_qbase"
     qbase_homedir_abspath="$(cd "$(dirname "$0")" && pwd)" # 本地测试
 else
-    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
+    qbaseScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "qbase")
     if [ $? != 0 ]; then
         exit 1
     fi
-    # echo "您的 qtargetScript_allVersion_homedir = ${qtargetScript_allVersion_homedir}"
-    qbase_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
-
-    qbase_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qbase_latest_version}")
+    # echo "您的 qbaseScript_allVersion_homedir = ${qbaseScript_allVersion_homedir}"
+    qbase_latest_version=$(getMaxVersionNumber_byDir "${qbaseScript_allVersion_homedir}")
     if [ $? != 0 ]; then
+        echo "${qbase_latest_version}" # 此时此值是错误信息
+        exit 1
+    fi
+    qbase_homedir_abspath=$(getHomeDir_abspath_byVersion "${qbaseScript_allVersion_homedir}" "${qbase_latest_version}" "bin")
+    if [ $? != 0 ]; then
+        echo "${qbase_homedir_abspath}" # 此时此值是错误信息
         exit 1
     fi
 fi
 if [ ! -d "${qbase_homedir_abspath}" ]; then
-    echo "您的 ${packageArg} 库的根目录 ${qbase_homedir_abspath} 计算错误，请检查"
+    echo "您的 qbase 库的根目录 ${qbase_homedir_abspath} 计算错误，请检查"
+    exit 1
+fi
+qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
+if [ $? != 0 ]; then
+    echo "${qtargetScript_allVersion_homedir}" # 此时此值是错误信息
+    exit 1
+fi
+# echo "您的 qtargetScript_allVersion_homedir = ${qtargetScript_allVersion_homedir}"
+qtarget_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
+if [ $? != 0 ]; then
+    echo "${qtarget_latest_version}" # 此时此值是错误信息
+    exit 1
+fi
+qtarget_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qtarget_latest_version}" "${packageCodeNameArg}")
+if [ $? != 0 ]; then
+    echo "${qtarget_homedir_abspath}" # 此时此值是错误信息
+    exit 1
+fi
+if [ ! -d "${qtarget_homedir_abspath}" ]; then
+    echo "您的 ${packageArg} 库的根目录 ${qtarget_homedir_abspath} 计算错误，请检查"
     exit 1
 fi
 
-qpackageJsonF="$qbase_homedir_abspath/${packageArg}.json"
+qpackageJsonF="$qtarget_homedir_abspath/${packageArg}.json"
 if [ ! -f "${qpackageJsonF}" ]; then
     echo "${RED}Error:您的 ${packageArg} 中缺少 json 文件，请检查。${NC}"
     exit 1
@@ -300,11 +326,11 @@ helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 elif [ "${firstArg}" == "-path" ]; then
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
-    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
-    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qbase_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
+    sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
 elif [ "${firstArg}" == "-help" ]; then
     echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'
