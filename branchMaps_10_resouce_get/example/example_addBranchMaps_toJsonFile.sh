@@ -17,8 +17,11 @@ PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-parent_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-addBranchMaps_toJsonFile_script_path=${parent_dir_Absolute}/addBranchMaps_toJsonFile.sh
+Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
+qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+
+addBranchMaps_toJsonFile_script_path=${CategoryFun_HomeDir_Absolute}/addBranchMaps_toJsonFile.sh
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
