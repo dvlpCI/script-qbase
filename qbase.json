@@ -234,10 +234,10 @@
                     "example": "sh ./branchMaps_10_resouce_get/addBranchMaps_toJsonFile.sh -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" -branchMapsAddToJsonF \"${BranchMapAddToJsonFile}\" -branchMapsAddToKey \"${BranchMapAddToKey}\" -requestBranchNamesString \"${requestBranchNamesString}\"  -checkPropertyInNetwork \"${CheckPropertyInNetworkType}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray}\" -shouldDeleteHasCatchRequestBranchFile \"${shouldDeleteHasCatchRequestBranchFile}\""
                 },
                 {
-                    "key": "branchMapsFile_checkMap",
+                    "key": "branchMapsFile_checkMaps",
                     "des": "检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值",
-                    "rel_path": "./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh",
-                    "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMap.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\""
+                    "rel_path": "./branchMaps_11_resouce_check/branchMapsFile_checkMaps.sh",
+                    "example": "sh ./branchMaps_11_resouce_check/branchMapsFile_checkMaps.sh -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\""
                 },
                 {
                     "key": "get20_branchMapsInfo_byHisJsonFile",
@@ -304,6 +304,18 @@
                     "key": "execScript_by_configJsonFile",
                     "rel_path": "./pythonModuleSrc/dealScript_by_scriptConfig.py",
                     "example": "python3 xxx.py \"${script_json_file_path}\""
+                }
+            ]
+        },
+        {
+            "type": "channel_file",
+            "des": "用于加固的多渠道配置文件",
+            "values": [
+                {
+                    "des": "360加固的多渠道文件生成",
+                    "key": "360channel_file_generate",
+                    "rel_path": "./channel_file/360channel_file_generate.sh",
+                    "example": "sh xxx.sh -arrayString \"${argArrayString}\" -jsonString \"${argsJsonString}\" -outputFile \"${outputFilePath}\" -shouldCheckOutput \"${shouldCheckOutput}\""
                 }
             ]
         }

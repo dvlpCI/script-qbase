@@ -1,5 +1,5 @@
 {
-    "create_time": "02.17",
+    "create_time": "11.11",
     "submit_test_time": "null",
     "pass_test_time": "null",
     "merger_pre_time": "null",
@@ -7,7 +7,16 @@
     "name": "chore/branch_get",
     "des": "详见outlines",
     "outlines": [
-        {"title": "测试分支信息的获取"}
+        {
+            "weekSpendHours": [1],
+            "url": "https://www.baidu.com",
+            "title": "测试分支信息的获取1"
+        },
+        {
+            "weekSpendHours": [1],
+            "url": "https://www.baidu.com",
+            "title": "测试分支信息的获取2"
+        }
     ],
     "answer": {
         "name": "qian"

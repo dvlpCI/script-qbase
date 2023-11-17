@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-11 16:51:53
+ # @LastEditTime: 2023-11-18 00:53:45
  # @Description: 检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值 的demo
 ### 
 
@@ -22,7 +22,7 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}    # 使用 %/* 方�
 workspace=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 qbase_branchMapFile_checkMap_scriptPath=${CategoryFun_HomeDir_Absolute}/branchMapFile_checkMap.sh
-qbase_branchMapsFile_checkMap_scriptPath=${CategoryFun_HomeDir_Absolute}/branchMapsFile_checkMap.sh
+qbase_branchMapsFile_checkMap_scriptPath=${CategoryFun_HomeDir_Absolute}/branchMapsFile_checkMaps.sh
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
@@ -32,15 +32,20 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     exit 1
 }
 
+# checkSpendToDate=$(date +%Y.%m.%d)
+
 
 log_title "检查branchMap在各环境下的属性"
 Example_BranchMap_FILE_PATH="${Example_HomeDir_Absolute}/example_branchMapFile_checkMap.json"
 checkBranchMap=$(cat "${Example_BranchMap_FILE_PATH}" | jq '.')
 PackageNetworkType="product"
+# skipCheckType="true"
+# skipCheckTime="true"
+# checkSpendToDate="2023.03.11"
 ignoreCheckBranchNameArray="(master development dev_publish_out dev_publish_in dev_all)"
-errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${checkBranchMap}" -pn "${PackageNetworkType}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
+errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${checkBranchMap}" -pn "${PackageNetworkType}" -skipCheckType "${skipCheckType}" -skipCheckTime "${skipCheckTime}" -checkSpendToDate "${checkSpendToDate}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
 if [ $? != 0 ]; then
-    echo "${RED}Error:在 ${PackageNetworkType} 环境下缺失 type 或 time 的所有分支信息如下：\n${errorMessage}${NC}"
+    echo "${RED}Error:您的分支在 ${PackageNetworkType} 环境下有属性异常了，分别如下：\n${errorMessage}${NC}"
 else
     echo "${GREEN}恭喜：检查branchMap在${BLUE} ${PackageNetworkType} ${GREEN}环境下的属性未缺失信息。${NC}"
 fi
@@ -52,12 +57,15 @@ Develop_Branchs_FILE_PATH="${Example_HomeDir_Absolute}/example_branchMapsFile_ch
 BranchMapsInJsonKey="package_merger_branchs"
 ignoreCheckBranchNameArray="(master development dev_publish_out dev_publish_in dev_all)"
 PackageNetworkType="product"
-echo "${YELLOW}正在执行命令(检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值):《${BLUE} sh ${qbase_branchMapsFile_checkMap_scriptPath} -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" -pn \"${PackageNetworkType}\" ${YELLOW}》${NC}"
-errorMessage=$(sh ${qbase_branchMapsFile_checkMap_scriptPath} -branchMapsJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsJsonK "${BranchMapsInJsonKey}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}" -pn "${PackageNetworkType}")
+# skipCheckType="true"
+# skipCheckTime="true"
+# checkSpendToDate="2023.03.11"
+echo "${YELLOW}正在执行命令(检查提测、测试、通过后等不同阶段分支的详细信息,如提测时json中的提测时间字段必须有值):《${BLUE} sh ${qbase_branchMapsFile_checkMap_scriptPath} -branchMapsJsonF \"${Develop_Branchs_FILE_PATH}\" -branchMapsJsonK \"${BranchMapsInJsonKey}\" -pn \"${PackageNetworkType}\" -checkSpendToDate \"${checkSpendToDate}\" -ignoreCheckBranchNames \"${ignoreCheckBranchNameArray[*]}\" ${YELLOW}》${NC}"
+errorMessage=$(sh ${qbase_branchMapsFile_checkMap_scriptPath} -branchMapsJsonF "${Develop_Branchs_FILE_PATH}" -branchMapsJsonK "${BranchMapsInJsonKey}" -pn "${PackageNetworkType}" -skipCheckType "${skipCheckType}" -skipCheckTime "${skipCheckTime}" -checkSpendToDate "${checkSpendToDate}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
 if [ $? != 0 ]; then
     echo "${RED}${errorMessage}${NC}"
     exit 1
 fi
-echo "${GREEN}恭喜：检查branchMaps通过，在 ${PackageNetworkType} 环境下未缺失信息。${NC}"
+echo "${GREEN}恭喜：检查branchMaps通过，在 ${PackageNetworkType} 环境下未有异常属性信息。${NC}"
 
 

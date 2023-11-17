@@ -5,7 +5,7 @@
 脚本的测试使用如下命令：
 #Develop_Branchs_FILE_PATH="../example_packing_info/app_branch_info.json"
 #ignoreCheckBranchNameArray="(master development dev_publish_out dev_publish_in dev_all)"
-#sh branchMapsFile_checkMap.sh -branchMapsJsonF "${Develop_Branchs_FILE_PATH}" -ignoreBranchNames "${ignoreCheckBranchNameArray}" -pn "test1"
+#sh branchMapsFile_checkMaps.sh -branchMapsJsonF "${Develop_Branchs_FILE_PATH}" -ignoreBranchNames "${ignoreCheckBranchNameArray}" -pn "test1"
 !
 
 # 定义颜色常量
@@ -50,8 +50,11 @@ do
     case "$1" in
         -branchMapsJsonF|--branch-maps-json-file) BranchMaps_JsonFilePath=$2; shift 2;;
         -branchMapsJsonK|--branch-maps-json-key) BranchMapsInJsonKey=$2; shift 2;;
-        -ignoreCheckBranchNames|--ignoreCheck-branchNameArray) ignoreCheckBranchNameArray=$2; shift 2;;
         -pn|--package-network-type) PackageNetworkType=$2; shift 2;;
+        -skipCheckType|--skip-check-type) skipCheckType=$2; shift 2;;
+        -skipCheckTime|--skip-check-time) skipCheckTime=$2; shift 2;;
+        -checkSpendToDate|--target-date) checkSpendToDate=$2; shift 2;;
+        -ignoreCheckBranchNames|--ignoreCheck-branchNameArray) ignoreCheckBranchNameArray=$2; shift 2;;
         --) break ;;
         *) break ;;
     esac
@@ -97,21 +100,25 @@ do
     iBranchMap=$(echo ${branchMapArray} | ${JQ_EXEC} -r ".[$((i))]") # -r 去除字符串引号
     branchName=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".name") # -r 去除字符串引号
 
-    errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${iBranchMap}" -pn "${PackageNetworkType}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
+    iResultMessage=""
+    if [ ${#errorMessageArray[@]} -gt 0 ]; then
+        iResultMessage+="\n"
+    fi
+    
+    errorMessage=$(sh ${qbase_branchMapFile_checkMap_scriptPath} -checkBranchMap "${iBranchMap}" -pn "${PackageNetworkType}" -skipCheckType "${skipCheckType}" -skipCheckTime "${skipCheckTime}" -checkSpendToDate "${checkSpendToDate}" -ignoreCheckBranchNames "${ignoreCheckBranchNameArray[*]}")
     if [ $? != 0 ]; then
         missingPropertyBranchNameArray[${#missingPropertyBranchNameArray[@]}]=${branchName}
-        iResultMessage=""
-        if [ ${#errorMessageArray[@]} -gt 0 ]; then
-            iResultMessage+="\n"
-        fi
-        iResultMessage+="${RED}$((i+1)).您的${BLUE} ${branchName} ${RED}分支缺失 ${errorMessage} ${RED}；"
-        errorMessageArray[${#errorMessageArray[@]}]=${iResultMessage}
+        iResultMessage+="${RED}$((i+1)).您的${BLUE} ${branchName} ${RED}分支异常的属性有 ${errorMessage} ${RED}❌"
+    else
+        iResultMessage+="${GREEN}$((i+1)).您的${BLUE} ${branchName} ${GREEN}分支要检查的所有属性都正常; ${GREEN}✅"
     fi
+    errorMessageArray[${#errorMessageArray[@]}]=${iResultMessage}
+
 done
 #echo "缺失分支属性的分支名分别为 missingPropertyBranchNameArray=${missingPropertyBranchNameArray[*]}"
 if [ "${#missingPropertyBranchNameArray[@]}" -gt 0 ]; then
     # 【分支类型type，该类型值为hotfix/feature/optimize/other 中一种【分别对应hotfix(线上修复)/feature(产品需求)/optimize(技术优化)/other(其他)】】
-    echo "${RED}Error❌:您有${#missingPropertyBranchNameArray[@]}个分支的json文件有缺失标明的部分，请前往补充后再执行打包。详细缺失信息如下：\n${errorMessageArray[*]}"
+    echo "${RED}Error❌:您有${#missingPropertyBranchNameArray[@]}个分支的json文件有属性异常，请前往补充后再执行打包。详细异常信息如下：\n${errorMessageArray[*]}"
     exit 1
 fi
 
