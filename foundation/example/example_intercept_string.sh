@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-09-09 12:59:37
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-14 01:24:40
+ # @LastEditTime: 2023-11-18 16:45:26
  # @FilePath: /example_intercept_string.sh
  # @Description: 测试字符串长度截取
 ### 
@@ -16,6 +16,15 @@ YELLOW="\033[33m"
 BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
+
+CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
+qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+
+
+interceptString_script_path=${CategoryFun_HomeDir_Absolute}/intercept_string.sh
+
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
@@ -33,9 +42,6 @@ function delay() {
 }
 
 
-CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-# parent_dir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-interceptString_script_path=${CurrentDIR_Script_Absolute}/intercept_string.sh
 
 
 log_title "1.获取字符串的长度"

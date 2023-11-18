@@ -53,6 +53,12 @@
                     "key": "intercept_string",
                     "rel_path": "./foundation/intercept_string.sh",
                     "example": "sh xxx.sh -string \"$string3\" -maxLength 30"
+                },
+                {
+                    "des": "中文转拼音(py脚本)",
+                    "key": "convert_to_pinyin",
+                    "rel_path": "./foundation/convert_to_pinyin.py",
+                    "example": "python3 xxx.py -originString \"$string\""
                 }
             ]
         },

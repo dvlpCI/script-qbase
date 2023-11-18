@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-12 19:29:58
+ # @LastEditTime: 2023-11-18 16:44:40
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
  # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
@@ -19,7 +19,7 @@ CYAN="\033[0;36m"
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
-CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 function log_title() {
