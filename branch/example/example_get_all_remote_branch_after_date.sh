@@ -23,7 +23,10 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法�
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 qbase_get_all_remote_branch_after_date_scriptPath=${CategoryFun_HomeDir_Absolute}/get_all_remote_branch_after_date.sh
-
+get_branch_self_detail_info_script_path=${qbase_homedir_abspath}/branchMaps_20_info/get10_branch_self_detail_info.sh
+qbase_get_filePath_mapping_branchName_from_dir_scriptPath=${qbase_homedir_abspath}/branchMaps_10_resouce_get/get_filePath_mapping_branchName_from_dir.sh
+BranceMaps_From_Directory_PATH="${qbase_homedir_abspath}/branchMaps_10_resouce_get/example/featureBrances"
+        
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
@@ -33,6 +36,44 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     echo "${RED}❌Error:发生错误了${NC}"
     exit 1
 }
+
+
+function test_getSingleBranchLog() {
+    shouldMarkdown=$1 # "false"
+    
+    showBranchLogFlag='true'
+    showBranchName='true'
+    showBranchTimeLog='all'
+    showBranchAtLog='true'
+    showBranchTable='false' # 通知也暂时都不显示
+    showCategoryName='true' # 通知时候显示
+    RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
+    # sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}"
+    # exit
+    # echo "${YELLOW}正在执行命令(获取分支自身的详细信息):《 ${BLUE}sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" ${YELLOW}》${NC}"
+    Normal_BRANCH_LOG_STRING_VALUE=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
+    if [ $? != 0 ]; then
+        echo "${RED}${Normal_BRANCH_LOG_STRING_VALUE}${NC}" # 此时值为错误原因
+        return 1
+    fi
+    # print "%s" "${Normal_BRANCH_LOG_STRING_VALUE}" 
+    # logResultValueToJsonFile "${Normal_BRANCH_LOG_STRING_VALUE}"
+    # exit
+
+    BRANCH_OUTLINES_ELEMENT_LOG_JSON="{\"name\": \"${branchName}\", \"outline\": \"${Normal_BRANCH_LOG_STRING_VALUE}\"}"
+    echo "${GREEN}恭喜您的第$((logBranchIndex+1))个分支的分支信息结果为:${BLUE}${BRANCH_OUTLINES_ELEMENT_LOG_JSON} ${GREEN}。${NC}"
+    
+    # 保存所获得的分支信息到文件中，方便查看
+    # logResultObjectStringToJsonFile "${BRANCH_OUTLINES_ELEMENT_LOG_JSON}"
+    echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
+    BRANCH_OUTLINES_LOG_JSON="[${BRANCH_OUTLINES_ELEMENT_LOG_JSON}]"
+    echo "${YELLOW}正在执行命令(保存所获得的分支信息到文件中，方便查看)：《${BLUE} sh ${JsonUpdateFun_script_file_Absolute} -f \"${TEST_DATA_RESULT_FILE_PATH}\" -k \"branch_info_result.Notification.current.branch\" -v \"${BRANCH_OUTLINES_LOG_JSON}\" --skip-value-check \"true\" ${YELLOW}》${NC}"
+    sh ${JsonUpdateFun_script_file_Absolute} -f "${TEST_DATA_RESULT_FILE_PATH}" -k "branch_info_result.Notification.current.branch" -v "${BRANCH_OUTLINES_LOG_JSON}" --skip-value-check "true"
+    cat ${TEST_DATA_RESULT_FILE_PATH} | jq ".${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" | jq '.'
+    echo "${YELLOW}更多详情请可点击查看文件:${BLUE}${TEST_DATA_RESULT_FILE_PATH}${NC}"
+}
+
+
 
 log_title "1"
 # 获取远程分支列表
@@ -62,7 +103,14 @@ do
     if [ "$commit_count" == "0" ]; then
         branchDescription="${branch_name}:没有提交记录 @${last_committer}"
     else
-        branchDescription="${branch_name}:提交记录待获取 @${last_committer}"
+        # test_getSingleBranchLog "false"
+        requestBranchName=$branch_name
+        mappingBrancName_FilePaths=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
+        if [ $? != 0 ] || [ -z "${mappingBrancName_FilePaths}" ]; then
+            branchDescription="${branch_name}:提交记录获取失败:未找到匹配分支名的文件 @${last_committer}"
+        else
+            branchDescription="${branch_name}:提交记录待获取 @${last_committer}"
+        fi
     fi
     echo "$((i+1)). ${branchDescription}"
 done

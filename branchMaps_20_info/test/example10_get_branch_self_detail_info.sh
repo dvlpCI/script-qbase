@@ -21,14 +21,12 @@ function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
 }
 
-# 当前【shell脚本】的工作目录
-# $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
+
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-#echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#CommonFun_HomeDir_Absolute3=${CurrentDIR_Script_Absolute}/..
-CommonFun_HomeDir_Absolute2=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-# CommonFun_HomeDir_Absolute2=${CommonFun_HomeDir_Absolute3%/*}
-CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute2%/*}
+Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
+CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
+qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+CommonFun_HomeDir_Absolute=${CategoryFun_HomeDir_Absolute%/*}
 
 # qscript_path_get_filepath="${CommonFun_HomeDir_Absolute}/qscript_path_get.sh"
 # qbase_function_log_msg_script_path="$(sh ${qscript_path_get_filepath} qbase function_log_msg)"

@@ -39,7 +39,9 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
 CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 CommonFun_HomeDir_Absolute=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
 
+qbase_get_filePath_mapping_branchName_from_dir_scriptPath=${CurCategoryFun_HomeDir_Absolute}/get_filePath_mapping_branchName_from_dir.sh
 qbase_branchMapFile_checkMap_scriptPath=${CommonFun_HomeDir_Absolute}/branchMaps_11_resouce_check/branchMapFile_checkMap.sh
+
 
 # shell 参数具名化
 while [ -n "$1" ]
@@ -154,7 +156,7 @@ function get_required_branch_file_paths_from_dir() {
         requestBranchName=${requestBranchNameArray[i]}
         branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
 
-        mappingBrancName_FilePaths=$(get_filePath_mapping_branchName_from_dir "${requestBranchName}")
+        mappingBrancName_FilePaths=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
         if [ $? != 0 ] || [ -z "${mappingBrancName_FilePaths}" ]; then
             mappingBrancName_FilePaths=()
             branchFiles='[]'
@@ -253,45 +255,6 @@ function get_required_branch_file_paths_from_dir() {
     # return 1
     printf "%s" "${resultBranchFilePaths[*]}"
 }
-
-# 在指定目录下获取符合分支名指向的文件，未找到返回空字符串
-function get_filePath_mapping_branchName_from_dir() {
-    mappingName=$1
-
-
-    mappingBrancName_FilePaths=()
-    for file in "${BranceMaps_From_Directory_PATH}"/*; do
-        if [ ! -f "$file" ]; then
-            continue
-        fi
-        
-        isFileMappingBranchName "$file" "$mappingName"
-        if [ $? != 0 ]; then
-            continue
-        fi
-        
-        mappingBrancName_FilePaths[${#mappingBrancName_FilePaths[@]}]=${file}
-    done
-
-    printf "%s" "${mappingBrancName_FilePaths[*]}"
-}
-
-# 判断文件是否映射到指定的分支名
-function isFileMappingBranchName() {
-    branchAbsoluteFilePath=$1
-    mappingName=$2
-
-    branchName=$(cat "${branchAbsoluteFilePath}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
-    if [ $? != 0 ]; then
-        echo "${RED}Error❌:获取文件${BLUE} ${branchAbsoluteFilePath} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
-        return 1
-    fi
-    # last_field="${mappingName##*/}" # 获取元素的最后一个字段
-    if [ "$mappingName" != "$branchName" ]; then
-        return 1
-    fi
-}
-
 
 
 function check_requiredBranchFilePaths() {
