@@ -26,6 +26,21 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
     exit 1
 }
 
+
+
+log_title "1"
+# 获取当前日期
+current_date=$(date "+%Y-%m-%d")
+
+# 计算前一周的起始日期和结束日期
+start_date=$(date -v-1w -j -f "%Y-%m-%d" "$current_date" "+%Y-%m-%d")
+end_date=$(date -v-1d -j -f "%Y-%m-%d" "$current_date" "+%Y-%m-%d")
+
+# 打印前一周日期范围
+echo "今天的上周日期: $start_date"
+echo "今天的昨天日期: $end_date"
+
+
 log_title "计算提测过程中的各个日期,与当前时间的天数间隔"
 daysResult=$(sh ${CurrentDIR_Script_Absolute}/days_cur_to_MdDate.sh --Md_date "12.09")
 if [ $? != 0 ]; then

@@ -226,6 +226,12 @@
                     "des": "获取当前分支【在指定日期后】的所有合入记录(已去除 HEAD -> 等)",
                     "rel_path": "./branch/get_merger_recods_after_date.sh",
                     "example": "sh ./get_merger_recods_after_date.sh --searchFromDateString \"2022-12-26 10:45:24\""
+                },
+                {
+                    "key": "getBranchJsonInfo_after_date",
+                    "des": "获取指定分组在指定日期范围内的分支情况(含修改情况)",
+                    "rel_path": "./branch/get_all_remote_branch_after_date.sh",
+                    "example": "sh ./xx.sh -branches \"${branches}\" -startDate \"${start_date}\" -endDate \"${end_date}\""
                 }
             ]
         },
