@@ -83,7 +83,7 @@ function isFileMappingBranchName() {
         # 检查字符串是否包含指定字符串变量
         errorFlagString="users/sign_in"
         if [[ $FileContent == *"$errorFlagString"* ]]; then
-            echo "Error❌: 获取网络地址内容失败。执行的命令为 《 curl -s --header \"Private-Token: $access_token\" \"$branchFileAbsolutePathOrUrl\"》"
+            echo "Error❌: 获取网络地址内容失败。执行的命令为 《 curl -s --header \"Private-Token: $access_token\" \"$branchFileAbsolutePathOrUrl\"》。得到的值为 $FileContent"
             # echo "所获得的错误内容如下:\n${FileContent}"
             return 1
         fi
@@ -107,7 +107,11 @@ function isFileMappingBranchName() {
         return 1
     fi
 
+
+    FileContent=$(printf "%s" "$FileContent" | jq --arg fileUrl "$branchFileAbsolutePathOrUrl" '. + { "fileUrl": $fileUrl }')
+
     # debug_log "恭喜:找到符合 ${mappingName} 的分支信息文件为: ${branchFileAbsolutePathOrUrl}"
+    printf "%s" "${FileContent}"
 }
 
 function changeToRawUrl_gitlab() {
@@ -196,6 +200,9 @@ function getBranchMapsFromDir_local() {
         exit_script
     fi
 
+
+    mappingBranchName_JsonStrings=""
+    mappingBranchName_JsonStrings+="["
     for file in "${BranceMaps_From_Directory_PATH}"/*; do
         if [ ! -f "$file" ]; then
             continue
@@ -205,9 +212,14 @@ function getBranchMapsFromDir_local() {
         if [ $? != 0 ]; then
             continue
         fi
-        
+        if [ "${mappingBranchName_JsonStrings}" != "[" ]; then
+            mappingBranchName_JsonStrings+=", "
+        fi
+        mappingBranchName_JsonStrings+="${isMappingResult}"
+
         mappingBranchName_FilePaths[${#mappingBranchName_FilePaths[@]}]=${file}
     done
+    mappingBranchName_JsonStrings+="]"
 }
 
 function isValidJsonFile() {
@@ -252,9 +264,6 @@ function isValidJsonFile() {
 
 
 function getBranchMapsFromDir_remote_github() {
-    mappingBranchName_FilePaths=()
-
-
     # 将字符串中的内容进行替换
     newUrl="${BranceMaps_From_Directory_PATH/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
     api_url="${newUrl/tree\/main/contents}"
@@ -274,10 +283,10 @@ function getBranchMapsFromDir_remote_github() {
     fi
     # 检查是否超过API请求限制
     if [[ $fileList == *"Bad credentials"* ]]; then
-        echo "凭证无效。请稍后再试。"
+        echo "凭证无效。请稍后再试。${fileList}"
         exit_script
     elif [[ $fileList == *"API rate limit exceeded"* ]]; then
-        echo "超过API请求限制。请稍后再试。"
+        echo "超过API请求限制。请稍后再试。${fileList}"
         exit_script
     fi
     # echo "================fileList=${fileList}"
@@ -304,6 +313,10 @@ function getBranchMapsFromDir_remote_github() {
     fileDownloadUrlArray=(${fileDownloadUrlArrayString})
     # echo "================fileDownloadUrlArray=${fileDownloadUrlArray[*]}"
 
+
+    mappingBranchName_JsonStrings=""
+    mappingBranchName_JsonStrings+="["
+    mappingBranchName_FilePaths=()
     fileDownloadUrlCount=${#fileDownloadUrlArray[@]}
     for((i=0;i<fileDownloadUrlCount;i++));
     do
@@ -316,8 +329,14 @@ function getBranchMapsFromDir_remote_github() {
             debug_log "${isMappingResult}"
             continue
         fi
+        if [ "${mappingBranchName_JsonStrings}" != "[" ]; then
+            mappingBranchName_JsonStrings+=", "
+        fi
+        mappingBranchName_JsonStrings+="${isMappingResult}"
+
         mappingBranchName_FilePaths+=("$rawFileAbsUrl")
     done
+    mappingBranchName_JsonStrings+="]"
 }
 
 
@@ -346,6 +365,8 @@ function getBranchMapsFromDir_remote_gitee() {
     mappingBranchName_FilePaths=()
     file_JsonStrings=""
     file_JsonStrings+="["
+    mappingBranchName_JsonStrings=""
+    mappingBranchName_JsonStrings+="["
     for((i=0;i<fileCount;i++));
     do
         fileRelPath=${fileArray[i]}
@@ -369,10 +390,16 @@ function getBranchMapsFromDir_remote_gitee() {
             debug_log "${isMappingResult}"
             continue
         fi
-        mappingBranchName_FilePaths+=("$rawFileAbsUrl")
+        if [ "${mappingBranchName_JsonStrings}" != "[" ]; then
+            mappingBranchName_JsonStrings+=", "
+        fi
+        mappingBranchName_JsonStrings+="${isMappingResult}"
 
+        mappingBranchName_FilePaths+=("$rawFileAbsUrl")
     done
     file_JsonStrings+="]"
+    mappingBranchName_JsonStrings+="]"
+
 
     # echo "file_JsonStrings的值如下:"
     # echo "${file_JsonStrings}" | jq '.'
@@ -433,6 +460,8 @@ function getBranchMapsFromDir_remote_gitlab() {
     mappingBranchName_FilePaths=()
     file_JsonStrings=""
     file_JsonStrings+="["
+    mappingBranchName_JsonStrings=""
+    mappingBranchName_JsonStrings+="["
     for((i=0;i<json_file_count;i++));
     do
         fileRelPath=${json_file_relPathArray[i]}
@@ -457,9 +486,15 @@ function getBranchMapsFromDir_remote_gitlab() {
             echo "${isMappingResult}"
             continue
         fi
+        if [ "${mappingBranchName_JsonStrings}" != "[" ]; then
+            mappingBranchName_JsonStrings+=", "
+        fi
+        mappingBranchName_JsonStrings+="${isMappingResult}"
+
         mappingBranchName_FilePaths+=("$rawFileAbsUrl")
     done
     file_JsonStrings+="]"
+    mappingBranchName_JsonStrings+="]"
     debug_log "================fileDownloadUrlArray=${fileDownloadUrlArray[*]}"
     
 
@@ -498,6 +533,12 @@ elif [[ "${BranceMaps_From_Directory_PATH}" == *"https://gitlab"* ]]; then
 else
     getBranchMapsFromDir_local
 fi
+
+
+# echo "mappingBranchName_JsonStrings=${mappingBranchName_JsonStrings}"
+mappingBranchName_FilePathsString=$(printf "%s" "${mappingBranchName_JsonStrings}" | jq ".[].fileUrl")
+# echo "mappingBranchName_FilePathsString=${mappingBranchName_FilePathsString}"
+mappingBranchName_FilePaths=(${mappingBranchName_FilePathsString})
 
 
 if [ "${#mappingBranchName_FilePaths[@]}" == 0 ]; then

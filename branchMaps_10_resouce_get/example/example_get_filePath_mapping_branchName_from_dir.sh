@@ -84,7 +84,48 @@ function dealFound() {
 # testLocal && dealFound
 # testGithub && dealFound
 # testGitee && dealFound
-testGilab && dealFound
+# testGilab && dealFound
+# exit 1
 
+# gitlab 的json文件获取测试
+access_token="glpat-xTEsz89Km9N1dessU56p"
+headers=(
+    "Authorization: Bearer $access_token"  # 替换为新的身份验证令牌
+)
+
+
+# 获取 projet_id
+# projectname="bojuehui/mobile/mobile_flutter_wish"
+# # https://gitlab.com/api/v3/projects?private_token=xxxx&search=projectname
+# curl -s "https://gitlab.com/api/v4/projects?private_token=${access_token}&search=${projectname}"
+
+# exit 1
+
+# curl -s --header "Private-Token: <Your_Access_Token>" "https://gitlab.xihuanwu.com/api/v4/projects/<Project_ID>/repository/files/<File_Path>/raw"
+
+# api_url="https://gitlab.xihuanwu.com/api/v4/projects/<Project_ID>/repository/files/<File_Path>/raw"
+project_id="4"
+file_path="master/bulidScript/featureBrances/chore_pack.json"
+file_path=$(echo "$file_path" | sed 's/\//%2F/g') # 将/替换成%2F
+api_url="https://gitlab.xihuanwu.com/api/v4/projects/${project_id}/repository/files/${file_path}/raw"
+echo "api_url:${api_url}"
+curl -s --header "Private-Token: ${access_token}" "${api_url}"
+exit 1
+
+log_title "headers 方式"
+# # 执行请求:下载文件列表(GitHub链接:无法直接访问到特定的文件夹和文件。所以尝试使用GitHub API来获取文件列表并下载文件。)
+# # api_url="https://api.github.com/repos/dvlpCI/script-qbase/contents/branchMaps_10_resouce_get/example/featureBrances"
+blob_url="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/blob/master/bulidScript/featureBrances/chore_pack.json"
+raw_url="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/raw/master/bulidScript/featureBrances/chore_pack.json"
+viewsource_url="view-source:https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/raw/master/bulidScript/featureBrances/chore_pack.json"
+api_url="${blob_url}"
+api_url="${raw_url}"
+# api_url="${viewsource_url}"
+curl -s -H "${headers[@]}" "$api_url"
+# fileList=$(curl -s -H "${headers[@]}" "$api_url")
+
+echo "\n"
+log_title " access_token 方式"
+curl -s --header "Private-Token: ${access_token}" "$api_url"
 
 
