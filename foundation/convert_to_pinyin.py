@@ -11,6 +11,12 @@ import argparse
 import sys
 from pypinyin import pinyin, Style
 
+# 执行本脚本前，请在shell中加入以下内容，避免出错
+# if ! python -c "import pypinyin" >/dev/null 2>&1; then
+#     echo "pypinyin module not found. Installing..."
+#     pip3 install pypinyin
+# fi
+
 
 # 定义颜色常量
 NC='\033[0m' # No Color
