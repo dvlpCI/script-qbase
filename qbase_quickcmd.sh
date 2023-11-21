@@ -183,7 +183,7 @@ if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
 fi
 
 if [ "${packagePathAction}" == "execCmd" ]; then
-    _verbose_log "正在执行命令(根据rebase,获取分支名):《 sh ${quickCmd_script_path} ${argsString} 》"
+    _verbose_log "正在执行参数快捷命令:《 sh ${quickCmd_script_path} ${argsString} 》"
     sh ${quickCmd_script_path} ${argsString}
 else
     echo "$quickCmd_script_path"

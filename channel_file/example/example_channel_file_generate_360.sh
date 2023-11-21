@@ -53,8 +53,8 @@ open "${outputFilePath}"
 
 
 echo "\n"
-log_title "2.使用 jsonString 生成多渠道配置文件"
-argsJsonString='
+log_title "2.使用 jsonString 生成多渠道配置文件 -- 使用脚本路径"
+channelsJsonString='
 [
   "CHANNEL 华为 huawei",
   "CHANNEL 小米 xiaomi",
@@ -69,8 +69,8 @@ argsJsonString='
 channelsFileName="360channels_byJsonString"
 outputFilePath="${CurrentDIR_Script_Absolute}/${channelsFileName}.txt"
 firstElementMustPerLine="CHANNEL"
-echo "${YELLOW}正在执行测试命令(使用 jsonString 生成多渠道配置文件):《${BLUE} sh $qtool_360channel_file_scriptPath -jsonString '${argsJsonString}' -outputFile \"${outputFilePath}\" -firstElementMustPerLine \"${firstElementMustPerLine}\" ${YELLOW}》${NC}"
-generateResult=$(sh $qtool_360channel_file_scriptPath -jsonString "${argsJsonString}" -outputFile "${outputFilePath}" -firstElementMustPerLine "${firstElementMustPerLine}")
+echo "${YELLOW}正在执行测试命令(使用 jsonString 生成多渠道配置文件):《${BLUE} sh $qtool_360channel_file_scriptPath -jsonString '${channelsJsonString}' -outputFile \"${outputFilePath}\" -firstElementMustPerLine \"${firstElementMustPerLine}\" ${YELLOW}》${NC}"
+generateResult=$(sh $qtool_360channel_file_scriptPath -jsonString "${channelsJsonString}" -outputFile "${outputFilePath}" -firstElementMustPerLine "${firstElementMustPerLine}")
 if [ $? != 0 ]; then
   echo "${RED}${generateResult}${NC}"  # 此时此值是错误信息
   exit 1
@@ -78,3 +78,22 @@ fi
 echo "${GREEN}您的360加固多渠道配置文件(byJsonString):${BLUE} ${generateResult} ${GREEN}。${NC}"
 open "${outputFilePath}"
 
+
+log_title "2.使用 jsonString 生成多渠道配置文件 -- 使用快捷方法(TODO:被 sh \${quickCmd_script_path} \${argsString} 的时候出错了)"
+argsJsonString='
+[
+    "-jsonString",
+    '${channelsJsonString}',
+    "-outputFile",
+    "'"${outputFilePath}"'",
+    "-firstElementMustPerLine",
+    "'"${firstElementMustPerLine}"'"
+]
+'
+generateResult=$(qbase.sh -quick channel_file_generate_360 -argsJsonString "${argsJsonString}")
+if [ $? != 0 ]; then
+    echo "${RED}${generateResult}${NC}"  # 此时此值是错误信息
+    exit 1
+fi
+echo "${GREEN}您的360加固多渠道配置文件(byJsonString):${BLUE} ${generateResult} ${GREEN}。${NC}"
+open "${outputFilePath}"

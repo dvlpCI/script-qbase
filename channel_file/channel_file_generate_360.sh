@@ -29,13 +29,13 @@ do
 done
 
 if [ -z "$outputFilePath" ]; then
-  echo "❌Error:您的 -file 参数值 ${outputFilePath} 不能为空，否则无法创建用来填写配置信息的文件，无法请检查。"
+  echo "❌Error:您的 -outputFile 参数值 ${outputFilePath} 不能为空，否则无法创建用来填写配置信息的文件，无法请检查。(如果你使用qbase调用本脚本，又同时使用的是 -jsonString ，则会在 sh \${quickCmd_script_path} \${argsString} 的时候出错。)"
   exit 1
 fi
 
 if [ -f "$outputFilePath" ]; then
   > "$outputFilePath"  # 清空文件内容
-  # echo "🤝温馨提示:您的 -file 指向的 ${outputFilePath} 文件内容已存在，会先进行清空，以将整个文件用来填写配置信息的文件。"
+  # echo "🤝温馨提示:您的 -outputFile 指向的 ${outputFilePath} 文件内容已存在，会先进行清空，以将整个文件用来填写配置信息的文件。"
 fi
 
 # 获取父目录路径
