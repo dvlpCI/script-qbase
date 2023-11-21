@@ -325,9 +325,9 @@
             "values": [
                 {
                     "des": "360加固的多渠道文件生成",
-                    "key": "360channel_file_generate",
-                    "rel_path": "./channel_file/360channel_file_generate.sh",
-                    "example": "sh xxx.sh -arrayString \"${argArrayString}\" -jsonString \"${argsJsonString}\" -outputFile \"${outputFilePath}\" -shouldCheckOutput \"${shouldCheckOutput}\""
+                    "key": "channel_file_generate_360",
+                    "rel_path": "./channel_file/channel_file_generate_360.sh",
+                    "example": "sh xxx.sh -arrayString \"${argArrayString}\" -jsonString \"${argsJsonString}\" -outputFile \"${outputFilePath}\" -firstElementMustPerLine \"${firstElementMustPerLine}\""
                 }
             ]
         }

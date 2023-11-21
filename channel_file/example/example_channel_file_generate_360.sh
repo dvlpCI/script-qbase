@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-11-16 16:43:04
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-17 18:41:08
+ # @LastEditTime: 2023-11-21 15:09:50
  # @Description: 360加固的多渠道文件生成
 ### 
 # 渠道配置文件脚本
@@ -29,7 +29,7 @@ Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
 CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
-qtool_360channel_file_scriptPath=${CategoryFun_HomeDir_Absolute}/360channel_file_generate.sh
+qtool_360channel_file_scriptPath=${CategoryFun_HomeDir_Absolute}/channel_file_generate_360.sh
 
 function log_title() {
     echo "${PURPLE}------------------ $1 ------------------${NC}"
@@ -58,14 +58,19 @@ argsJsonString='
 [
   "CHANNEL 华为 huawei",
   "CHANNEL 小米 xiaomi",
-  "CHANNEL 抖音 douyin"
+  "CHANNEL 抖音 douyin",
+  "CHANNEL 360应用平台 1",
+  "CHANNEL 谷歌市场 2",
+  "CHANNEL 91手机商城 3",
+  "CHANNEL 豌豆荚 4",
+  "CHANNEL 安卓市场 5"
 ]'
 # channelsFileName=$(date +"%m%d_%H%M%S")
 channelsFileName="360channels_byJsonString"
 outputFilePath="${CurrentDIR_Script_Absolute}/${channelsFileName}.txt"
-shouldCheckOutput="true"
-echo "${YELLOW}正在执行测试命令(使用 jsonString 生成多渠道配置文件):《${BLUE} sh $qtool_360channel_file_scriptPath -jsonString '${argsJsonString}' -outputFile \"${outputFilePath}\" -shouldCheckOutput \"${shouldCheckOutput}\" ${YELLOW}》${NC}"
-generateResult=$(sh $qtool_360channel_file_scriptPath -jsonString "${argsJsonString}" -outputFile "${outputFilePath}" -shouldCheckOutput "${shouldCheckOutput}")
+firstElementMustPerLine="CHANNEL"
+echo "${YELLOW}正在执行测试命令(使用 jsonString 生成多渠道配置文件):《${BLUE} sh $qtool_360channel_file_scriptPath -jsonString '${argsJsonString}' -outputFile \"${outputFilePath}\" -firstElementMustPerLine \"${firstElementMustPerLine}\" ${YELLOW}》${NC}"
+generateResult=$(sh $qtool_360channel_file_scriptPath -jsonString "${argsJsonString}" -outputFile "${outputFilePath}" -firstElementMustPerLine "${firstElementMustPerLine}")
 if [ $? != 0 ]; then
   echo "${RED}${generateResult}${NC}"  # 此时此值是错误信息
   exit 1

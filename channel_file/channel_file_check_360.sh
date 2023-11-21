@@ -3,17 +3,30 @@
  # @Author: dvlproad
  # @Date: 2023-11-16 16:50:27
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-16 18:52:51
+ # @LastEditTime: 2023-11-21 15:05:43
  # @Description: 检查360加固的多渠道配置文件是否合规
 ### 
 #!/bin/bash
 
 # 接收文件路径作为参数
-file_path=$1
+while [ -n "$1" ]
+do
+    case "$1" in
+        -channelF|--channel-file-path) file_path=$2; shift 2;;
+        -firstElementMustPerLine|--firstElementMustPerLine) firstElementMustPerLine=$2; shift 2;;
+        --) break ;;
+        *) break ;;
+    esac
+done
 
 # 检查文件是否存在
 if [ ! -f "$file_path" ]; then
   echo "您要检查的360加固配置文件不存在: $file_path"
+  exit 1
+fi
+
+if [ -z "${firstElementMustPerLine}" ]; then
+  echo "缺少 -firstElementMustPerLine 参数，请补充您的360加固多渠道配置文件每行第一个元素必须使用的值"
   exit 1
 fi
 
@@ -31,9 +44,9 @@ while IFS= read -r line; do
     exit 1
   fi
 
-  # 检查第一个元素是否为CHANNEL
-  if [ "${elements[0]}" != "CHANNEL" ]; then
-    echo "不符合规范: 第一个元素不是CHANNEL"
+  # 检查第一个元素是否为
+  if [ "${elements[0]}" != "${firstElementMustPerLine}" ]; then
+    echo "不符合规范: 第一个元素不是${firstElementMustPerLine}"
     exit 1
   fi
 

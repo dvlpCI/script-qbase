@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-11-16 16:43:04
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-17 11:16:16
+ # @LastEditTime: 2023-11-21 15:04:25
  # @Description: 360加固的多渠道文件生成
 ### 
 # 渠道配置文件脚本
@@ -22,7 +22,7 @@ do
         -arrayString|--arrayString) argArrayString=$2; shift 2;;
         -jsonString|--jsonString) argsJsonString=$2; shift 2;;
         -outputFile|--output-file-path) outputFilePath=$2; shift 2;;
-        -shouldCheckOutput|--shouldCheckOutput) shouldCheckOutput=$2; shift 2;;
+        -firstElementMustPerLine|--firstElementMustPerLine) firstElementMustPerLine=$2; shift 2;;  # 每行第一个元素必须使用的值，有设置即检查整个文件，不设置就整个文件不检查
         --) break ;;
         *) break ;;
     esac
@@ -117,8 +117,8 @@ for ((i=0; i<${#argArray[@]}; i++)); do
   echo "${argArray[$i]}" >> "$outputFilePath"
 done
 
-if [ "${shouldCheckOutput}" == "true" ]; then
-  checkResult=$(sh $CurrentDIR_Script_Absolute/360channel_file_check.sh "$outputFilePath")
+if [ -n "${firstElementMustPerLine}" ]; then
+  checkResult=$(sh $CurrentDIR_Script_Absolute/channel_file_check_360.sh -channelF "$outputFilePath" -firstElementMustPerLine "${firstElementMustPerLine}")
   if [ $? != 0 ]; then
     echo "${checkResult}" # 此时此值是错误结果
     exit 1

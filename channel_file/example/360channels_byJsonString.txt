@@ -1,3 +1,1 @@
-CHANNEL 华为 huawei
-CHANNEL 小米 xiaomi
-CHANNEL 抖音 douyin
+
