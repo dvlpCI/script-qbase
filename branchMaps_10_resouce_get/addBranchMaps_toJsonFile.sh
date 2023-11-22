@@ -26,9 +26,9 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
 # branchNameFileJsonString='{
             
 #         }'
-# mappingBrancName_FilePaths="a b c d"
-# mappingBrancName_FilePaths=($mappingBrancName_FilePaths)
-# branchFiles=$(printf "%s\n" "${mappingBrancName_FilePaths[@]}" | jq -R . | jq -s .)
+# mappingBranchName_FilePaths="a b c d"
+# mappingBranchName_FilePaths=($mappingBranchName_FilePaths)
+# branchFiles=$(printf "%s\n" "${mappingBranchName_FilePaths[@]}" | jq -R . | jq -s .)
 # branchFiles='[]'
 # branchFiles='["a"]'
 # # printf "%s\n" "✅branchFiles=${branchFiles}"
@@ -156,25 +156,33 @@ function get_required_branch_file_paths_from_dir() {
         requestBranchName=${requestBranchNameArray[i]}
         branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
 
-        mappingBrancName_FilePaths=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
-        if [ $? != 0 ] || [ -z "${mappingBrancName_FilePaths}" ]; then
-            mappingBrancName_FilePaths=()
+        mappingBranchName_JsonStrings=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
+        if [ $? != 0 ]; then
+            mappingBranchName_FilePaths=()
+            branchFiles='[]'
+        elif [ -z "${mappingBranchName_JsonStrings}" ]; then
+            # echo "Error❌: 没有找到映射到 ${requestBranchName} 分支的信息文件。"
+            mappingBranchName_FilePaths=()
             branchFiles='[]'
         else
-            # if [ "${#mappingBrancName_FilePaths[@]}" == 0 ]; then
+            # echo "mappingBranchName_JsonStrings=${mappingBranchName_JsonStrings}"
+            mappingBranchName_FilePathsString=$(printf "%s" "${mappingBranchName_JsonStrings}" | jq -r ".[].fileUrl")   # 记得使用-r去除双引号，避免后续路径使用时出错
+            # echo "mappingBranchName_FilePathsString=${mappingBranchName_FilePathsString}"
+            mappingBranchName_FilePaths=(${mappingBranchName_FilePathsString})
+
+            # if [ "${#mappingBranchName_FilePaths[@]}" == 0 ]; then
             #     echo "很遗憾：【未找到任何】符合分支名是 ${mappingName} 的文件，请检查 ${BranceMaps_From_Directory_PATH}。"
             #     return 1
             # fi
 
-            # if [ "${#mappingBrancName_FilePaths[@]}" -gt 1 ]; then
+            # if [ "${#mappingBranchName_FilePaths[@]}" -gt 1 ]; then
             #     echo "发生异常：【找到多个】符合分支名是 ${mappingName} 的文件，请检查 ${BranceMaps_From_Directory_PATH}。"
             #     return 1
             # fi
-            mappingBrancName_FilePaths=($mappingBrancName_FilePaths)
-            branchFiles=$(printf "%s\n" "${mappingBrancName_FilePaths[@]}" | jq -R . | jq -s .)
+            branchFiles=$(printf "%s\n" "${mappingBranchName_FilePaths[@]}" | jq -R . | jq -s .)
             # branchFiles='["a"]'
         fi
-        # echo "🚗🚗🚗🚗 mappingBrancName_FilePaths 个数 ${#mappingBrancName_FilePaths[@]} ,分别为 ${mappingBrancName_FilePaths}"
+        # echo "🚗🚗🚗🚗 mappingBranchName_FilePaths 个数 ${#mappingBranchName_FilePaths[@]} ,分别为 ${mappingBranchName_FilePaths}"
         # echo "🚗🚗🚗🚗 branchFiles=${branchFiles}"
         branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --argjson branchFiles "$branchFiles" '. + { "branchFiles": $branchFiles }')
         # printf "%s" "$branchNameFileJsonString" | jq -r .
@@ -251,6 +259,11 @@ function get_required_branch_file_paths_from_dir() {
         done
     done
 
+    errorFilePathCount=${#resultBranchFilePaths_ErrorPaths[@]}
+    if [ "${errorFilePathCount}" -gt 0 ]; then
+        echo "您有 ${errorFilePathCount} 个文件路径错误，请检查 ${resultBranchFilePaths_ErrorPaths[*]}"
+        exit 1
+    fi
     # printf "🚗🚗🚗🚗 %s 🚗🚗🚗🚗" "${resultBranchFilePaths[*]}"
     # return 1
     printf "%s" "${resultBranchFilePaths[*]}"

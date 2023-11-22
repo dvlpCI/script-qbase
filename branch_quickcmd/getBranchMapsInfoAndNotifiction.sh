@@ -80,6 +80,9 @@ do
     esac
 done
 
+# branchMapsFilename=$(basename "${branchMapsInJsonFile}" | cut -d. -f1)    # 获取文件名并去除后缀名
+branchMapsFilename=$(basename "${branchMapsInJsonFile}")
+
 debug_log "========2.2=======✅-branchMapsInJsonF:${branchMapsInJsonFile}"
 debug_log "========2.3=======✅-branchMapsInKey:${branchMapsInKey}"
 
@@ -143,7 +146,7 @@ notification_strings_to_wechat_scriptPath=${qbase_homedir_abspath}/notification/
 
 CONTENTS_JSON_FILE_PATH=${RESULT_SALE_TO_JSON_FILE_PATH}
 CONTENTS_JSON_KEY="${RESULT_FULL_STRING_SALE_BY_KEY}_slice"
-HEADER_TEXT=">>>>>>>>您当前打包的分支信息如下>>>>>>>>>\n"
+HEADER_TEXT=">>>>>>>>您当前打包的分支信息如下(${branchMapsFilename})>>>>>>>>>\n"
 # FOOTER_TEXT="未换行<<<<<<<<这是尾部<<<<<<<<<"
 # AtMiddleBracketIdsString="[\"@all\", \"lichaoqian\"]"
 debug_log "${YELLOW}正在执行命令(发送分支数组内容)《${BLUE} sh ${notification_strings_to_wechat_scriptPath} -robot \"${ROBOT_URL}\" -headerText \"${HEADER_TEXT}\" -contentJsonF \"${CONTENTS_JSON_FILE_PATH}\" -contentJsonKey \"${CONTENTS_JSON_KEY}\" -footerText \"${FOOTER_TEXT}\" -at \"${AtMiddleBracketIdsString}\" -msgtype \"${msgtype}\" ${YELLOW}》${NC}"

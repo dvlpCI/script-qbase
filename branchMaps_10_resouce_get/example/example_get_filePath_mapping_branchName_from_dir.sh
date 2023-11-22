@@ -67,15 +67,21 @@ function testGilab {
 function dealFound() {
     # sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_URL}" -access-token "${access_token}"
     # exit
-    mappingBrancName_FilePaths=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_URL}" -access-token "${access_token}")
+
+    mappingBranchName_JsonStrings=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_URL}" -access-token "${access_token}")
     if [ $? != 0 ]; then
-        echo "${mappingBrancName_FilePaths}"
+        echo "${mappingBranchName_JsonStrings}"
         exit 1
     fi
-    if [ -z "${mappingBrancName_FilePaths}" ]; then
+    if [ -z "${mappingBranchName_JsonStrings}" ]; then
         branchDescription="${YELLOW}很遗憾:${BLUE} ${requestBranchName} ${YELLOW}:提交记录获取失败:未找到匹配分支名的文件。${NC}"
     else
-        branchDescription="${GREEN}恭喜:${BLUE} ${requestBranchName} ${GREEN}:提交记录待获取。匹配到的分支信息文件分别为:${BLUE} ${mappingBrancName_FilePaths[*]} ${GREEN}。${NC}"
+        # echo "mappingBranchName_JsonStrings=${mappingBranchName_JsonStrings}"
+        mappingBranchName_FilePathsString=$(printf "%s" "${mappingBranchName_JsonStrings}" | jq -r ".[].fileUrl") # 记得使用-r去除双引号，避免后续路径使用时出错
+        # echo "mappingBranchName_FilePathsString=${mappingBranchName_FilePathsString}"
+        mappingBranchName_FilePaths=(${mappingBranchName_FilePathsString})
+
+        branchDescription="${GREEN}恭喜:${BLUE} ${requestBranchName} ${GREEN}:提交记录待获取。匹配到的分支信息文件分别为:${BLUE} ${mappingBranchName_FilePaths[*]} ${GREEN}。${NC}"
     fi
     echo "${branchDescription}"
 }

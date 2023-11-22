@@ -105,8 +105,8 @@ do
     else
         # test_getSingleBranchLog "false"
         requestBranchName=$branch_name
-        mappingBrancName_FilePaths=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
-        if [ $? != 0 ] || [ -z "${mappingBrancName_FilePaths}" ]; then
+        mappingBranchName_JsonStrings=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
+        if [ $? != 0 ] || [ -z "${mappingBranchName_JsonStrings}" ]; then
             branchDescription="${branch_name}:提交记录获取失败:未找到匹配分支名的文件 @${last_committer}"
         else
             branchDescription="${branch_name}:提交记录待获取 @${last_committer}"

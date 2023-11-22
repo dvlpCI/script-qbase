@@ -535,15 +535,4 @@ else
 fi
 
 
-# echo "mappingBranchName_JsonStrings=${mappingBranchName_JsonStrings}"
-mappingBranchName_FilePathsString=$(printf "%s" "${mappingBranchName_JsonStrings}" | jq ".[].fileUrl")
-# echo "mappingBranchName_FilePathsString=${mappingBranchName_FilePathsString}"
-mappingBranchName_FilePaths=(${mappingBranchName_FilePathsString})
-
-
-if [ "${#mappingBranchName_FilePaths[@]}" == 0 ]; then
-    echo "Error❌: 没有找到映射到 ${mappingName} 分支的信息文件。"
-    exit_script
-fi
-
-printf "%s" "${mappingBranchName_FilePaths[*]}"
+printf "%s" "${mappingBranchName_JsonStrings}"
