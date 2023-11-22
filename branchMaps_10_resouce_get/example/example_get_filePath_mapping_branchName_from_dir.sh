@@ -94,28 +94,63 @@ function dealFound() {
 # exit 1
 
 # gitlab 的json文件获取测试
-access_token="glpat-xTEsz89Km9N1dessU56p"
+# personal_access_token="glpat-BBhe_zYnj59Kt4eL35xq" # 仅 read
+personal_access_token="glpat-mU-BBsFtjkNWa6NSaZ37" # 四种权限
+project_access_token="glpat-xTEsz89Km9N1dessU56p"
 headers=(
-    "Authorization: Bearer $access_token"  # 替换为新的身份验证令牌
+    "Authorization: Bearer $personal_access_token"  # 替换为新的身份验证令牌
 )
 
+project_path="bojuehui/mobile/mobile_flutter_wish"
 
-# 获取 projet_id
-# projectname="bojuehui/mobile/mobile_flutter_wish"
-# # https://gitlab.com/api/v3/projects?private_token=xxxx&search=projectname
-# curl -s "https://gitlab.com/api/v4/projects?private_token=${access_token}&search=${projectname}"
+# 1、获取 projet_id
+# [gitlab查看项目ID/projectId](https://blog.csdn.net/LJLLJL20020628/article/details/101852672)
+projectname="mobile_flutter_wish"
+# https://gitlab.example.com/api/v3/projects?private_token=xxxx&search=projectname
+responseJsonString=$(curl -s "https://gitlab.xihuanwu.com/api/v4/projects?private_token=${personal_access_token}&search=${projectname}")
+mayMatchProjectCount=$(echo "${responseJsonString}" | jq -r ".|length")
+echo "mayMatchProjectCount=${mayMatchProjectCount}"
+project_id=""
+for((i=0;i<${mayMatchProjectCount};i++));
+do
+    mayMatchProjectJsonString=$(echo "${responseJsonString}" | jq -r ".[$i]")
+    # echo "$((i+1)).${mayMatchProjectJsonString}"
+    path_with_namespace=$(echo "${mayMatchProjectJsonString}" | jq -r ".path_with_namespace")
+    echo "$((i+1)).${path_with_namespace}"
+    if [ "${path_with_namespace}" == "${project_path}" ]; then
+        project_id=$(echo "${mayMatchProjectJsonString}" | jq -r ".id")
+        echo "$((i+1)).project_id=${project_id}"
+        break
+    fi
+done
+
+if [ -z "${project_id}" ]; then
+    echo "project_id is empty"
+    exit 1
+fi
 
 # exit 1
 
-# curl -s --header "Private-Token: <Your_Access_Token>" "https://gitlab.xihuanwu.com/api/v4/projects/<Project_ID>/repository/files/<File_Path>/raw"
 
+# 2、通过 project_id 获取其他数据
+# curl -s --header "Private-Token: <Your_Access_Token>" "https://gitlab.xihuanwu.com/api/v4/projects/<Project_ID>/repository/files/<File_Path>/raw"
 # api_url="https://gitlab.xihuanwu.com/api/v4/projects/<Project_ID>/repository/files/<File_Path>/raw"
-project_id="4"
-file_path="master/bulidScript/featureBrances/chore_pack.json"
+# project_id="4"
+file_path="bulidScript/featureBrances/chore_pack.json"
 file_path=$(echo "$file_path" | sed 's/\//%2F/g') # 将/替换成%2F
-api_url="https://gitlab.xihuanwu.com/api/v4/projects/${project_id}/repository/files/${file_path}/raw"
+
+
+# GitLab API相关信息
+gitlab_url="https://gitlab.xihuanwu.com"  # 替换为您的GitLab域名
+
+# 构建API URL
+api_url="${gitlab_url}/api/v4/projects/${project_id}/repository/files/${file_path}/raw"
+
+
 echo "api_url:${api_url}"
-curl -s --header "Private-Token: ${access_token}" "${api_url}"
+# curl -s "${api_url}"
+# curl -s --header "PRIVATE-TOKEN: ${project_access_token}" "${api_url}"
+curl -s --header "Private-Token: ${project_access_token}" "${api_url}"
 exit 1
 
 log_title "headers 方式"
