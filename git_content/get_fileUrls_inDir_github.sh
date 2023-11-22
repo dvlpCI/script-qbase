@@ -29,7 +29,7 @@ CYAN='\033[0;36m'
 while [ -n "$1" ]
 do
     case "$1" in
-        -fileUrl|--fiel-url) FILR_URL=$2; shift 2;; # 获取分支信息的文件源，请确保该文件夹内的json文件都是合规的
+        -dirUrl|--dir-url) DIRECTORY_URL=$2; shift 2;;
         -access-token|--access-token) access_token=$2; shift 2;;
         --) break ;;
         *) break ;;
@@ -38,7 +38,7 @@ done
 
 
 # 将字符串中的内容进行替换
-newUrl="${FILR_URL/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
+newUrl="${DIRECTORY_URL/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
 api_url="${newUrl/tree\/main/contents}"
 # echo "====api_url=${api_url}"
 # exit
