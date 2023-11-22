@@ -36,6 +36,10 @@ function debug_log() {
 CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
 
+GIT_SCIRTP_DIR_PATH=${qbase_homedir_abspath}/git_content
+qbase_get_fileUrls_inDir_github_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_github.sh
+qbase_get_fileUrls_inDir_gitee_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_gitee.sh
+qbase_get_fileUrls_inDir_gitlab_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_gitlab.sh
 
 # shell 参数具名化
 while [ -n "$1" ]
@@ -113,72 +117,6 @@ function isFileMappingBranchName() {
     # debug_log "恭喜:找到符合 ${mappingName} 的分支信息文件为: ${branchFileAbsolutePathOrUrl}"
     printf "%s" "${FileContent}"
 }
-
-function changeToRawUrl_gitlab() {
-    
-    input=$1
-    if [[ $input != http* ]]; then
-        echo "您要转化的地址 ${input} 不是以 http 开头，请检查"
-        exit 1
-    fi
-    target=${input/tree/raw}    # 将 "blob" 替换为指定变量的值
-    echo "${target}"
-}
-
-function changeToApiUrl_gitlab() {
-    # 输入字符串
-    # input="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/tree/master/bulidScript/featureBrances"
-          #  https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/raw/version/v1.7.4_1121/bulidScript/featureBrances/chore_pack.json
-    input=$1
-    if [[ $input != http* ]]; then
-        echo "您要转化的地址 ${input} 不是以 http 开头，请检查"
-        exit 1
-    fi
-
-    # 1、截取各内容
-    project_host_removed_suffix=$(echo "$input" | sed -E 's/\.com.*$//')    # 去掉.com/之后(含.com)的字符串
-    # echo "project_host_removed_suffix=${project_host_removed_suffix}"
-    project_host_removed_suffix="${project_host_removed_suffix}.com"
-    # echo "project_host_removed_suffix=${project_host_removed_suffix}"
-
-
-    project_removed_suffix=$(echo "$input" | sed -e 's/\/-.*//')   # 去掉/-之后的字符串
-    # echo "project_removed_suffix=${project_removed_suffix}"
-
-    all_raw_home_url="${project_removed_suffix}/-/raw"
-
-    project_removed_prefix=$(echo "$project_removed_suffix" | sed -e 's/.*\.com\///')    # 去掉.com/之前的字符串
-    # echo "project_removed_prefix=${project_removed_prefix}"
-    project_encoded_string=$(echo "$project_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
-    # echo "project_encoded_string=${project_encoded_string}"
-
-
-    project_path_removed_prefix=$(echo "$input" | sed -e 's/.*-\/tree\/master\///')    # 去掉.com/之前的字符串
-    # echo "project_path_removed_prefix=${project_path_removed_prefix}"
-    project_path_encoded_string=$(echo "$project_path_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
-    # echo "project_path_encoded_string=${project_path_encoded_string}"
-
-    # 去除origin/开头
-    branchName="master"
-    branchName=${branchName#origin/}
-
-    # 2、拼接
-    target="${project_host_removed_suffix}/api/v4/projects/${project_encoded_string}/repository/tree?ref=${branchName}&path=${project_path_encoded_string}"
-    # successTarget="https://gitlab.xihuanwu.com/api/v4/projects/bojuehui%2Fmobile%2Fmobile_flutter_wish/repository/tree?ref=master&path=bulidScript%2FfeatureBrances"
-    # if [ "${target}" != "${successTarget}" ]; then
-    #     echo "抱歉，转化失败"
-    #     exit 1
-    # fi
-
-    # BranceMaps_From_Directory_PATH=${project_removed_suffix//tree/$mappingName}    # 将 "blob" 替换为指定变量的值
-    responseJsonString='{
-        "api_url_master_current_dir": "'"${target}"'",
-        "raw_url_all_home": "'"${all_raw_home_url}"'"
-    }'
-    # responseJsonString=$(printf "%s" "$responseJsonString" | jq --arg message "$message" '. + { "message": $message }')
-    printf "%s" "${responseJsonString}"
-}
-
 
 # 从本地获取
 function getBranchMapsFromDir_local() {
@@ -264,52 +202,11 @@ function isValidJsonFile() {
 
 
 function getBranchMapsFromDir_remote_github() {
-    # 将字符串中的内容进行替换
-    newUrl="${BranceMaps_From_Directory_PATH/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
-    api_url="${newUrl/tree\/main/contents}"
-    # echo "====api_url=${api_url}"
-    # exit
-
-
-    headers=(
-        "Authorization: Bearer $access_token"  # 替换为新的身份验证令牌
-    )
-    # 执行请求:下载文件列表(GitHub链接:无法直接访问到特定的文件夹和文件。所以尝试使用GitHub API来获取文件列表并下载文件。)
-    # api_url="https://api.github.com/repos/dvlpCI/script-qbase/contents/branchMaps_10_resouce_get/example/featureBrances"
-    fileList=$(curl -s -H "${headers[@]}" "$api_url")
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_github_scriptPath -dirUrl "${BranceMaps_From_Directory_PATH}" -access-token "${access_token}" -inBranchName "${mappingName}")
     if [ $? != 0 ]; then
-        echo "Error❌:无法获取文件列表。请检查您的身份验证令牌是否正确。"
+        echo "${fileDownloadUrlArrayString}"    # 此时此值是错误信息
         exit_script
     fi
-    # 检查是否超过API请求限制
-    if [[ $fileList == *"Bad credentials"* ]]; then
-        echo "凭证无效。请稍后再试。${fileList}"
-        exit_script
-    elif [[ $fileList == *"API rate limit exceeded"* ]]; then
-        echo "超过API请求限制。请稍后再试。${fileList}"
-        exit_script
-    fi
-    # echo "================fileList=${fileList}"
-    # exit
-    # [
-    #   {
-    #     "name": "branch_get.json",
-    #     "path": "branchMaps_10_resouce_get/example/featureBrances/branch_get.json",
-    #     "sha": "436851fbe0b094a31ca3f68fc18a4f4a5690aaa4",
-    #     "size": 372,
-    #     "url": "https://api.github.com/repos/dvlpCI/script-qbase/contents/branchMaps_10_resouce_get/example/featureBrances/branch_get.json?ref=main",
-    #     "html_url": "https://github.com/dvlpCI/script-qbase/blob/main/branchMaps_10_resouce_get/example/featureBrances/branch_get.json",
-    #     "git_url": "https://api.github.com/repos/dvlpCI/script-qbase/git/blobs/436851fbe0b094a31ca3f68fc18a4f4a5690aaa4",
-    #     "download_url": "https://raw.githubusercontent.com/dvlpCI/script-qbase/main/branchMaps_10_resouce_get/example/featureBrances/branch_get.json",
-    #     "type": "file",
-    #     "_links": {
-    #       "self": "https://api.github.com/repos/dvlpCI/script-qbase/contents/branchMaps_10_resouce_get/example/featureBrances/branch_get.json?ref=main",
-    #       "git": "https://api.github.com/repos/dvlpCI/script-qbase/git/blobs/436851fbe0b094a31ca3f68fc18a4f4a5690aaa4",
-    #       "html": "https://github.com/dvlpCI/script-qbase/blob/main/branchMaps_10_resouce_get/example/featureBrances/branch_get.json"
-    #     }
-    #   }
-    # ]
-    fileDownloadUrlArrayString=$(printf "%s" "${fileList}" | jq -r '.[].download_url') # 记得此处去除双引号，避免后面取值不正确
     fileDownloadUrlArray=(${fileDownloadUrlArrayString})
     # echo "================fileDownloadUrlArray=${fileDownloadUrlArray[*]}"
 
@@ -343,25 +240,17 @@ function getBranchMapsFromDir_remote_github() {
 function getBranchMapsFromDir_remote_gitee() {
     BranceMaps_From_Directory_PATH=$1
     mappingName=$2
-    # BranceMaps_From_Directory_PATH="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances"
-    BranceMaps_From_Directory_PATH=${BranceMaps_From_Directory_PATH//master/$mappingName}    # 将 "blob" 替换为指定变量的值
-    debug_log "BranceMaps_From_Directory_PATH=${BranceMaps_From_Directory_PATH}"
 
-    mappingBranchName_FilePaths=()
-
-    fileList=$(curl -s "${BranceMaps_From_Directory_PATH}" | grep -oE 'href="[^"]+\.json"' | sed -E 's/^href="([^"]+)".*/\1/')
-    # fileList=$(curl -s "https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances" | grep -oE 'href="[^"]+\.json"' | sed -E 's/^href="([^"]+)".*/\1/')
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl "${BranceMaps_From_Directory_PATH}" -access-token "${access_token}" -inBranchName "${mappingName}")
     if [ $? != 0 ]; then
-        echo "Error❌: 无法获取文件列表。请检查您的身份验证令牌是否正确。"
+        echo "${fileDownloadUrlArrayString}"    # 此时此值是错误信息
         exit_script
     fi
-    debug_log "================fileList=${fileList}"
 
-    fileArray=(${fileList})
-    fileCount=${#fileArray[@]}
+    fileDownloadUrlArray=(${fileDownloadUrlArrayString})
+    fileCount=${#fileDownloadUrlArray[@]}
 
 
-    fileDownloadUrlArray=()
     mappingBranchName_FilePaths=()
     file_JsonStrings=""
     file_JsonStrings+="["
@@ -369,10 +258,7 @@ function getBranchMapsFromDir_remote_gitee() {
     mappingBranchName_JsonStrings+="["
     for((i=0;i<fileCount;i++));
     do
-        fileRelPath=${fileArray[i]}
-        rawFileRelPath=${fileRelPath//blob/raw} # 将 "blob" 替换为 "raw"        
-        rawFileAbsUrl="https://gitee.com$rawFileRelPath"    # 添加前缀 "https://gitee.com"
-        fileDownloadUrlArray[${#fileDownloadUrlArray[@]}]=${rawFileAbsUrl}
+        rawFileAbsUrl=${fileDownloadUrlArray[i]}
 
         rawFileContent=$(isValidJsonFile "$rawFileAbsUrl")
         # echo "$((i+1)).${rawFileRelUrl}的内容如下:\n${rawFileContent}"
@@ -414,49 +300,16 @@ function getBranchMapsFromDir_remote_gitlab() {
     BranceMaps_From_Directory_PATH=$1
     mappingName=$2
 
-    # master_api_dir_url
-    gitlab_responseJsonString=$(changeToApiUrl_gitlab "${BranceMaps_From_Directory_PATH}")
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitlab_scriptPath -dirUrl "${BranceMaps_From_Directory_PATH}" -access-token "${access_token}" -inBranchName "${mappingName}")
     if [ $? != 0 ]; then
-        echo "changeToApiUrl_gitlab ${gitlab_responseJsonString}"
-        exit 1
-    fi
-    echo "${GREEN}恭喜:gitlab转化之后的结果如下:${NC}"
-    echo "${gitlab_responseJsonString}" | jq -r "."
-
-
-    master_api_dir_url=$(printf "%s" "${gitlab_responseJsonString}" | jq -r '.api_url_master_current_dir')
-    echo "master_api_dir_url=${master_api_dir_url}"
-    
-    # raw_url_all_home
-    raw_url_all_home=$(printf "%s" "${gitlab_responseJsonString}" | jq -r '.raw_url_all_home')
-    if [ $? != 0 ]; then
-        echo "changeToRawUrl_gitlab ${raw_url_all_home}"
-        exit 1
-    fi
-    debug_log "raw_url_all_home=${raw_url_all_home}"
-
-
-    # branch_api_dir_url
-    branch_api_dir_url=${master_api_dir_url/master/$mappingName}    # 将 "master" 替换为指定变量的值
-    echo "branch_api_dir_url=${branch_api_dir_url}"
-
-    # request: 发送带有访问令牌的请求获取目录内容
-    echo "${YELLOW}正在执行命令(获取网络地址对应的内容):《${BLUE} curl -s --header \"Private-Token: $access_token\" \"$branch_api_dir_url\" ${YELLOW}》${NC}"
-    response=$(curl -s --header "Private-Token: $access_token" "$branch_api_dir_url")
-    if [ $? != 0 ]; then
-        echo "Error❌: 无法获取文件列表。请检查您的身份验证令牌是否正确。"
+        echo "${fileDownloadUrlArrayString}"    # 此时此值是错误信息
         exit_script
     fi
-    echo "✅response=${response}"
-    # exit 1
 
-    # 解析 JSON 响应，提取 JSON 文件路径
-    json_file_relPaths=$(echo "$response" | jq -r '.[] | .path')
-    echo "json_file_relPaths=${json_file_relPaths}"
-    json_file_relPathArray=(${json_file_relPaths})
-    json_file_count=${#json_file_relPathArray[@]}
 
-    fileDownloadUrlArray=()
+    fileDownloadUrlArray=(${fileDownloadUrlArrayString})
+    json_file_count=${#fileDownloadUrlArray[@]}
+
     mappingBranchName_FilePaths=()
     file_JsonStrings=""
     file_JsonStrings+="["
@@ -464,11 +317,8 @@ function getBranchMapsFromDir_remote_gitlab() {
     mappingBranchName_JsonStrings+="["
     for((i=0;i<json_file_count;i++));
     do
-        fileRelPath=${json_file_relPathArray[i]}
-        rawFileAbsUrl="${raw_url_all_home}/${mappingName}/${fileRelPath}"
+        rawFileAbsUrl=${fileDownloadUrlArray[i]}
         # echo "$((i+1)).${rawFileAbsUrl}"
-        fileDownloadUrlArray[${#fileDownloadUrlArray[@]}]=${rawFileAbsUrl}
-
 
         rawFileContent=$(isValidJsonFile "$rawFileAbsUrl")
         # echo "$((i+1)).${rawFileRelUrl}的内容如下:\n${rawFileContent}"
