@@ -81,7 +81,7 @@ if [ $? != 0 ]; then
 fi
 # 检查是否超过API请求限制
 if [[ $fileList == *"Bad credentials"* ]]; then
-    echo "获取git目录下的所有文件路径的凭证无效。请稍后再试。${fileList}"
+    echo "获取git目录下的所有文件路径的凭证无效。请稍后再试。${fileList}. github请进入: https://github.com/settings/tokens"
     exit 1
 elif [[ $fileList == *"API rate limit exceeded"* ]]; then
     echo "超过API请求限制。请稍后再试。${fileList}"

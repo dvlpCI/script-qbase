@@ -32,7 +32,7 @@ function log_title() {
 function testGithub {
     log_title "1.github"
     # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
-    access_token="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"
+    access_token="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"
     DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
     requestBranchName="test/test1"
 }
@@ -59,8 +59,8 @@ function execAndPrintfResult() {
         echo "${RED}${allFileContent_JsonStrings}${NC}" #此时此值是错误原因
         exit 1
     fi
-
-    echo "allFileContent_JsonStrings 的值如下:"
+    allFileContent_Count=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | length')
+    echo "${GREEN}恭喜:指定目录 ${DIRECTORY_URL} 下的所有json文件共有 ${allFileContent_Count} 个，它们内容组成的值如下:${NC}"
     echo "${allFileContent_JsonStrings}" | jq '.'
 
 
@@ -68,7 +68,6 @@ function execAndPrintfResult() {
 
     jsonStringWhereJsonMappingBranchName=""
     jsonStringWhereJsonMappingBranchName+="["
-    allFileContent_Count=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | length')
     for((i=0;i<$allFileContent_Count;i++));
     do
         iFileContentJsonString=$(printf "%s" "${allFileContent_JsonStrings}" | jq ".[${i}]")
@@ -80,27 +79,29 @@ function execAndPrintfResult() {
             echo "${RED}Error❌:获取文件${BLUE} ${branchFileAbsolutePathOrUrl} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $DIRECTORY_URL ${RED}内的所有json文件都是合规的。${NC}";
             continue
         fi
-        echo "$((i+1)).${branchName}"
+        # echo "$((i+1)).${branchName}"
         # last_field="${requestBranchName##*/}" # 获取元素的最后一个字段
         if [ "$requestBranchName" != "$branchName" ]; then
             continue
         fi
 
-        if [ -n "${jsonStringWhereJsonMappingBranchName}" ]; then
+        if [ "${jsonStringWhereJsonMappingBranchName}" != "[" ]; then
             jsonStringWhereJsonMappingBranchName+=", "
         fi
         jsonStringWhereJsonMappingBranchName+=${iFileContentJsonString}
     done
     jsonStringWhereJsonMappingBranchName+="]"
+    # echo "jsonStringWhereJsonMappingBranchName============${jsonStringWhereJsonMappingBranchName}"
 
 
     jsonWhereJsonMappingBranchName_count=$(printf "%s" "${jsonStringWhereJsonMappingBranchName}" | jq '. | length')
+    # echo "jsonWhereJsonMappingBranchName_count=${jsonWhereJsonMappingBranchName_count}"
     if [ "${jsonWhereJsonMappingBranchName_count}" == 0 ]; then
         echo "您目录 ${DIRECTORY_URL} 下的所有json文件提取成功了，但是未找到匹配 ${requestBranchName} 分支名的json文件，请检查。"
         exit 1
     else
-        # echo "您找到匹配 ${requestBranchName} 分支名的json文件组成的json数组如下:"
-        printf "%s" "${jsonStringWhereJsonMappingBranchName}"
+        echo "${GREEN}恭喜:您找到匹配 ${requestBranchName} 分支名的json文件共有 ${jsonWhereJsonMappingBranchName_count} 个，它们组成的json数组如下:${NC}"
+        printf "%s" "${jsonStringWhereJsonMappingBranchName}" | jq "."
     fi
 }
 
