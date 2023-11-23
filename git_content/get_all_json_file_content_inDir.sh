@@ -32,6 +32,8 @@ GIT_SCIRTP_DIR_PATH=${CurCategoryFun_HomeDir_Absolute}
 qbase_get_fileUrls_inDir_github_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_github.sh
 qbase_get_fileUrls_inDir_gitee_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_gitee.sh
 qbase_get_fileUrls_inDir_gitlab_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_fileUrls_inDir_gitlab.sh
+
+qbase_get_filecontent_gitlab_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_filecontent_gitlab.sh
 qbase_get_filecontent_git_all_scriptPath=${GIT_SCIRTP_DIR_PATH}/get_filecontent_git_all.sh
 
 while [ -n "$1" ]
@@ -45,6 +47,8 @@ do
     esac
 done
 
+# echo "===========inBranchName=${inBranchName}"
+
 
 # 如果文件内容是json且有效，则返回文件内容；否则提示出错
 function getContentIfJson() {
@@ -53,14 +57,22 @@ function getContentIfJson() {
         case "$1" in
             -branchFile|--branchFile) branchFileAbsolutePathOrUrl=$2; shift 2;;
             -access-token|--access-token) access_token=$2; shift 2;;
+            -curBranchName|--cur-branch-name) curBranchName=$2; shift 2;;
             --) break ;;
             *) break ;;
         esac
     done
 
 
-    if [[ $branchFileAbsolutePathOrUrl == http* ]]; then
-        FileContent=$(sh $qbase_get_filecontent_git_all_scriptPath -fileUrl "${branchFileAbsolutePathOrUrl}" -access-token "${access_token}")
+    if [[ "${branchFileAbsolutePathOrUrl}" == *"https://gitlab"* ]]; then
+        FileContent=$(sh $qbase_get_filecontent_gitlab_scriptPath -fileUrl "${branchFileAbsolutePathOrUrl}" -access-token "${access_token}" -curBranchName "${curBranchName}")
+        if [ $? != 0 ]; then
+            echo "${FileContent}"
+            return 1
+        fi
+
+    elif [[ $branchFileAbsolutePathOrUrl == http* ]]; then
+        FileContent=$(sh $qbase_get_filecontent_git_all_scriptPath -fileUrl "${branchFileAbsolutePathOrUrl}" -access-token "${access_token}" -curBranchName "${curBranchName}")
         if [ $? != 0 ]; then
             echo "${FileContent}"
             return 1
@@ -156,13 +168,16 @@ if [[ "${DIRECTORY_URL}" != "/"* ]] &&  [[ "${DIRECTORY_URL}" != "~"* ]] \
 fi
 
 if [[ "${DIRECTORY_URL}" == *"https://github.com"* ]]; then
-    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_github_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}")
+    debug_log "${YELLOW}正在执行命令(获取github目录下的所有文件路径):《${BLUE} sh $qbase_get_fileUrls_inDir_github_scriptPath -dirUrl \"${DIRECTORY_URL}\" -access-token \"${access_token}\" -curBranchName \"${inBranchName}\" ${YELLOW}》${NC}"
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_github_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -curBranchName "${inBranchName}")
 
 elif [[ "${DIRECTORY_URL}" == *"https://gitee"* ]]; then 
-    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}")
+    debug_log "${YELLOW}正在执行命令(获取gitee目录下的所有文件路径):《${BLUE} sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl \"${DIRECTORY_URL}\" -access-token \"${access_token}\" -curBranchName \"${inBranchName}\" ${YELLOW}》${NC}"
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -curBranchName "${inBranchName}")
 
 elif [[ "${DIRECTORY_URL}" == *"https://gitlab"* ]]; then
-    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitlab_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}")
+    debug_log "${YELLOW}正在执行命令(获取gitlab目录下的所有文件路径):《${BLUE} sh $qbase_get_fileUrls_inDir_gitlab_scriptPath -dirUrl \"${DIRECTORY_URL}\" -access-token \"${access_token}\" -curBranchName \"${inBranchName}\" ${YELLOW}》${NC}"
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitlab_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -curBranchName "${inBranchName}")
 
 else
     fileDownloadUrlArrayString=$(get_fileUrls_inDir_local)
@@ -184,7 +199,7 @@ do
     rawFileAbsUrl=${fileDownloadUrlArray[i]}
     # echo "$((i+1)).rawFileAbsUrl=${rawFileAbsUrl}"
 
-    rawFileContent=$(getContentIfJson -branchFile "$rawFileAbsUrl" -access-token "${access_token}")
+    rawFileContent=$(getContentIfJson -branchFile "$rawFileAbsUrl" -access-token "${access_token}" -curBranchName "${inBranchName}")
     if [ $? -ne 0 ]; then
         debug_log "${rawFileContent}"
         continue

@@ -62,7 +62,7 @@ function testLocal {
 function testGithub {
     log_title "1.github"
     # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
-    access_token="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"
+    access_token="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"
     # script-qbase 的 test/test1 分支下
     GIT_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
     curBranchName="test/test1"
@@ -76,8 +76,9 @@ function testGithub {
 function testGitee {
     log_title "2.gitee"
     # AutoPackage-CommitInfo 的 dev_script_pack 分支下
+    curBranchName="dev_script_pack"
     GIT_DIRECTORY_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/dev_script_pack/example_packing_info/featureBrances"
-    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl "${GIT_DIRECTORY_URL}" -access-token "${access_token}")
+    fileDownloadUrlArrayString=$(sh $qbase_get_fileUrls_inDir_gitee_scriptPath -dirUrl "${GIT_DIRECTORY_URL}" -access-token "${access_token}" -curBranchName "${curBranchName}")
     if [ $? != 0 ]; then
         echo "${RED}${fileDownloadUrlArrayString}${NC}"    # 此时此值是错误信息
         exit 1

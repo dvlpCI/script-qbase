@@ -50,7 +50,7 @@ function testLocal {
 function testGithub {
     log_title "1.github"
     # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
-    access_token="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"
+    access_token="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"
     curBranchName="test/test1"
     FILE_URL="https://raw.githubusercontent.com/dvlpCI/script-qbase/test/test1/branchMaps_10_resouce_get/example/featureBrances/this_is_test.json"
 }

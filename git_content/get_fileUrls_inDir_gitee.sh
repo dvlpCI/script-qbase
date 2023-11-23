@@ -37,7 +37,7 @@ do
 done
 
 if [ -z "${curBranchName}" ]; then
-    echo "您的 -curBranchName 参数值为空，但github 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表。所以请检查。"
+    echo "您的 -curBranchName 参数值为空，但gitee 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表。所以请检查。"
     exit 1
 fi
 # 去除origin/开头
