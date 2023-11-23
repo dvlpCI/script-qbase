@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-08-03 11:44:37
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-08-08 23:41:11
+ # @LastEditTime: 2023-11-24 02:45:36
  # @Description: 获取指定日期之后的所有合入记录(已去除 HEAD -> 等)
  # @Example: sh ./get_merger_recods_after_date.sh --searchFromDateString "2022-12-26 10:45:24"
 ### 
@@ -23,6 +23,12 @@ YELLOW='\033[33m'
 BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+
+
+CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
+
+qbase_get_only_branch_from_recods_scriptPath=${qbase_homedir_abspath}/branch/get_only_branch_from_recods.sh
 
 
 function debug_log() {
@@ -52,45 +58,11 @@ done
 debug_log "正在执行命令(获取本分支合入的分支(会含标签,记得去除)):《 git log --pretty=format:'%C(yellow)%d' --after \"${searchFromDateString}\" 》"
 responseResult=$(git log --pretty=format:'%C(yellow)%d' --after "${searchFromDateString}")
 debug_log "恭喜通过《 git log --pretty=format:'%C(yellow)%d' --after \"${searchFromDateString}\" 》，得到本分支合入的所有其他分支和标签为:${BLUE}${responseResult} ${NC}。${NC}"
-arr=(${responseResult})
-num=${#arr[@]}
-#echo "${arr[*]}"
-#echo "num=$num"
-    
-    
-noBranchNames=("HEAD" "origin/HEAD" "->")
-# noBranchNames[${#noBranchNames[@]}]="${currentBranch}"
-#echo "noBranchNames=${noBranchNames[*]}, noBranchNameCount=${#noBranchNames[@]}"
-for ((i=0;i<num;i+=1))
-{
-    mergeBranchName=${arr[i]}
-    mergeBranchName=$(echo $mergeBranchName | sed "s/(//g" | sed "s/)//g" | sed "s/,//g") #去除左右括号
-    # mergeBranchName=${mergeBranchName##*/} # 取最后的component
-    #echo "$((i+1)) mergeBranchName=${mergeBranchName}"
-    if [ "${mergeBranchName}" == "tag:" ]; then
-        #echo "$((i+1)) mergeBranchName=${mergeBranchName}=========跳过本身及其下一个"
-        i=$((i+1));
-        continue;
-    fi
-    
-    # if [[ "${noBranchNames[*]}" =~ ${mergeBranchName} ]]; then
-    if echo "${noBranchNames[@]}" | grep -wq "${mergeBranchName}" &>/dev/null; then
-        debug_log "${mergeBranchName}:pass 不是分支名，过滤掉"
-        continue
-    elif [[ "${noBranchNames[*]}" == *"$mergeBranchName"* ]]; then # 避免识别 noBranchNames=("HEAD" "->") 和 mergeBranchName="->"  时候识别不到(可在 a_function_test.sh 中测试)
-        debug_log "${mergeBranchName}:pass 不是分支名，过滤掉"
-        continue
 
-    else
-        #echo "${mergeBranchName}:ok"
-        matchMergeBranchNames[${#matchMergeBranchNames[@]}]=${mergeBranchName}
-    fi
-}
+recordsString=${responseResult}
+branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${recordsString}")
 
-#[shell 数组去重](https://www.jianshu.com/p/1043e40c0502)
-matchMergeBranchNames=($(awk -v RS=' ' '!a[$1]++' <<< ${matchMergeBranchNames[@]}))
-
-echo "${matchMergeBranchNames[*]}"
+echo "${branchesString}"
 
 
 

@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 02:04:23
+ # @LastEditTime: 2023-11-24 03:00:02
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -23,6 +23,8 @@ Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
 CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
+qbase_get_only_branch_from_recods_scriptPath=${qbase_homedir_abspath}/branch/get_only_branch_from_recods.sh
+qbase_get_all_remote_branch_after_date_scriptPath=${qbase_homedir_abspath}/branch/get_all_remote_branch_after_date.sh
 qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir_Absolute}/get_allBranchJson_inBranchNames_byJsonDir.sh
 qbase_getBranchMapsInfoAndNotifiction_scriptPath=${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsInfoAndNotifiction.sh
 
@@ -56,8 +58,16 @@ function testLocal {
 function testGithub {
     log_title "1.github"
     # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
-    requestBranchNames="master test3 test/test1"
-    access_token="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"
+    # 获取远程分支列表
+    # branches=$(git branch -r)
+    branches=$(git branch -r)
+    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
+    requestBranchNames="${branchesString}"
+    # requestBranchNames="master test3 test/test1"
+    echo "您要获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
+    # exit
+    
+    access_token="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"
     ONE_OF_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
     DIRECTORY_URL_BranchName="test/test1"
     example_remote_branchs_json_filePath=${example_remote_branchs_json_github_filePath}
@@ -78,6 +88,8 @@ function testGilab {
 
 
 function dealFound() {
+    # sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}"
+    # return
     allBranchJsonStrings=$(sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}")
     if [ $? != 0 ]; then
         echo "${allBranchJsonStrings}"
