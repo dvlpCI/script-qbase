@@ -34,11 +34,18 @@ do
     case "$1" in
         -dirUrl|--dir-url) DIRECTORY_URL=$2; shift 2;;
         -access-token|--access-token) access_token=$2; shift 2;;
-        -inBranchName|--in-branch-name) inBranchName=$2 shift 2;;
+        -curBranchName|--cur-branch-name) curBranchName=$2; shift 2;;
         --) break ;;
         *) break ;;
     esac
 done
+
+if [ -z "${curBranchName}" ]; then
+    echo "gitee 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表"
+    exit 1
+fi
+# 去除origin/开头
+curBranchName=${curBranchName#origin/}
 
 
 function changeToRawUrl_gitlab() {
@@ -79,27 +86,24 @@ function changeToApiUrl_gitlab() {
     project_encoded_string=$(echo "$project_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
     # echo "project_encoded_string=${project_encoded_string}"
 
-
-    project_path_removed_prefix=$(echo "$input" | sed -e 's/.*-\/tree\/master\///')    # 去掉.com/之前的字符串
+    # 去除needRemoveText之前包括needRemoveText的字符
+    # 将 sed 命令中的替换分隔符从 / 更改为 |，以避免与 URL 中的斜杠冲突
+    needRemoveText="-/tree/${curBranchName}/"
+    project_path_removed_prefix=$(echo "$input" | sed -E "s|.*${needRemoveText}||")
     # echo "project_path_removed_prefix=${project_path_removed_prefix}"
     project_path_encoded_string=$(echo "$project_path_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
     # echo "project_path_encoded_string=${project_path_encoded_string}"
 
-    # 去除origin/开头
-    branchName="master"
-    branchName=${branchName#origin/}
-
     # 2、拼接
-    target="${project_host_removed_suffix}/api/v4/projects/${project_encoded_string}/repository/tree?ref=${branchName}&path=${project_path_encoded_string}"
+    target="${project_host_removed_suffix}/api/v4/projects/${project_encoded_string}/repository/tree?ref=${curBranchName}&path=${project_path_encoded_string}"
     # successTarget="https://gitlab.xihuanwu.com/api/v4/projects/bojuehui%2Fmobile%2Fmobile_flutter_wish/repository/tree?ref=master&path=bulidScript%2FfeatureBrances"
     # if [ "${target}" != "${successTarget}" ]; then
     #     echo "抱歉，转化失败"
     #     exit 1
     # fi
 
-    # DIRECTORY_URL=${project_removed_suffix//tree/$inBranchName}    # 将 "blob" 替换为指定变量的值
     responseJsonString='{
-        "api_url_master_current_dir": "'"${target}"'",
+        "api_url_current_dir": "'"${target}"'",
         "raw_url_all_home": "'"${all_raw_home_url}"'"
     }'
     # responseJsonString=$(printf "%s" "$responseJsonString" | jq --arg message "$message" '. + { "message": $message }')
@@ -107,7 +111,7 @@ function changeToApiUrl_gitlab() {
 }
 
 
-# master_api_dir_url
+# branch_api_dir_url
 gitlab_responseJsonString=$(changeToApiUrl_gitlab "${DIRECTORY_URL}")
 if [ $? != 0 ]; then
     echo "changeToApiUrl_gitlab ${gitlab_responseJsonString}"
@@ -116,9 +120,8 @@ fi
 debug_log "${GREEN}恭喜:gitlab转化之后的结果如下:${NC}"
 debug_log "${gitlab_responseJsonString}" | jq -r "."
 
-
-master_api_dir_url=$(printf "%s" "${gitlab_responseJsonString}" | jq -r '.api_url_master_current_dir')
-debug_log "master_api_dir_url=${master_api_dir_url}"
+branch_api_dir_url=$(printf "%s" "${gitlab_responseJsonString}" | jq -r '.api_url_current_dir')
+debug_log "branch_api_dir_url=${branch_api_dir_url}"
 
 # raw_url_all_home
 raw_url_all_home=$(printf "%s" "${gitlab_responseJsonString}" | jq -r '.raw_url_all_home')
@@ -128,10 +131,6 @@ if [ $? != 0 ]; then
 fi
 debug_log "raw_url_all_home=${raw_url_all_home}"
 
-
-# branch_api_dir_url
-branch_api_dir_url=${master_api_dir_url/master/$inBranchName}    # 将 "master" 替换为指定变量的值
-debug_log "branch_api_dir_url=${branch_api_dir_url}"
 
 # request: 发送带有访问令牌的请求获取目录内容
 debug_log "${YELLOW}正在执行命令(获取网络地址对应的内容):《${BLUE} curl -s --header \"Private-Token: $access_token\" \"$branch_api_dir_url\" ${YELLOW}》${NC}"
@@ -153,7 +152,7 @@ fileDownloadUrlArray=()
 for((i=0;i<json_file_count;i++));
 do
     fileRelPath=${json_file_relPathArray[i]}
-    rawFileAbsUrl="${raw_url_all_home}/${inBranchName}/${fileRelPath}"
+    rawFileAbsUrl="${raw_url_all_home}/${curBranchName}/${fileRelPath}"
     # echo "$((i+1)).${rawFileAbsUrl}"
     fileDownloadUrlArray[${#fileDownloadUrlArray[@]}]=${rawFileAbsUrl}
 done

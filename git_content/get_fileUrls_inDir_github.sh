@@ -2,10 +2,11 @@
 ###
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-22 23:39:42
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-22 23:56:31
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-11-23 11:02:27
  # @FilePath: get_fileUrls_inDir_github.sh
  # @Description: 获取目录下的所有文件路径--github
+ # @Other: github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
 ### 
 
 # 定义颜色常量
@@ -31,15 +32,22 @@ do
     case "$1" in
         -dirUrl|--dir-url) DIRECTORY_URL=$2; shift 2;;
         -access-token|--access-token) access_token=$2; shift 2;;
+        -curBranchName|--cur-branch-name) curBranchName=$2; shift 2;;
         --) break ;;
         *) break ;;
     esac
 done
 
+if [ -z "${curBranchName}" ]; then
+    echo "github 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表"
+    exit 1
+fi
+
+needReplaceText="tree/${curBranchName}"
 
 # 将字符串中的内容进行替换
 newUrl="${DIRECTORY_URL/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
-api_url="${newUrl/tree\/main/contents}"
+api_url="${newUrl/${needReplaceText}/contents}" # 替换
 # echo "====api_url=${api_url}"
 # exit
 
@@ -82,5 +90,6 @@ fi
 #     }
 #   }
 # ]
+
 fileDownloadUrlArrayString=$(printf "%s" "${fileList}" | jq -r '.[].download_url') # 记得此处去除双引号，避免后面取值不正确
 printf "%s" "${fileDownloadUrlArrayString}"
