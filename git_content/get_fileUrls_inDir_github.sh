@@ -48,6 +48,13 @@ needReplaceText="tree/${curBranchName}"
 # 将字符串中的内容进行替换
 newUrl="${DIRECTORY_URL/https:\/\/github.com/https://api.github.com/repos}" # 前面\要转义，后面不用
 api_url="${newUrl/${needReplaceText}/contents}" # 替换
+# 判断是否存在 '?'
+if [[ $api_url == *"?"* ]]; then
+  api_url+="&"
+else
+  api_url+="?"
+fi
+api_url+="ref=${curBranchName}"
 # echo "====api_url=${api_url}"
 # exit
 
