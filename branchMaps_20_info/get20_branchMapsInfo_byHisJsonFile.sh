@@ -115,6 +115,11 @@ branchMapArray=$(cat ${branchMapsInJsonFile} | jq -r "${branchMapsInKey}") # -r 
 # echo "执行文件信息获取《 ${BLUE}cat ${branchMapsInJsonFile} | jq -r \"${branchMapsInKey}\" ${NC}》所得的值如下:\n${branchMapArray} ${NC}"
 # exit 1
 
+if [ ! -f "${RESULT_SALE_TO_JSON_FILE_PATH}" ]; then
+    echo "您的 -resultSaveToJsonF 参数的值指向的 ${RESULT_SALE_TO_JSON_FILE_PATH} 文件不存在，请检查。"
+    exit 1
+fi
+
 #echo "要获取信息的所有分支数组branchMapArray=${branchMapArray}"
 if [ -z "${branchMapArray}" ] || [ "${branchMapArray}" == "null" ]; then
     echo "-------------------------💡💡💡友情提示tips：您的 ${branchMapsInJsonFile} 文件中不存在 ${branchMapsInKey} 字段的数据,请检查"

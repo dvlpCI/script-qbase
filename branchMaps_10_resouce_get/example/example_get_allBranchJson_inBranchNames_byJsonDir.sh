@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 01:27:39
+ # @LastEditTime: 2023-11-24 01:51:42
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -24,6 +24,7 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法�
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir_Absolute}/get_allBranchJson_inBranchNames_byJsonDir.sh
+get_branch_all_detail_info_script_path="${qbase_homedir_abspath}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
 
 example_remote_branchs_json_github_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_github.json
 
@@ -59,6 +60,7 @@ function testGithub {
     access_token="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"
     ONE_OF_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
     DIRECTORY_URL_BranchName="test/test1"
+    example_remote_branchs_json_filePath=${example_remote_branchs_json_github_filePath}
 }
 
 function testGitee {
@@ -83,11 +85,44 @@ function dealFound() {
     fi
 
     # echo ""
-    echo "${GREEN}获取所有远程的分支信息(每个分支从它自己的分支里提取)分支总结:${NC}"
+    echo "${GREEN}恭喜:获取所有远程的分支信息(每个分支从它自己的分支里提取)分支总结:${NC}"
     printf "%s" "${allBranchJsonStrings}" | jq "."
 
-    printf "%s" "$allBranchJsonStrings" > ${example_remote_branchs_json_github_filePath}
-    open "${example_remote_branchs_json_github_filePath}"
+    lastJson='
+    {
+        "branchJsons": '${allBranchJsonStrings}'
+    }
+    '
+    printf "%s" "$lastJson" > ${example_remote_branchs_json_filePath}
+    open "${example_remote_branchs_json_filePath}"
+
+    test_getAllBranchLogArray_andCategoryThem
+}
+
+
+function test_getAllBranchLogArray_andCategoryThem() {
+    showBranchLogFlag='true'
+    showBranchName='true'
+    showBranchTimeLog='all'
+    showBranchAtLog='true'
+    showBranchTable='false' # 通知也暂时都不显示
+    showCategoryName='true' # 通知时候显示
+    shouldMarkdown='false'
+    
+    RESULT_SALE_TO_JSON_FILE_PATH=${example_remote_branchs_json_filePath}
+    RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
+    RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
+    RESULT_FULL_STRING_SALE_BY_KEY="branch_info_result.Notification.current.full"           
+
+    branchMapsInJsonFile=${example_remote_branchs_json_filePath}
+    branchMapsInKey="branchJsons"
+
+    echo "${YELLOW}正在执行命令(整合 branchMapsInfo)：《${BLUE} sh $get_branch_all_detail_info_script_path -branchMapsInJsonF \"${branchMapsInJsonFile}\" -branchMapsInKey \".${branchMapsInKey}\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" ${YELLOW}》${NC}"
+    sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${branchMapsInJsonFile}" -branchMapsInKey ".${branchMapsInKey}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}"
+    
+
+    echo ""
+    echo "${YELLOW}更多详情请可点击查看文件:${BLUE} ${example_remote_branchs_json_filePath}${NC}"
 }
 
 

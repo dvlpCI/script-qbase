@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-23 00:54:34
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 01:12:00
+ # @LastEditTime: 2023-11-24 01:44:45
  # @FilePath: get_filePath_mapping_branchName_from_dir.sh
  # @Description: 获取所有远程的分支信息(每个分支从它自己的分支里提取)
 ### 
@@ -76,7 +76,7 @@ function get_all_json_file_content_inDir_mapping_branchName() {
                 "tester": {
                     "name": "null"
                 },
-                "fileUrl": null
+                "fileUrl": "null"
             }
         ]'
         printf "%s" "${jsonStringWhereJsonMappingBranchName}"
