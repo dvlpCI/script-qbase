@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 03:00:02
+ # @LastEditTime: 2023-11-24 03:14:16
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -29,6 +29,8 @@ qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir
 qbase_getBranchMapsInfoAndNotifiction_scriptPath=${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsInfoAndNotifiction.sh
 
 example_remote_branchs_json_github_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_github.json
+example_remote_branchs_json_gitee_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_gitee.json
+example_remote_branchs_json_gitlab_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_gitlab.json
 
 function debug_log() {
     # 只有直接执行本脚本的时候才能够输出日志，不然如果是形如 echo $(sh xx.sh) 的时候会导致结果值不对
@@ -48,26 +50,20 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 
-
-function testLocal {
-    log_title "0.local"
-    requestBranchName="test/test3"
-    BranceMaps_From_Directory_URL="${CategoryFun_HomeDir_Absolute}/example/featureBrances"
-}
-
 function testGithub {
     log_title "1.github"
-    # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
     # 获取远程分支列表
     # branches=$(git branch -r)
     branches=$(git branch -r)
     branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
     requestBranchNames="${branchesString}"
     # requestBranchNames="master test3 test/test1"
-    echo "您要获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
+    echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
     
+    # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
     access_token="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"
+    
     ONE_OF_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
     DIRECTORY_URL_BranchName="test/test1"
     example_remote_branchs_json_filePath=${example_remote_branchs_json_github_filePath}
@@ -75,15 +71,36 @@ function testGithub {
 
 function testGitee {
     log_title "2.gitee"
-    requestBranchName="dev_script_pack"
-    BranceMaps_From_Directory_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances"
+    # 获取远程分支列表
+    # branches=$(git branch -r)
+    branches=$(git branch -r)
+    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
+    requestBranchNames="${branchesString}"
+    # requestBranchNames="master test3 test/test1"
+    echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
+    # exit
+
+    ONE_OF_DIRECTORY_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/dev_script_pack/example_packing_info/featureBrances"
+    DIRECTORY_URL_BranchName="dev_script_pack"
+    example_remote_branchs_json_filePath=${example_remote_branchs_json_gitee_filePath}
 }
 
-function testGilab {
+function testGitlab {
     log_title "3.gitlab"
-    requestBranchName="chore/pack"
+    # 获取远程分支列表
+    # branches=$(git branch -r)
+    branches=$(git branch -r)
+    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
+    requestBranchNames="${branchesString}"
+    # requestBranchNames="master test3 test/test1"
+    echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
+    # exit
+
     access_token="glpat-xTEsz89Km9N1dessU56p"
-    BranceMaps_From_Directory_URL="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/tree/master/bulidScript/featureBrances"
+
+    ONE_OF_DIRECTORY_URL="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/tree/chore/pack/bulidScript/featureBrances"
+    DIRECTORY_URL_BranchName="chore/pack"
+    example_remote_branchs_json_filePath=${example_remote_branchs_json_gitlab_filePath}
 }
 
 
@@ -138,4 +155,4 @@ function test_getAllBranchLogArray_andCategoryThem() {
 
 testGithub && dealFound
 # testGitee && dealFound
-# testGilab && dealFound
+# # testGitlab && dealFound
