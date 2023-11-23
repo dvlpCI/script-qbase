@@ -40,14 +40,14 @@ function testGithub {
 function testGitee {
     log_title "2.gitee"
     requestBranchName="dev_script_pack"
-    DIRECTORY_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances"
+    DIRECTORY_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/dev_script_pack/example_packing_info/featureBrances"
 }
 
 function testGitlab {
     log_title "3.gitlab"
     requestBranchName="chore/pack"
     access_token="glpat-xTEsz89Km9N1dessU56p"
-    DIRECTORY_URL="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/tree/master/bulidScript/featureBrances"
+    DIRECTORY_URL="https://gitlab.xihuanwu.com/bojuehui/mobile/mobile_flutter_wish/-/tree/chore/pack/bulidScript/featureBrances"
 }
 
 function execAndPrintfResult() {
@@ -60,7 +60,7 @@ function execAndPrintfResult() {
         exit 1
     fi
     allFileContent_Count=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | length')
-    echo "${GREEN}恭喜:指定目录 ${DIRECTORY_URL} 下的所有json文件共有 ${allFileContent_Count} 个，它们内容组成的值如下:${NC}"
+    echo "${GREEN}恭喜:指定目录${BLUE} ${DIRECTORY_URL} ${GREEN}下的所有json文件共有${BLUE} ${allFileContent_Count} ${GREEN}个，它们内容组成的值如下:${NC}"
     echo "${allFileContent_JsonStrings}" | jq '.'
 
 
@@ -100,7 +100,7 @@ function execAndPrintfResult() {
         echo "您目录 ${DIRECTORY_URL} 下的所有json文件提取成功了，但是未找到匹配 ${requestBranchName} 分支名的json文件，请检查。"
         exit 1
     else
-        echo "${GREEN}恭喜:您找到匹配 ${requestBranchName} 分支名的json文件共有 ${jsonWhereJsonMappingBranchName_count} 个，它们组成的json数组如下:${NC}"
+        echo "${GREEN}恭喜:您找到匹配${BLUE} ${requestBranchName} ${GREEN}分支名的json文件共有${BLUE} ${jsonWhereJsonMappingBranchName_count} ${GREEN}个，它们组成的json数组如下:${NC}"
         printf "%s" "${jsonStringWhereJsonMappingBranchName}" | jq "."
     fi
 }
@@ -109,6 +109,6 @@ function execAndPrintfResult() {
 
 
 testGithub && execAndPrintfResult
-# testGitee && execAndPrintfResult
-# testGitlab && execAndPrintfResult
+testGitee && execAndPrintfResult
+testGitlab && execAndPrintfResult
 

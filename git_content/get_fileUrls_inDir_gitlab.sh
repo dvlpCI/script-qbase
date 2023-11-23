@@ -118,8 +118,6 @@ function changeToApiUrl_gitlab() {
 
 
 # branch_api_dir_url
-changeToApiUrl_gitlab "${DIRECTORY_URL}"
-exit 1
 gitlab_responseJsonString=$(changeToApiUrl_gitlab "${DIRECTORY_URL}")
 if [ $? != 0 ]; then
     echo "changeToApiUrl_gitlab ${gitlab_responseJsonString}"
