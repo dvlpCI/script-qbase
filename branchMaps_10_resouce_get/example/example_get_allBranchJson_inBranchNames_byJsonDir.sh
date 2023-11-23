@@ -105,6 +105,7 @@ function testGitlab {
 
 
 function dealFound() {
+    echo "${YELLOW}正在执行测试名(获取所有json):《${BLUE} sh \"$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath\" -requestBranchNames \"${requestBranchNames}\" -access-token \"${access_token}\" -oneOfDirUrl \"${ONE_OF_DIRECTORY_URL}\" -dirUrlBranchName \"${DIRECTORY_URL_BranchName}\" ${YELLOW}》${NC}"
     # sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}"
     # return
     allBranchJsonStrings=$(sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}")

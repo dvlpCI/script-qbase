@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-23 00:54:34
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 01:44:45
+ # @LastEditTime: 2023-11-24 03:38:37
  # @FilePath: get_filePath_mapping_branchName_from_dir.sh
  # @Description: 获取所有远程的分支信息(每个分支从它自己的分支里提取)
 ### 
@@ -50,9 +50,16 @@ function get_all_json_file_content_inDir_mapping_branchName() {
 
     # echo "${YELLOW}正在执行测试命令(获取git上指定目录下所有的json文件的内容):《${BLUE} sh $qbase_get_all_json_file_content_inDir_scriptPath -dirUrl \"${DIRECTORY_URL}\" -access-token \"${access_token}\" -inBranchName \"${inBranchName}\" ${YELLOW}》${NC}"
     # sh $qbase_get_all_json_file_content_inDir_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}"
-    # return 1
+    # if [ $? != 0 ]; then
+    #     echo "❌qbase_get_all_json_file_content_inDir_scriptPath 执行失败"
+    #     return 1
+    # else
+    #     echo "✅qbase_get_all_json_file_content_inDir_scriptPath 执行成功"
+    #     return 0
+    # fi
+    
     allFileContent_JsonStrings=$(sh $qbase_get_all_json_file_content_inDir_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}")
-    if [ $? != 0 ]; then
+    if [ $? != 0 ] || [ "${allFileContent_JsonStrings}" == "[]" ]; then
         # echo "${allFileContent_JsonStrings}" #此时此值是错误原因
         # return 1
         allFileContent_JsonStrings=$(echo "$allFileContent_JsonStrings" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
@@ -91,10 +98,10 @@ function get_all_json_file_content_inDir_mapping_branchName() {
 
     jsonStringWhereJsonMappingBranchName=""
     jsonStringWhereJsonMappingBranchName+="["
-    for((i=0;i<$allFileContent_Count;i++));
+    for((fileContentIndex=0;fileContentIndex<$allFileContent_Count;fileContentIndex++));  # 用fileContentIndex这么长，而不用i的目的是避免其他for方法调用此方法，调用方用i,这边也用i导致被重新赋值而错误
     do
-        iFileContentJsonString=$(printf "%s" "${allFileContent_JsonStrings}" | jq ".[${i}]")
-        # echo "$((i+1)).${iFileContentJsonString}"
+        iFileContentJsonString=$(printf "%s" "${allFileContent_JsonStrings}" | jq ".[${fileContentIndex}]")
+        # echo "$((fileContentIndex+1)).${iFileContentJsonString}"
         # 判断文件是否映射到指定的分支名
         branchName=$(printf "%s" "${iFileContentJsonString}" | jq -r '.name') # 去除双引号，才不会导致等下等号判断对不上
         if [ $? != 0 ]; then
@@ -102,7 +109,7 @@ function get_all_json_file_content_inDir_mapping_branchName() {
             echo "${RED}Error❌:获取文件${BLUE} ${branchFileAbsolutePathOrUrl} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $DIRECTORY_URL ${RED}内的所有json文件都是合规的。${NC}";
             continue
         fi
-        # echo "$((i+1)).${branchName}"
+        # echo "$((fileContentIndex+1)).${branchName}"
         # last_field="${inBranchName##*/}" # 获取元素的最后一个字段
         if [ "$inBranchName" != "$branchName" ]; then
             continue
@@ -150,7 +157,14 @@ do
     iRequestBranchName=${requestBranchNameArray[i]}
     iDirUrl=${ONE_OF_DIRECTORY_URL//${DIRECTORY_URL_BranchName}/${iRequestBranchName}} # 将 "blob" 替换为 "raw"      
     # echo "$((i+1)).请求${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iDirUrl} ${NC}"
-
+    # get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}"
+    # if [ $? != 0 ]; then
+    #     echo "$((i+1)).获取分支信息结果❌${BLUE} ${iRequestBranchName} ${NC}"
+    # else
+    #     echo "$((i+1)).获取分支信息结果✅${BLUE} ${iRequestBranchName} ${NC}"
+    # fi
+    # continue
+    
     iBranchJsonStrings=$(get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}")
     if [ $? != 0 ]; then
         # echo "$((i+1)).结果❌${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iBranchJsonStrings} ${NC}"

@@ -212,4 +212,11 @@ do
 done
 allFileContent_JsonStrings+="]"
 
+allFileContent_count=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | length')
+# echo "allFileContent_count=${allFileContent_count}"
+if [ "${allFileContent_count}" == 0 ]; then
+    echo "您目录 ${DIRECTORY_URL} 下的所有json文件提取成功了，但是未找到匹配 ${inBranchName} 分支名的json文件，请检查。"
+    exit 1
+fi
+
 printf "%s" "${allFileContent_JsonStrings}"
