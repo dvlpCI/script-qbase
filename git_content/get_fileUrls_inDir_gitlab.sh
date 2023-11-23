@@ -142,7 +142,7 @@ debug_log "raw_url_all_home=${raw_url_all_home}"
 debug_log "${YELLOW}正在执行命令(获取网络地址对应的内容):《${BLUE} curl -s --header \"Private-Token: $access_token\" \"$branch_api_dir_url\" ${YELLOW}》${NC}"
 response=$(curl -s --header "Private-Token: $access_token" "$branch_api_dir_url")
 if [ $? != 0 ]; then
-    echo "Error❌: 无法获取文件列表。请检查您的身份验证令牌是否正确。"
+    echo "无法获取gitlab文件列表。请检查您的身份验证令牌是否正确。详细的错误信息为:${response}"
     exit_script
 fi
 debug_log "✅response=${response}"

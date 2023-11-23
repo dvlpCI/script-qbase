@@ -76,18 +76,27 @@ headers=(
 # api_url="https://api.github.com/repos/dvlpCI/script-qbase/contents/branchMaps_10_resouce_get/example/featureBrances"
 fileList=$(curl -s -H "${headers[@]}" "$api_url")
 if [ $? != 0 ]; then
-    echo "Error❌:无法获取文件列表。请检查您的身份验证令牌是否正确。"
+    echo "无法获取github文件列表。请检查您的身份验证令牌是否正确。详细的错误信息为:${fileList}"
     exit 1
 fi
 # 检查是否超过API请求限制
 if [[ $fileList == *"Bad credentials"* ]]; then
-    echo "获取git目录下的所有文件路径的凭证无效。请稍后再试。${fileList}. github请进入: https://github.com/settings/tokens"
+    echo "获取git目录下的所有文件路径的凭证无效，请检查您的token值 ${access_token} 是否正确。或者进入git查看token是否已过期或者被删除(github请进入: https://github.com/settings/tokens ) 。详细的错误信息为:${fileList} ."
     exit 1
 elif [[ $fileList == *"API rate limit exceeded"* ]]; then
     echo "超过API请求限制。请稍后再试。${fileList}"
     exit 1
 fi
 # echo "================fileList=${fileList}"
+
+
+# 使用jq解析JSON并获取类型
+json_type=$(echo "$fileList" | jq -r 'type')
+if [[ "$json_type" != "array" ]]; then #  # 获取成功结果是数组，所以如果不是数组，则当做请求失败(array数组、object字典)
+    echo "获取github文件列表失败，请检查。详细的错误信息为:${fileList}"
+    exit 1
+fi
+
 # exit
 # [
 #   {

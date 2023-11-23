@@ -54,7 +54,7 @@ debug_log "==========curBranchName=${curBranchName} DIRECTORY_URL=${DIRECTORY_UR
 fileList=$(curl -s "${DIRECTORY_URL}" | grep -oE 'href="[^"]+\.json"' | sed -E 's/^href="([^"]+)".*/\1/')
 # fileList=$(curl -s "https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances" | grep -oE 'href="[^"]+\.json"' | sed -E 's/^href="([^"]+)".*/\1/')
 if [ $? != 0 ]; then
-    echo "Error❌: 无法获取文件列表。请检查您的身份验证令牌是否正确。"
+    echo "无法获取gitee文件列表。请检查您的身份验证令牌是否正确。详细的错误信息为:${fileList}"
     exit 1
 fi
 debug_log "================fileList=${fileList}"

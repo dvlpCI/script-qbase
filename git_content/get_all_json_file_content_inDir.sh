@@ -156,7 +156,7 @@ function isValidJsonFile() {
 
 
 if [ -z "${inBranchName}" ]; then
-    echo "Error❌:您的 -inBranchName 参数指向的'要获取哪个分支下的文件'的参数值不能为空，请检查！"
+    echo "您的 -inBranchName 参数指向的'要获取哪个分支下的文件'的参数值不能为空，请检查！"
     exit_script
 fi
 
