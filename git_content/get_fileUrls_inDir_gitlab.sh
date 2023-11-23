@@ -89,7 +89,7 @@ function changeToApiUrl_gitlab() {
     # 去除needRemoveText之前包括needRemoveText的字符
     # 将 sed 命令中的替换分隔符从 / 更改为 |，以避免与 URL 中的斜杠冲突
     needRemoveText="-/tree/${curBranchName}/"
-    project_path_removed_prefix=$(echo "$input" | sed -E "s|.*${needRemoveText}||")
+    project_path_removed_prefix=$(echo "$input" | sed -E "s|.*${needRemoveText}||") # 去掉needRemoveText之前的字符串
     # echo "project_path_removed_prefix=${project_path_removed_prefix}"
     project_path_encoded_string=$(echo "$project_path_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
     # echo "project_path_encoded_string=${project_path_encoded_string}"
