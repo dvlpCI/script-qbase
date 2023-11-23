@@ -46,7 +46,13 @@ if [ -z "${curBranchName}" ]; then
 fi
 # 去除origin/开头
 curBranchName=${curBranchName#origin/}
+debug_log "==========curBranchName=${curBranchName}"
 
+if [[ "${DIRECTORY_URL}" != *"${curBranchName}"* ]]; then
+    echo "您的 -curBranchName 参数值 ${curBranchName} 不是 ${DIRECTORY_URL} 的分支，请检查"
+    exit 1
+fi
+debug_log "==========curBranchName=${curBranchName} DIRECTORY_URL=${DIRECTORY_URL}"
 
 function changeToRawUrl_gitlab() {
     input=$1
@@ -90,7 +96,7 @@ function changeToApiUrl_gitlab() {
     # 将 sed 命令中的替换分隔符从 / 更改为 |，以避免与 URL 中的斜杠冲突
     needRemoveText="-/tree/${curBranchName}/"
     project_path_removed_prefix=$(echo "$input" | sed -E "s|.*${needRemoveText}||") # 去掉needRemoveText之前的字符串
-    # echo "project_path_removed_prefix=${project_path_removed_prefix}"
+    # echo "project_path_removed_prefix=${project_path_removed_prefix} needRemoveText=${needRemoveText}"
     project_path_encoded_string=$(echo "$project_path_removed_prefix" | sed 's/\//%2F/g') # 将/替换成%2F
     # echo "project_path_encoded_string=${project_path_encoded_string}"
 

@@ -24,19 +24,31 @@ function debug_log() {
 # printf "%s" "${responseJsonString}"
 
 
+# shell 参数具名化
 while [ -n "$1" ]
 do
     case "$1" in
         -dirUrl|--dir-url) DIRECTORY_URL=$2; shift 2;;
         -access-token|--access-token) access_token=$2; shift 2;;
+        -curBranchName|--cur-branch-name) curBranchName=$2; shift 2;;
         --) break ;;
         *) break ;;
     esac
 done
 
+if [ -z "${curBranchName}" ]; then
+    echo "您的 -curBranchName 参数值为空，但github 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表。所以请检查。"
+    exit 1
+fi
+# 去除origin/开头
+curBranchName=${curBranchName#origin/}
+debug_log "==========curBranchName=${curBranchName}"
 
-# DIRECTORY_URL="https://gitee.com/dvlpCI/AutoPackage-CommitInfo/tree/master/example_packing_info/featureBrances"
-debug_log "DIRECTORY_URL=${DIRECTORY_URL}"
+if [[ "${DIRECTORY_URL}" != *"${curBranchName}"* ]]; then
+    echo "您的 -curBranchName 参数值 ${curBranchName} 不是 ${DIRECTORY_URL} 的分支，请检查"
+    exit 1
+fi
+debug_log "==========curBranchName=${curBranchName} DIRECTORY_URL=${DIRECTORY_URL}"
 
 
 fileList=$(curl -s "${DIRECTORY_URL}" | grep -oE 'href="[^"]+\.json"' | sed -E 's/^href="([^"]+)".*/\1/')

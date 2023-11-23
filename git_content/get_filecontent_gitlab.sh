@@ -46,6 +46,14 @@ if [ -z "$curBranchName" ]; then
     echo " -curBranchName 参数值不能为空，否则等下无法从路径中获取到文件的相对路径。"
     exit 1
 fi
+# 去除origin/开头
+curBranchName=${curBranchName#origin/}
+debug_log "==========curBranchName=${curBranchName}"
+if [[ "${FILE_URL}" != *"${curBranchName}"* ]]; then
+    echo "您的 -curBranchName 参数值 ${curBranchName} 不是 ${FILE_URL} 文件的分支，请检查"
+    exit 1
+fi
+debug_log "==========curBranchName=${curBranchName} FILE_URL=${FILE_URL}"
 
 if [ -z "${access_token}" ]; then
     echo "缺少 -access-token 参数值，无法获取文件内容，请检查"

@@ -18,12 +18,13 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
-
-# responseJsonString='{
-#     "code": 0
-# }'
-# responseJsonString=$(printf "%s" "$responseJsonString" | jq --arg message "$message" '. + { "message": $message }')
-# printf "%s" "${responseJsonString}"
+function debug_log() {
+    # 只有直接执行本脚本的时候才能够输出日志，不然如果是形如 echo $(sh xx.sh) 的时候会导致结果值不对
+    # is_Directly_execute_this_script=true
+    if [ "${is_Directly_execute_this_script}" == true ]; then
+        echo "$1"
+    fi
+}
 
 
 # shell 参数具名化
@@ -39,9 +40,18 @@ do
 done
 
 if [ -z "${curBranchName}" ]; then
-    echo "github 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表"
+    echo "您的 -curBranchName 参数值为空，但github 暂时需要提供您的 -dirUrl 参数值 ${DIRECTORY_URL} 目前是哪个分支的，否则无法获取到文件列表。所以请检查。"
     exit 1
 fi
+# 去除origin/开头
+curBranchName=${curBranchName#origin/}
+debug_log "==========curBranchName=${curBranchName}"
+
+if [[ "${DIRECTORY_URL}" != *"${curBranchName}"* ]]; then
+    echo "您的 -curBranchName 参数值 ${curBranchName} 不是 ${DIRECTORY_URL} 的分支，请检查"
+    exit 1
+fi
+debug_log "==========curBranchName=${curBranchName} DIRECTORY_URL=${DIRECTORY_URL}"
 
 needReplaceText="tree/${curBranchName}"
 
@@ -71,7 +81,7 @@ if [ $? != 0 ]; then
 fi
 # 检查是否超过API请求限制
 if [[ $fileList == *"Bad credentials"* ]]; then
-    echo "凭证无效。请稍后再试。${fileList}"
+    echo "获取git目录下的所有文件路径的凭证无效。请稍后再试。${fileList}"
     exit 1
 elif [[ $fileList == *"API rate limit exceeded"* ]]; then
     echo "超过API请求限制。请稍后再试。${fileList}"
