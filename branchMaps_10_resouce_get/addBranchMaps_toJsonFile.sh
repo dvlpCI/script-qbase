@@ -37,10 +37,16 @@ exit_script() { # 退出脚本的方法，省去当某个步骤失败后，还�
 # exit 1
 
 CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-CommonFun_HomeDir_Absolute=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
+qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
+
+qbase_json_file_check_script_path="${qbase_homedir_abspath}/json_check/json_file_check.sh"
+get_jsonstring_script_file=${qbase_homedir_abspath}/json_formatter/get_jsonstring.sh
+JsonUpdateFun_script_file_Absolute="${qbase_homedir_abspath}/value_update_in_file/update_json_file.sh"
+
+
 
 qbase_get_filePath_mapping_branchName_from_dir_scriptPath=${CurCategoryFun_HomeDir_Absolute}/get_filePath_mapping_branchName_from_dir.sh
-qbase_branchMapFile_checkMap_scriptPath=${CommonFun_HomeDir_Absolute}/branchMaps_11_resouce_check/branchMapFile_checkMap.sh
+qbase_branchMapFile_checkMap_scriptPath=${qbase_homedir_abspath}/branchMaps_11_resouce_check/branchMapFile_checkMap.sh
 
 
 # shell 参数具名化
@@ -115,24 +121,6 @@ function log_msg() {
         echo "$1"
     fi
 }
-
-# 当前【shell命令】执行的工作目录
-#CurrentDIR_WORK_Relative=$PWD
-#echo "CurrentDIR_WORK_Relative=${CurrentDIR_WORK_Relative}"
-
-# 当前【shell脚本】的工作目录
-# $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
-CurrentDIR_Script_Absolute="$(cd "$(dirname "$0")" && pwd)"
-#echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
-CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-#echo "CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute}"
-
-qbase_json_file_check_script_path="${CommonFun_HomeDir_Absolute}/json_check/json_file_check.sh"
-get_jsonstring_script_file=${CommonFun_HomeDir_Absolute}/json_formatter/get_jsonstring.sh
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
-
-#exit
 
 
 # responseJsonString='{
@@ -457,6 +445,7 @@ fi
 log_msg "${YELLOW}正在执行命令(获取json内容)《${BLUE} sh ${get_jsonstring_script_file} -arrayString \"${dirFileContentsResult[*]}\" -escape \"true\" ${YELLOW}》${NC}"
 dirFileContentJsonStrings=$(sh ${get_jsonstring_script_file} -arrayString "${dirFileContentsResult[*]}" -escape "false")
 if [ $? != 0 ]; then
+    echo "${dirFileContentJsonStrings}" # 此时此值为错误信息
     exit 1
 fi
 log_msg "${YELLOW}所得json结果为:\n${BLUE}${dirFileContentJsonStrings}${BLUE}${NC}"
