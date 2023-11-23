@@ -125,7 +125,7 @@ if [ -z "${branchMapArray}" ] || [ "${branchMapArray}" == "null" ]; then
     echo "-------------------------💡💡💡友情提示tips：您的 ${branchMapsInJsonFile} 文件中不存在 ${branchMapsInKey} 字段的数据,请检查"
     branchMapArray="" # 写此行，只是为了将 "null" 也设置成空字符串
     updateBranchResultFileKeyValue "${RESULT_SALE_TO_JSON_FILE_PATH}" "${RESULT_FULL_STRING_SALE_BY_KEY}" ""
-    return 0
+    exit 0
 fi
 
 if [ -z "${showCategoryName}" ]; then   # 避免外面没传值

@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 01:51:42
+ # @LastEditTime: 2023-11-24 02:04:23
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -24,7 +24,7 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法�
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir_Absolute}/get_allBranchJson_inBranchNames_byJsonDir.sh
-get_branch_all_detail_info_script_path="${qbase_homedir_abspath}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
+qbase_getBranchMapsInfoAndNotifiction_scriptPath=${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsInfoAndNotifiction.sh
 
 example_remote_branchs_json_github_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_github.json
 
@@ -101,24 +101,22 @@ function dealFound() {
 
 
 function test_getAllBranchLogArray_andCategoryThem() {
+    branchMapsInJsonFile=${example_remote_branchs_json_filePath}
+    branchMapsInKey="branchJsons"
+
     showBranchLogFlag='true'
     showBranchName='true'
     showBranchTimeLog='all'
     showBranchAtLog='true'
     showBranchTable='false' # 通知也暂时都不显示
     showCategoryName='true' # 通知时候显示
-    shouldMarkdown='false'
-    
-    RESULT_SALE_TO_JSON_FILE_PATH=${example_remote_branchs_json_filePath}
-    RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
-    RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
-    RESULT_FULL_STRING_SALE_BY_KEY="branch_info_result.Notification.current.full"           
+    shouldMarkdown='true'
 
-    branchMapsInJsonFile=${example_remote_branchs_json_filePath}
-    branchMapsInKey="branchJsons"
+    TEST_ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
 
-    echo "${YELLOW}正在执行命令(整合 branchMapsInfo)：《${BLUE} sh $get_branch_all_detail_info_script_path -branchMapsInJsonF \"${branchMapsInJsonFile}\" -branchMapsInKey \".${branchMapsInKey}\" -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultBranchKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" -resultCategoryKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" ${YELLOW}》${NC}"
-    sh $get_branch_all_detail_info_script_path -branchMapsInJsonF "${branchMapsInJsonFile}" -branchMapsInKey ".${branchMapsInKey}" -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultBranchKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}" -resultCategoryKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}"
+    sh $qbase_getBranchMapsInfoAndNotifiction_scriptPath -branchMapsInJsonF "${branchMapsInJsonFile}" -branchMapsInKey "${branchMapsInKey}" \
+    -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}"\
+    -robot "${TEST_ROBOT_URL}"
     
 
     echo ""
