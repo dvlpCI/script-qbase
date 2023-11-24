@@ -49,7 +49,6 @@ done
 
 # echo "===========inBranchName=${inBranchName}"
 
-
 # 如果文件内容是json且有效，则返回文件内容；否则提示出错
 function getContentIfJson() {
     while [ -n "$1" ]
@@ -159,7 +158,8 @@ if [ -z "${inBranchName}" ]; then
     echo "您的 -inBranchName 参数指向的'要获取哪个分支下的文件'的参数值不能为空，请检查！"
     exit_script
 fi
-
+# 去除origin/开头
+inBranchName=${inBranchName#origin/}
 
 if [[ "${DIRECTORY_URL}" != "/"* ]] &&  [[ "${DIRECTORY_URL}" != "~"* ]] \
 && [[ "${DIRECTORY_URL}" != *"https://github.com"* ]] && [[ "${DIRECTORY_URL}" != *"https://gitee"* ]] && [[ "${DIRECTORY_URL}" != *"https://gitlab"* ]]; then

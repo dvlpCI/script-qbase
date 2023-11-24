@@ -33,7 +33,7 @@ while [ -n "$1" ]
 do
     case "$1" in
         -recordsString|--recordsString) recordsString=$2; shift 2;;
-        -branchShouldRemoveOrigin|branchShouldRemoveOrigin) branchShouldRemoveOrigin=$2; shift 2;;  # 是否移除每个分支前面的 origin/
+        -branchShouldRemoveOrigin|branchShouldRemoveOrigin) branchShouldRemoveOrigin=$2; shift 2;;  # 是否移除每个分支前面的 origin/（取分支信息的时候一定不能是true，否则会变成取本地，而本地可能又没该分支的错误现象）
         --) break ;;
         *) break ;;
     esac
@@ -89,7 +89,7 @@ if [[ "${lowercase_branchShouldRemoveOrigin}" == "true" ]]; then
     branchesString=$(printf "%s" "$branchesString" | sed -e "s|${needRemoveText}||g") 
 fi
 
-echo "${branchesString}"
+printf "%s" "${branchesString}"
 
 
 

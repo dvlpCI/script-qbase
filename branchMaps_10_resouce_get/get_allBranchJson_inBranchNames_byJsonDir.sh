@@ -35,6 +35,11 @@ do
     esac
 done
 
+if [ -z "${requestBranchNames}" ]; then
+    echo "获取分支的json信息时，您的 -requestBranchNames 参数不能为空，请检查"
+    exit 1
+fi
+
 
 function get_all_json_file_content_inDir_mapping_branchName() {
     while [ -n "$1" ]
@@ -73,9 +78,9 @@ function get_all_json_file_content_inDir_mapping_branchName() {
                 "name": "'"${inBranchName}"'",
                 "des": "详见outlines",
                 "outlines": [
-                {
-                    "title": "未获取到分支信息，原因为'${allFileContent_JsonStrings}'"
-                }
+                    {
+                        "title": "未获取到分支信息，原因为'${allFileContent_JsonStrings}'"
+                    }
                 ],
                 "answer": {
                     "name": "null"
@@ -90,6 +95,10 @@ function get_all_json_file_content_inDir_mapping_branchName() {
         return 0
     fi
     allFileContent_Count=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | length')
+    if [ $? != 0 ]; then
+        echo "获取个数失败 allFileContent_Count=${allFileContent_Count}"
+        return 1
+    fi
     # echo "${GREEN}恭喜:指定目录${BLUE} ${DIRECTORY_URL} ${GREEN}下的所有json文件共有${BLUE} ${allFileContent_Count} ${GREEN}个，它们内容组成的值如下:${NC}"
     # echo "${allFileContent_JsonStrings}" | jq '.'
 
@@ -136,14 +145,19 @@ function get_all_json_file_content_inDir_mapping_branchName() {
 }
 
 # 测试单个
-# i=0
+# i=2
 # requestBranchNameArray=($requestBranchNames)
 # requestBranchCount=${#requestBranchNameArray[@]}
 # iRequestBranchName=${requestBranchNameArray[i]}
 # iDirUrl=${ONE_OF_DIRECTORY_URL//${DIRECTORY_URL_BranchName}/${iRequestBranchName}} # 将 "blob" 替换为 "raw"      
-# echo "$((i+1)).请求${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iDirUrl} ${NC}"
+# # echo "$((i+1)).您正在测试请求${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iDirUrl} ${NC}"
 # get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}"
-# exit 1
+# if [ $? != 0 ]; then
+#     echo "get_all_json_file_content_inDir_mapping_branchName 测试失败"
+#     exit 1
+# fi
+# printf "%s" "${jsonStringWhereJsonMappingBranchName}" | jq ".[${0}]"
+# exit 0
 
 
 allBranchJsonStrings=""
@@ -155,8 +169,13 @@ requestBranchCount=${#requestBranchNameArray[@]}
 for((i=0;i<requestBranchCount;i++));
 do
     iRequestBranchName=${requestBranchNameArray[i]}
+    # 去除origin/开头
+    iRequestBranchName=${iRequestBranchName#origin/}
+
     iDirUrl=${ONE_OF_DIRECTORY_URL//${DIRECTORY_URL_BranchName}/${iRequestBranchName}} # 将 "blob" 替换为 "raw"      
     # echo "$((i+1)).请求${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iDirUrl} ${NC}"
+
+    # 测试 get_all_json_file_content_inDir_mapping_branchName 方法
     # get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}"
     # if [ $? != 0 ]; then
     #     echo "$((i+1)).获取分支信息结果❌${BLUE} ${iRequestBranchName} ${NC}"
@@ -168,10 +187,18 @@ do
     iBranchJsonStrings=$(get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}")
     if [ $? != 0 ]; then
         # echo "$((i+1)).结果❌${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iBranchJsonStrings} ${NC}"
+        
+        # 此时 iBranchJsonStrings 是错误信息字符串
+        iBranchJsonStrings=$(echo "$iBranchJsonStrings" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
+        errorJsonString='{
+            "branchName": "'"${iRequestBranchName}"'",
+            "errorMessage": "'"${iBranchJsonStrings}"'"
+        }'
+
         if [ "${allBranchJsonErrorMessage}" != "[" ]; then
             allBranchJsonErrorMessage+=", "
         fi
-        iBranchJsonStrings=$(echo "$iBranchJsonStrings" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
+        # allBranchJsonErrorMessage+="${errorJsonString}"
         allBranchJsonErrorMessage+="\"${iRequestBranchName}: ${iBranchJsonStrings}\""  # 此时此值是错误信息
         continue
     fi

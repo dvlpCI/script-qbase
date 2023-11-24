@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-24 14:50:28
+ # @LastEditTime: 2023-11-24 19:23:33
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -50,10 +50,15 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 
-function getBranchNames() {
+function getRequestBranchNames() {
     # 获取远程分支列表
     branchNames=$(git branch -r)
-    branchNamesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branchNames[*]}" -branchShouldRemoveOrigin "true")
+    # 不能去除origin，否则git取分支信息的时候会变成取本地，而本地又没该分支的错误现象了
+    branchNamesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branchNames[*]}" -branchShouldRemoveOrigin "false")
+    if [ $? -ne 0 ]; then
+        echo "${branchNamesString}"
+        return 1
+    fi
     # echo "======branchNamesString=${branchNamesString}"
 
     # sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}"
@@ -66,6 +71,19 @@ function getBranchNames() {
     branchGitInfoString=$(sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}")
     if [ $? != 0 ]; then
         echo "${branchGitInfoString}"
+        return 1
+    fi
+    # echo "======branchGitInfoString=${branchGitInfoString}"
+    errorBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".errors")
+    errorBranchGitInfoCount=$(printf "%s" "${errorBranchGitInfoString}" | jq -r ".|length")
+    if [ "${errorBranchGitInfoCount}" -gt 0 ]; then
+        echo "你有 ${errorBranchGitInfoCount} 个分支获取失败了，分别如下："
+        # echo "${errorBranchGitInfoString}" | jq "."
+        for((i=0;i<errorBranchGitInfoCount;i++));
+        do
+            iErrorBranchGitInfoString=$(printf "%s" "${errorBranchGitInfoString}" | jq -r ".[${i}]")
+            echo "$((i+1)). ${iErrorBranchGitInfoString}"
+        done
         return 1
     fi
     matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".matchs")
@@ -82,9 +100,7 @@ function testGithub {
     ignoreBranchNameOrRules="unuse/* test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
-    # getBranchNames
-    requestBranchNames=$(getBranchNames)
-    # requestBranchNames="master test3 test/test1"
+    requestBranchNames=$(getRequestBranchNames)
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
     
@@ -96,15 +112,15 @@ function testGithub {
     example_remote_branchs_json_filePath=${example_remote_branchs_json_github_filePath}
 }
 
+
 function testGitee {
     log_title "2.gitee"
     # 获取要请求的分支列表
     ignoreBranchNameOrRules="unuse/* test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
-    # getBranchNames
-    requestBranchNames=$(getBranchNames)
     # requestBranchNames="master test3 test/test1"
+    requestBranchNames=$(getRequestBranchNames)
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
 
@@ -113,14 +129,15 @@ function testGitee {
     example_remote_branchs_json_filePath=${example_remote_branchs_json_gitee_filePath}
 }
 
+
 function testGitlab {
     log_title "3.gitlab"
     # 获取要请求的分支列表
+    ignoreBranchNameOrRules="unuse/* test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
-    # getBranchNames
-    requestBranchNames=$(getBranchNames)
-    # requestBranchNames="master test3 test/test1"
+    requestBranchNames="origin/chore/ipa_backup origin/chore/pack origin/dev_route_trantive"
+    requestBranchNames=$(getRequestBranchNames)
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
 
@@ -182,6 +199,6 @@ function test_getAllBranchLogArray_andCategoryThem() {
 }
 
 
-testGithub && dealFound
+# testGithub && dealFound
 # testGitee && dealFound
-# testGitlab && dealFound
+testGitlab && dealFound

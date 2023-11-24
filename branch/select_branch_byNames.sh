@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-24 14:47:15
+ # @LastEditTime: 2023-11-24 19:18:26
  # @Description: 从分支名中筛选符合条件的分支信息(含修改情况)
  # @使用示例: 
 ### 
@@ -67,13 +67,16 @@ if [ -z "${branchNames}" ]; then
     # branchNames=${currentBranchResult}
     exit 1
 fi
+# echo "您要请求的所有分支为: ${branchNames}"
 
 
 # 要舍弃哪些分支(可以是分支名feature/test1、也可以是分支规则test/*
 if [ -n "${ignoreBranchNameOrRules}" ]; then
     branchNames=$(sh $qbase_select_stings_by_rules_scriptPath  -originStrings "${branchNames}" -patternsString "${ignoreBranchNameOrRules}" -returnIsMatch "false")
-    printf "%s" "${branchNames}"
-    exit 1
+    if [ $? != 0 ]; then
+        printf "%s" "${branchNames}"
+        exit 1
+    fi
 fi
 
 function isDateFormatter() {
@@ -117,20 +120,49 @@ match_branch_gitJsonStrings=""
 match_branch_gitJsonStrings+="["
 unmatch_branch_gitJsonStrings=""
 unmatch_branch_gitJsonStrings+="["
+errorJsonStrings=""
+errorJsonStrings+="["
 # 遍历分支列表
-index=0 # 初始化索引计数器
-while IFS= read -r branch; do
-    # 提取分支名
-    branch_name=$(echo "$branch" | awk '{print $1}')
-    # branch_name=$(echo "$branch" | awk '{print $1}' | awk -F'/' '{print $2}')
-    # echo "✅branch_name : $branch_name"
+# echo "您要遍历的所有分支为: ${branchNames}"
+branchNameArray=(${branchNames})
+branchCount=${#branchNameArray[@]}
+for((i=0;i<branchCount;i++));
+do
+    branch_name=${branchNameArray[$i]}
+    # echo "---------$((i+1)). ${branch_name}"
 
+    # 2>/dev/null 只将标准错误输出重定向到 /dev/null，保留标准输出。
+    # >/dev/null 2>&1 将标准输出和标准错误输出都重定向到 /dev/null，即全部丢弃。
     # 获取分支创建的时间（格式化为 "2020-11-10 10:10:00"）
-    timestamp_create=$(git log --diff-filter=A --format="%ad" --date=format:'%Y-%m-%d %H:%M:%S' "${branch_name}" | tail -1)
+    timestamp_commit=$(git log --diff-filter=A --format="%ad" --date=format:'%Y-%m-%d %H:%M:%S' "${branch_name}" 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        if [ "${errorJsonStrings}" != "[" ]; then
+            errorJsonStrings+=", "
+        fi
+        branch_info='{
+            "branch_name": "'"${branch_name}"'",
+            "errorMessage": "获取分支创建的时间失败"
+        }'
+        errorJsonStrings+="$branch_info"
+        continue
+    fi
+    timestamp_create=$(echo "$timestamp_commit" | tail -1)
+    # echo "----------------------1------${timestamp_create}"
 
     # 获取最后一次提交的时间（格式化为 "2020-11-10 10:10:00"）
-    timestamp_last_commit=$(git log -1 --format="%ad" --date=format:'%Y-%m-%d %H:%M:%S')
-
+    timestamp_last_commit=$(git log -1 --format="%ad" --date=format:'%Y-%m-%d %H:%M:%S' 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        if [ "${errorJsonStrings}" != "[" ]; then
+            errorJsonStrings+=", "
+        fi
+        branch_info='{
+            "branch_name": "'"${branch_name}"'",
+            "errorMessage": "获取最后一次提交的时间失败"
+        }'
+        errorJsonStrings+="$branch_info"
+        continue
+    fi
+    # echo "----------------------2------${timestamp_last_commit}"
 
     commitCount_start_date=${timestamp_create}
     commitCount_end_date=$(date +%Y-%m-%d)
@@ -146,6 +178,7 @@ while IFS= read -r branch; do
             commitCount_start_date="${create_start_date}"
         fi
     fi
+    # echo "----------------------3------${isDateFormatter}"
 
     # 若有值，最后修改时间不在该值之后不显示(即该时间值之后没有提交的不显示)
     isDateFormatter=$(isDateFormatter "${lastCommit_start_date}")
@@ -157,15 +190,27 @@ while IFS= read -r branch; do
             commitCount_end_date="${lastCommit_start_date}"
         fi
     fi
-    
+    # echo "----------------------4------${isDateFormatter}"
+
     # 获取分支在指定时间范围内的提交次数
     commit_count=$(git rev-list --count "$branch_name" --since="$commitCount_start_date" --until="$commitCount_end_date" 2>/dev/null)
-    # echo "✅ commit_count : $commit_count"
+    # echo "----------------------5------$commit_count"
 
     # 获取分支的作者和最后修改者
     # branch_info=$(git log -1 --pretty=format:'{"branch_name":'"$branch_name"',"author":"%an","last_committer":"%cn","commit_count":'"$commit_count"'}' 2>/dev/null)
     branch_info=$(git log -1 --pretty=format:'{"branch_name":"'"$branch_name"'","author":"%an","last_committer":"%cn","commit_count":'"$commit_count"'}' 2>/dev/null)
-    # echo "branch_info : $branch_info"
+    if [[ $? -ne 0 ]]; then
+        if [ "${errorJsonStrings}" != "[" ]; then
+            errorJsonStrings+=", "
+        fi
+        branch_info='{
+            "branch_name": "'"${branch_name}"'",
+            "errorMessage": "获取分支的作者和最后修改者"
+        }'
+        errorJsonStrings+="$branch_info"
+        continue
+    fi
+    # echo "----------------------6------$branch_info"
     # 将分支信息添加到 JSON 数组
     if [ -n "${unMatchErrorMessage}" ]; then
         if [ "${unmatch_branch_gitJsonStrings}" != "[" ]; then
@@ -178,17 +223,14 @@ while IFS= read -r branch; do
         fi
         match_branch_gitJsonStrings+="$branch_info"
     fi
-
-    # if [ $index -gt 4 ]; then
-    #     echo "============大于4,不显示"
-    #     break
-    # fi
-    # ((index++)) # 增加索引计数器
-done <<< "$branchNames"
+done
 match_branch_gitJsonStrings+="]"
 unmatch_branch_gitJsonStrings+="]"
+errorJsonStrings+="]"
+
 
 lastJson='{
+    "errors": '${errorJsonStrings}',
     "matchs": '${match_branch_gitJsonStrings}',
     "unmatchs": '${unmatch_branch_gitJsonStrings}'
 }'
@@ -197,67 +239,5 @@ lastJson='{
 # echo "$lastJson" > branchNames.json
 printf "%s" "${lastJson}"
 
-echo "所有分支的匹配和不匹配结果如下:"
-printf "%s\n" "${lastJson}" | jq "."
-
-exit 0
-
-
-
-
-
-
-
-
-
-result=$(echo "${match_branch_gitJsonStrings}" | jq '.')
-
-allBranchCount=$(echo "$match_branch_gitJsonStrings" | jq -r 'length')
-
-# printf "All Branches:\n%s\n\n" "$result"
-
-# 使用 jq 进行筛选，获取 commit_count 不为 0 的分支信息
-exsitCommit_branchJsonStrings=$(printf "%s" "${match_branch_gitJsonStrings}" | jq '. | map(select(.commit_count != 0))')
-# echo "===========exsitCommit_branchJsonStrings : $exsitCommit_branchJsonStrings"
-
-
-TotalMessage="✅从 ${start_date} 到 ${end_date} 时间里，"
-TotalMessage+="\n"
-exsitCommit_branchCount=$(echo "$exsitCommit_branchJsonStrings" | jq -r 'length')
-if [ "$exsitCommit_branchCount" == 0 ]; then
-    TotalMessage+="您所有分支都没有进行任何开发。"
-else
-    TotalMessage+="您正在开发的(有提交记录)的分支有 ${exsitCommit_branchCount}/${allBranchCount} 个，信息如下:"
-    for ((i = 0; i < exsitCommit_branchCount; i++)); do
-        exsitCommit_branchJsonString=$(echo "$exsitCommit_branchJsonStrings" | jq -r ".[$i]")
-        TotalMessage+="$((i + 1)). $exsitCommit_branchJsonString"
-    done
-fi
-
-
-TotalMessage+="\n"
-# 使用 jq 进行筛选，获取 commit_count 不为 0 的分支信息
-noCommit_branchJsonStrings=$(printf "%s" "${match_branch_gitJsonStrings}" | jq '. | map(select(.commit_count == 0))')
-# echo "===========noCommit_branchJsonStrings : $noCommit_branchJsonStrings"
-noCommit_branchCount=$(echo "$noCommit_branchJsonStrings" | jq -r 'length')
-if [ "$noCommit_branchCount" == 0 ]; then
-    TotalMessage+="您检查到的所有分支在这段时间内都有更新。"
-else
-    TotalMessage+="您有 ${noCommit_branchCount}/${allBranchCount} 个分支已经没有新的开发记录。(如果已经上线了，请及时清理；)信息如下:"
-    for ((i = 0; i < noCommit_branchCount; i++)); do
-        noCommit_branchJsonString=$(echo "$noCommit_branchJsonStrings" | jq -r ".[$i]")
-        TotalMessage+="$((i + 1)). $noCommit_branchJsonString"
-    done
-fi
-echo "${TotalMessage}"
-
-
-exsitCommit_branchNamesString=$(printf "%s" "${exsitCommit_branchJsonStrings}" | jq -r '.[].branch_name')
-# echo "===============${exsitCommit_branchNamesString}"
-exsitCommit_branchNameArray=($exsitCommit_branchNamesString)
-# echo "===============${exsitCommit_branchNameArray[*]}"
-
-noCommit_branchNamesString=$(printf "%s" "${noCommit_branchJsonStrings}" | jq -r '.[].branch_name')
-# echo "===============${noCommit_branchNamesString}"
-noCommit_branchNameArray=($noCommit_branchNamesString)
-# echo "===============${noCommit_branchNameArray[*]}"
+# echo "所有分支的匹配和不匹配结果如下:"
+# printf "%s\n" "${lastJson}" | jq "."
