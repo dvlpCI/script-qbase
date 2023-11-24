@@ -39,11 +39,15 @@ do
     esac
 done
 
-
+# echo "recordsString=${recordsString}"
+if [[ "${recordsString}" == *"*"* ]]; then
+    echo "您的分支字符串中含有*号，会导致用(\${recordsString})转字符串时候把本地所有的文件输出，即*功能如果ls一样。(*来源可能是你获取本地分支时候，使用 git branch -l 少了 --format=%\(refname:short\) 导致结果里有*号，请检查"
+    exit 1
+fi
 recordArray=(${recordsString})
 recordCount=${#recordArray[@]}
-#echo "${recordArray[*]}"
-#echo "recordCount=$recordCount"
+# echo "recordArray=${recordArray[*]}"
+# echo "recordCount=${recordCount}"
     
     
 noBranchNames=("HEAD" "origin/HEAD" "->")
@@ -56,7 +60,7 @@ for ((i=0;i<recordCount;i+=1))
     iRecordString=${recordArray[i]}
     iRecordString=$(echo "$iRecordString" | sed "s/(//g" | sed "s/)//g" | sed "s/,//g") #去除左右括号
     # iRecordString=${iRecordString##*/} # 取最后的component
-    #echo "$((i+1)) iRecordString=${iRecordString}"
+    # echo "$((i+1)) iRecordString=${iRecordString}"
     if [ "${iRecordString}" == "tag:" ]; then
         #echo "$((i+1)) iRecordString=${iRecordString}=========跳过本身及其下一个"
         i=$((i+1));

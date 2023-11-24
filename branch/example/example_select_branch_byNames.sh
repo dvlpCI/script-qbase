@@ -91,8 +91,8 @@ if [ $? != 0 ]; then
 fi
 echo "所有分支的匹配和不匹配结果如下:"
 printf "%s\n" "${branchGitInfoString}" | jq "."
-matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".matchs")
-unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".unmatchs")
+matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".eligibles")
+unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".ineligibles")
 
 allBranchCount=$(echo "$matchBranchGitInfoString" | jq -r 'length')
 for((i=0;i<allBranchCount;i++));

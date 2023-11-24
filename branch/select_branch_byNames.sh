@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-24 19:18:26
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-11-25 01:20:50
  # @Description: 从分支名中筛选符合条件的分支信息(含修改情况)
  # @使用示例: 
 ### 
@@ -67,16 +67,31 @@ if [ -z "${branchNames}" ]; then
     # branchNames=${currentBranchResult}
     exit 1
 fi
-# echo "您要请求的所有分支为: ${branchNames}"
+# echo "您要请求的所有分支(原始值)为: ${branchNames}"
 
 
 # 要舍弃哪些分支(可以是分支名feature/test1、也可以是分支规则test/*
 if [ -n "${ignoreBranchNameOrRules}" ]; then
-    branchNames=$(sh $qbase_select_stings_by_rules_scriptPath  -originStrings "${branchNames}" -patternsString "${ignoreBranchNameOrRules}" -returnIsMatch "false")
+    # sh $qbase_select_stings_by_rules_scriptPath -originStrings "${branchNames}" -patternsString "${ignoreBranchNameOrRules}"
+    # exit
+    branchNameMatchResultJson=$(sh $qbase_select_stings_by_rules_scriptPath -originStrings "${branchNames}" -patternsString "${ignoreBranchNameOrRules}")
     if [ $? != 0 ]; then
-        printf "%s" "${branchNames}"
+        printf "%s" "${branchNameMatchResultJson}"
         exit 1
     fi
+
+    if ! jq -e . <<< "$branchNameMatchResultJson" >/dev/null 2>&1; then
+        echo "❌qbase_select_stings_by_rules_scriptPath 失败，返回的结果不是json"
+        # echo "❌branchNameMatchResultJson=${branchNameMatchResultJson}"
+        exit 1
+    fi
+    # echo "✅branchNameMatchResultJson=${branchNameMatchResultJson}"
+
+    remainingPatternStringJsonString=$(printf "%s" "${branchNameMatchResultJson}" | jq -r ".unmatchs")
+    needIgnorePatternStringJsonString=$(printf "%s" "${branchNameMatchResultJson}" | jq -r ".matchs")
+    # echo "remainingPatternStringJsonString=${remainingPatternStringJsonString}"
+    branchNames=$(printf "%s" "${remainingPatternStringJsonString}" | jq -r ".[].originString")
+    # echo "您要请求的所有分支(过滤后)为: ${branchNames}"
 fi
 
 function isDateFormatter() {
@@ -194,6 +209,17 @@ do
 
     # 获取分支在指定时间范围内的提交次数
     commit_count=$(git rev-list --count "$branch_name" --since="$commitCount_start_date" --until="$commitCount_end_date" 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        if [ "${errorJsonStrings}" != "[" ]; then
+            errorJsonStrings+=", "
+        fi
+        branch_info='{
+            "branch_name": "'"${branch_name}"'",
+            "errorMessage": "获取分支在指定时间范围内的提交次数"
+        }'
+        errorJsonStrings+="$branch_info"
+        continue
+    fi
     # echo "----------------------5------$commit_count"
 
     # 获取分支的作者和最后修改者
@@ -229,15 +255,18 @@ unmatch_branch_gitJsonStrings+="]"
 errorJsonStrings+="]"
 
 
-lastJson='{
+responseJsonString='{
     "errors": '${errorJsonStrings}',
-    "matchs": '${match_branch_gitJsonStrings}',
-    "unmatchs": '${unmatch_branch_gitJsonStrings}'
+    "eligibles": '${match_branch_gitJsonStrings}',
+    "ineligibles": '${unmatch_branch_gitJsonStrings}'
 }'
+if [ -n "${needIgnorePatternStringJsonString}" ]; then
+    responseJsonString=$(printf "%s" "$responseJsonString" | jq --argjson ignores "$needIgnorePatternStringJsonString" '. + { "ignores": $ignores }')
+fi
 
 # 写入 JSON 文件
-# echo "$lastJson" > branchNames.json
-printf "%s" "${lastJson}"
+# echo "$responseJsonString" > branchNames.json
+printf "%s" "${responseJsonString}"
 
 # echo "所有分支的匹配和不匹配结果如下:"
-# printf "%s\n" "${lastJson}" | jq "."
+# printf "%s\n" "${responseJsonString}" | jq "."

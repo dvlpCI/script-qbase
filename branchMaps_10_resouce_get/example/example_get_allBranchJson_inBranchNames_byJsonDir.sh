@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-24 19:23:33
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2023-11-25 01:22:45
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -53,28 +53,40 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 function getRequestBranchNames() {
     # 获取远程分支列表
     branchNames=$(git branch -r)
+    # branchNames=$(git branch -l --format=%\(refname:short\)) # 这里要加上 --format=%\(refname:short\) 否则结果里可能出现*星号
+    # echo "======branchNames=${branchNames}"
+    # sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branchNames[*]}" -branchShouldRemoveOrigin "false"
+    # exit 
     # 不能去除origin，否则git取分支信息的时候会变成取本地，而本地又没该分支的错误现象了
     branchNamesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branchNames[*]}" -branchShouldRemoveOrigin "false")
     if [ $? -ne 0 ]; then
         echo "${branchNamesString}"
         return 1
     fi
-    # echo "======branchNamesString=${branchNamesString}"
-
+    # echo "======branchNamesString=${branchNamesString}==="
+    
     # sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}"
     # if [ $? -ne 0 ]; then
     #     return 1
     # else
     #     return 0
     # fi
+
     # echo "${YELLOW}正在执行命令(筛选符合条件的分支名):《${BLUE} sh $qbase_select_branch_byNames_scriptPath -branchNames \"${branchNamesString}\" -ignoreBranchNameOrRules \"${ignoreBranchNameOrRules}\" -create-startDate \"${create_start_date}\" -lastCommit-startDate \"${lastCommit_start_date}\" ${YELLOW}》${NC}"
     branchGitInfoString=$(sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}")
     if [ $? != 0 ]; then
         echo "${branchGitInfoString}"
         return 1
     fi
-    # echo "======branchGitInfoString=${branchGitInfoString}"
+    if ! jq -e . <<< "$branchGitInfoString" >/dev/null 2>&1; then
+        echo "qbase_select_branch_byNames_scriptPath 失败，返回的结果不是json"
+        echo "❌branchGitInfoString=${branchGitInfoString}"
+        return 1
+    fi
+    # echo "✅恭喜：您从分支名中筛选符合条件的分支信息(含修改情况)的结果如下:${branchGitInfoString}"
+    
     errorBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".errors")
+    # echo "======errorBranchGitInfoString=${errorBranchGitInfoString}"
     errorBranchGitInfoCount=$(printf "%s" "${errorBranchGitInfoString}" | jq -r ".|length")
     if [ "${errorBranchGitInfoCount}" -gt 0 ]; then
         echo "你有 ${errorBranchGitInfoCount} 个分支获取失败了，分别如下："
@@ -86,8 +98,8 @@ function getRequestBranchNames() {
         done
         return 1
     fi
-    matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".matchs")
-    unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".unmatchs")
+    matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".eligibles")
+    unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".ineligibles")
 
     matchBranchNamesString=$(printf "%s" "${matchBranchGitInfoString}" | jq -r '.[].branch_name')
     printf "%s" "${matchBranchNamesString}"
@@ -138,6 +150,7 @@ function testGitlab {
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
     requestBranchNames="origin/chore/ipa_backup origin/chore/pack origin/dev_route_trantive"
     requestBranchNames=$(getRequestBranchNames)
+    # getRequestBranchNames
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
 
@@ -199,6 +212,6 @@ function test_getAllBranchLogArray_andCategoryThem() {
 }
 
 
-# testGithub && dealFound
+testGithub && dealFound
 # testGitee && dealFound
-testGitlab && dealFound
+# testGitlab && dealFound

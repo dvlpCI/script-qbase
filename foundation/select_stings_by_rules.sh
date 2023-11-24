@@ -19,7 +19,6 @@ do
     case "$1" in
         -originStrings|--originStrings) originStrings=$2; shift 2;;
         -patternsString|--patternsString) patternsString=$2; shift 2;;  # 要舍弃哪些分支(可以是分支名feature/test1、也可以是分支规则test/*)
-        -returnIsMatch|--returnIsMatch) returnIsMatch=$2; shift 2;;     # 不设置默认返回匹配的结果(true:返回匹配的结果，false返回不匹配的结果)
         --) break ;;
         *) break ;;
     esac
@@ -35,30 +34,36 @@ fi
 
 originStringArray=($originStrings)
 originStringCount=${#originStringArray[@]}
+# echo "$(basename "$0")脚本: originStrings=${originStrings}"
 
-resultStringArray=()
+matchPatternStringJsonString="["
+unmatchPatternStringJsonString="["
 for ((i=0;i<originStringCount;i+=1))
 {
     iOriginString=${originStringArray[i]}
     iOriginString=$(echo "$iOriginString" | sed "s/(//g" | sed "s/)//g" | sed "s/,//g") #去除左右括号
-    # iOriginString=${iOriginString##*/} # 取最后的component
-    #echo "$((i+1)) iOriginString=${iOriginString}"
+    # echo "$((i+1)) iOriginString=${iOriginString}"
     
     matchPatter=$(sh $qbase_isStringMatchPatterns_scriptPath -inputString "${iOriginString}" -patternsString "${patternsString}")
-    isMatch=$?
-    if [ "${returnIsMatch}" == "false" ]; then  # 返回不匹配的，匹配的过滤掉
-        if [ ${isMatch} == 0 ]; then # 被匹配的过滤掉
-            continue
+    if [ $? == 0 ]; then # 被匹配的过滤掉
+        if [ "${matchPatternStringJsonString}" != "[" ]; then
+            matchPatternStringJsonString+=", "
         fi
-        resultStringArray[${#resultStringArray[@]}]=${iOriginString}
+        iJson='{"originString":"'"${iOriginString}"'", "matchPattern":"'"${matchPatter}"'"}'
+        matchPatternStringJsonString+="${iJson}"
     else
-        if [ ${isMatch} != 0 ]; then # 不匹配的过滤掉
-            continue
+        if [ "${unmatchPatternStringJsonString}" != "[" ]; then
+            unmatchPatternStringJsonString+=", "
         fi
-        resultStringArray[${#resultStringArray[@]}]=${iOriginString}
+        iJson='{"originString":"'"${iOriginString}"'"}'
+        unmatchPatternStringJsonString+="${iJson}"
     fi
 }
-
-#[shell 数组去重](https://www.jianshu.com/p/1043e40c0502)
-resultStringArray=($(awk -v RS=' ' '!a[$1]++' <<< ${resultStringArray[@]}))
-printf "%s" "${resultStringArray[*]}"
+matchPatternStringJsonString+="]"
+unmatchPatternStringJsonString+="]"
+# echo "----------match=${matchPatternStringJsonString}, unmatch=${unmatchPatternStringJsonString}"
+stringMatchResultJsonString='{
+    "matchs":'${matchPatternStringJsonString}',
+    "unmatchs":'${unmatchPatternStringJsonString}'
+}'
+printf "%s" "${stringMatchResultJsonString}"
