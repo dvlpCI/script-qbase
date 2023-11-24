@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 03:14:16
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-11-24 14:50:28
  # @Description: 测试获取在指定日期范围内有提交记录的分支
  # @使用示例: 
 ### 
@@ -24,7 +24,7 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法�
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
 qbase_get_only_branch_from_recods_scriptPath=${qbase_homedir_abspath}/branch/get_only_branch_from_recods.sh
-qbase_get_all_remote_branch_after_date_scriptPath=${qbase_homedir_abspath}/branch/get_all_remote_branch_after_date.sh
+qbase_select_branch_byNames_scriptPath=${qbase_homedir_abspath}/branch/select_branch_byNames.sh
 qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir_Absolute}/get_allBranchJson_inBranchNames_byJsonDir.sh
 qbase_getBranchMapsInfoAndNotifiction_scriptPath=${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsInfoAndNotifiction.sh
 
@@ -50,13 +50,40 @@ function error_exit_script() { # 退出脚本的方法，省去当某个步骤�
 }
 
 
+function getBranchNames() {
+    # 获取远程分支列表
+    branchNames=$(git branch -r)
+    branchNamesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branchNames[*]}" -branchShouldRemoveOrigin "true")
+    # echo "======branchNamesString=${branchNamesString}"
+
+    # sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}"
+    # if [ $? -ne 0 ]; then
+    #     return 1
+    # else
+    #     return 0
+    # fi
+    # echo "${YELLOW}正在执行命令(筛选符合条件的分支名):《${BLUE} sh $qbase_select_branch_byNames_scriptPath -branchNames \"${branchNamesString}\" -ignoreBranchNameOrRules \"${ignoreBranchNameOrRules}\" -create-startDate \"${create_start_date}\" -lastCommit-startDate \"${lastCommit_start_date}\" ${YELLOW}》${NC}"
+    branchGitInfoString=$(sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}")
+    if [ $? != 0 ]; then
+        echo "${branchGitInfoString}"
+        return 1
+    fi
+    matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".matchs")
+    unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".unmatchs")
+
+    matchBranchNamesString=$(printf "%s" "${matchBranchGitInfoString}" | jq -r '.[].branch_name')
+    printf "%s" "${matchBranchNamesString}"
+}
+
+
 function testGithub {
     log_title "1.github"
-    # 获取远程分支列表
-    # branches=$(git branch -r)
-    branches=$(git branch -r)
-    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
-    requestBranchNames="${branchesString}"
+    # 获取要请求的分支列表
+    ignoreBranchNameOrRules="unuse/* test/*"
+    create_start_date=""        # 若有值，创建时间早于该值不显示
+    lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
+    # getBranchNames
+    requestBranchNames=$(getBranchNames)
     # requestBranchNames="master test3 test/test1"
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
@@ -71,11 +98,12 @@ function testGithub {
 
 function testGitee {
     log_title "2.gitee"
-    # 获取远程分支列表
-    # branches=$(git branch -r)
-    branches=$(git branch -r)
-    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
-    requestBranchNames="${branchesString}"
+    # 获取要请求的分支列表
+    ignoreBranchNameOrRules="unuse/* test/*"
+    create_start_date=""        # 若有值，创建时间早于该值不显示
+    lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
+    # getBranchNames
+    requestBranchNames=$(getBranchNames)
     # requestBranchNames="master test3 test/test1"
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
@@ -87,11 +115,11 @@ function testGitee {
 
 function testGitlab {
     log_title "3.gitlab"
-    # 获取远程分支列表
-    # branches=$(git branch -r)
-    branches=$(git branch -r)
-    branchesString=$(sh $qbase_get_only_branch_from_recods_scriptPath -recordsString "${branches[*]}" -branchShouldRemoveOrigin "true")
-    requestBranchNames="${branchesString}"
+    # 获取要请求的分支列表
+    create_start_date=""        # 若有值，创建时间早于该值不显示
+    lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
+    # getBranchNames
+    requestBranchNames=$(getBranchNames)
     # requestBranchNames="master test3 test/test1"
     echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
     # exit
@@ -156,4 +184,4 @@ function test_getAllBranchLogArray_andCategoryThem() {
 
 testGithub && dealFound
 # testGitee && dealFound
-# # testGitlab && dealFound
+# testGitlab && dealFound

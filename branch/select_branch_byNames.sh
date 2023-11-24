@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-24 11:59:45
+ # @LastEditTime: 2023-11-24 14:47:15
  # @Description: 从分支名中筛选符合条件的分支信息(含修改情况)
  # @使用示例: 
 ### 
@@ -17,10 +17,10 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
-CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
-CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
-qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
+CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
+
+qbase_select_stings_by_rules_scriptPath=${qbase_homedir_abspath}/foundation/select_stings_by_rules.sh
 
 
 function debug_log() {
@@ -43,6 +43,7 @@ while [ -n "$1" ]
 do
     case "$1" in
         -branchNames|--branchNames) branchNames=$2; shift 2;;
+        -ignoreBranchNameOrRules|--ignoreBranchNameOrRules) ignoreBranchNameOrRules=$2; shift 2;;   # 要舍弃哪些分支(可以是分支名feature/test1、也可以是分支规则test/*)
         -create-startDate|--create-start-date) create_start_date=$2; shift 2;;  # 若有值，创建时间早于该值不显示
         -create-endDate|--create-end-date) create_end_date=$2; shift 2;;        # 若有值，创建时间晚于该值不显示
         -lastCommit-startDate|--lastCommit-start-date) lastCommit_start_date=$2; shift 2;;  # 若有值，最后修改时间不在该值之后不显示(即该时间值之后没有提交的不显示)
@@ -64,6 +65,14 @@ if [ -z "${branchNames}" ]; then
     # branchNames=$(git branch -r)
     # currentBranchResult=$(git branch --show-current) # 获取当前分支
     # branchNames=${currentBranchResult}
+    exit 1
+fi
+
+
+# 要舍弃哪些分支(可以是分支名feature/test1、也可以是分支规则test/*
+if [ -n "${ignoreBranchNameOrRules}" ]; then
+    branchNames=$(sh $qbase_select_stings_by_rules_scriptPath  -originStrings "${branchNames}" -patternsString "${ignoreBranchNameOrRules}" -returnIsMatch "false")
+    printf "%s" "${branchNames}"
     exit 1
 fi
 
