@@ -2,9 +2,9 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-06-07 16:03:56
- # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-19 22:21:22
- # @Description: 测试获取在指定日期范围内有提交记录的分支
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-11-24 11:47:10
+ # @Description: 测试从分支名中筛选符合条件的分支信息(含修改情况)
  # @使用示例: 
 ### 
 
@@ -22,7 +22,7 @@ Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
 CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
 
-qbase_get_all_remote_branch_after_date_scriptPath=${CategoryFun_HomeDir_Absolute}/get_all_remote_branch_after_date.sh
+qbase_select_branch_byNames_scriptPath=${CategoryFun_HomeDir_Absolute}/select_branch_byNames.sh
 get_branch_self_detail_info_script_path=${qbase_homedir_abspath}/branchMaps_20_info/get10_branch_self_detail_info.sh
 qbase_get_filePath_mapping_branchName_from_dir_scriptPath=${qbase_homedir_abspath}/branchMaps_10_resouce_get/get_filePath_mapping_branchName_from_dir.sh
 BranceMaps_From_Directory_PATH="${qbase_homedir_abspath}/branchMaps_10_resouce_get/example/featureBrances"
@@ -77,22 +77,27 @@ function test_getSingleBranchLog() {
 
 log_title "1"
 # 获取远程分支列表
-# branches=$(git branch -r)
-branches=$(git branch -r)
+# branchNames=$(git branch -r)
+branchNames=$(git branch -r)
 # currentBranchResult=$(git branch --show-current) # 获取当前分支
-# branches=${currentBranchResult}
+# branchNames=${currentBranchResult}
 start_date="2023-08-01"
 end_date="2023-09-01"
-# echo "${YELLOW}正在执行测试命令(获取在指定日期范围内有提交记录的分支)：《 sh ${qbase_get_all_remote_branch_after_date_scriptPath} -branches \"${branches}\" -startDate \"${start_date}\" -endDate \"${end_date}\" ${YELLOW}》${NC}"
-all_branches_string=$(sh ${qbase_get_all_remote_branch_after_date_scriptPath} -branches "${branches}" -startDate "${start_date}" -endDate "${end_date}")
+# echo "${YELLOW}正在执行测试命令(获取在指定日期范围内有提交记录的分支)：《 sh ${qbase_select_branch_byNames_scriptPath} -branchNames \"${branchNames}\" -startDate \"${start_date}\" -endDate \"${end_date}\" ${YELLOW}》${NC}"
+branchGitInfoString=$(sh ${qbase_select_branch_byNames_scriptPath} -branchNames "${branchNames}" -startDate "${start_date}" -endDate "${end_date}")
 if [ $? != 0 ]; then
-    echo "$all_branches_string" # 此时输出的值是错误信息
+    echo "$branchGitInfoString" # 此时输出的值是错误信息
     exit 1
 fi
-allBranchCount=$(echo "$all_branches_string" | jq -r 'length')
+echo "所有分支的匹配和不匹配结果如下:"
+printf "%s\n" "${branchGitInfoString}" | jq "."
+matchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".matchs")
+unmatchBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".unmatchs")
+
+allBranchCount=$(echo "$matchBranchGitInfoString" | jq -r 'length')
 for((i=0;i<allBranchCount;i++));
 do
-    iBranchJsonString=$(echo "$all_branches_string" | jq -r ".[$i]")
+    iBranchJsonString=$(echo "$matchBranchGitInfoString" | jq -r ".[$i]")
 
     branch_name=$(echo "$iBranchJsonString" | jq -r '.branch_name')
     commit_count=$(echo "$iBranchJsonString" | jq -r '.commit_count')
@@ -120,14 +125,14 @@ exit 1
 
 
 
-result=$(echo "${all_branches_string}" | jq '.')
+result=$(echo "${matchBranchGitInfoString}" | jq '.')
 
 
 # printf "All Branches:\n%s\n\n" "$result"
 
 # 使用 jq 进行筛选，获取 commit_count 不为 0 的分支信息
-exsitCommit_branchJsonStrings=$(printf "%s" "${all_branches_string}" | jq '. | map(select(.commit_count != 0))')
-noCommit_branchJsonStrings=$(printf "%s" "${all_branches_string}" | jq '. | map(select(.commit_count == 0))')
+exsitCommit_branchJsonStrings=$(printf "%s" "${matchBranchGitInfoString}" | jq '. | map(select(.commit_count != 0))')
+noCommit_branchJsonStrings=$(printf "%s" "${matchBranchGitInfoString}" | jq '. | map(select(.commit_count == 0))')
 exsitCommit_branchCount=$(echo "$exsitCommit_branchJsonStrings" | jq -r 'length')
 noCommit_branchCount=$(echo "$noCommit_branchJsonStrings" | jq -r 'length')
 

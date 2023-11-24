@@ -229,8 +229,8 @@
                 },
                 {
                     "key": "getBranchJsonInfo_after_date",
-                    "des": "获取指定分组在指定日期范围内的分支情况(含修改情况)",
-                    "rel_path": "./branch/get_all_remote_branch_after_date.sh",
+                    "des": "从分支名中筛选符合条件的分支信息(含修改情况)",
+                    "rel_path": "./branch/select_branch_byNames.sh",
                     "example": "sh ./xx.sh -branches \"${branches}\" -startDate \"${start_date}\" -endDate \"${end_date}\""
                 }
             ]
