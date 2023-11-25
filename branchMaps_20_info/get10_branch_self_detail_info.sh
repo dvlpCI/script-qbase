@@ -247,6 +247,7 @@ do
         -showName|--show-branchName) showBranchName=$2; shift 2;;
         -showTime|--show-branchTimeLog) showBranchTimeLog=$2; shift 2;;
         -showAt|--show-branchAtLog) showBranchAtLog=$2; shift 2;;
+        -shouldShowSpendHours|--should-show-spend-hours) shouldShowSpendHours=$2; shift 2;;
         -shouldMD|--should-markdown) shouldMarkdown=$2; shift 2;;
         -resultSaveToJsonF|--result-save-to-json-file-path) RESULT_SALE_TO_JSON_FILE_PATH=$2; shift 2;; # 为简化换行符的保真(而不是显示成换行,导致后面计算数组个数麻烦),将结果保存在的JSON文件
         -resultArrayKey|--result-array-save-by-key) RESULT_ARRAY_SALE_BY_KEY=$2; shift 2;;   # 数组结果,用什么key保存到上述文件
@@ -304,7 +305,7 @@ debug_log "✅哈哈哈 2②:${branchName}"
 
 # ③分支描述 {name:xxx,outline:yyy} ,并添加(而不是覆盖)保存到指定文件的指定key中
 getSingleBranchDescription_scriptPath=${CurCategoryFun_HomeDir_Absolute}/get10_branch_self_detail_info_outline.sh
-des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
+des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" -shouldShowSpendHours "${shouldShowSpendHours}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
 if [ $? != 0 ]; then
     exit_script
 fi 

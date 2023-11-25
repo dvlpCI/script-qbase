@@ -100,6 +100,7 @@ do
         -showName|--show-branchName) showBranchName=$2; shift 2;;
         -showTime|--show-branchTimeLog) showBranchTimeLog=$2; shift 2;; # 时间显示方式(all、only_last、none)
         -showAt|--show-branchAtLog) showBranchAtLog=$2; shift 2;;
+        -shouldShowSpendHours|--should-show-spend-hours) shouldShowSpendHours=$2; shift 2;;
         -showTable|--show-branchTable) showBranchTable=$2; shift 2;;
         -shouldMD|--should-markdown) shouldMarkdown=$2; shift 2;;
         -resultSaveToJsonF|--result-save-to-json-file-path) RESULT_SALE_TO_JSON_FILE_PATH=$2; shift 2;; # 为简化换行符的保真(而不是显示成换行,导致后面计算数组个数麻烦),将结果保存在的JSON文件
@@ -149,8 +150,8 @@ branchCount=$(echo ${branchMapArray} | ${JQ_EXEC} -r ".|length")
 for ((logBranchIndex=0;logBranchIndex<branchCount;logBranchIndex++)) # 注意📢:取名logBranchIndex，而不用i避免被getSingleBranchLog中的getSingleBranchDescription的i给影响了
 do
     iBranchMap=$(echo ${branchMapArray} | ${JQ_EXEC} -r ".[$((logBranchIndex))]") # -r 去除字符串引号
-    debug_log "${YELLOW}正在执行命令(获取单分支信息,并添加(而不是覆盖)保存到 ${RESULT_SALE_TO_JSON_FILE_PATH} 文件的 ${RESULT_BRANCH_ARRAY_SALE_BY_KEY} 中)：《 sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" 》${NC}"
-    iBranchLog=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
+    debug_log "${YELLOW}正在执行命令(获取单分支信息,并添加(而不是覆盖)保存到 ${RESULT_SALE_TO_JSON_FILE_PATH} 文件的 ${RESULT_BRANCH_ARRAY_SALE_BY_KEY} 中)：《 sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldShowSpendHours \"${shouldShowSpendHours}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" 》${NC}"
+    iBranchLog=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldShowSpendHours "${shouldShowSpendHours}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
     if [ $? != 0 ]; then
         echo "${RED}您的${BLUE} ${branchMapsInJsonFile} ${RED}文件出错了，请检查。出错信息为：${NC} ${iBranchLog}" # 此时此值为错误信息
         exit 1

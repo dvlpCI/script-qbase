@@ -25,7 +25,7 @@ fi
 weekSpendJsonString=$(echo "${outlineJsonString}" | jq -r ".weekSpend")
 if [ -z "${weekSpendJsonString}" ] || [ "${weekSpendJsonString}" == "null" ]; then
     echo "0"
-    exit
+    exit 1
 fi
 # echo "您的耗时情况如下: ${weekSpendJsonString}"
 

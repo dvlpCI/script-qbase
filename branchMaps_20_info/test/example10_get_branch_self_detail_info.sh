@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-25 02:04:22
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-26 01:44:16
+ # @LastEditTime: 2023-11-26 02:12:19
  # @FilePath: example10_get_branch_self_detail_info.sh
  # @Description: 测试分支本身的详情信息
 ### 
@@ -68,11 +68,12 @@ function test_getSingleBranchLog() {
     showBranchAtLog='true'
     showBranchTable='false' # 通知也暂时都不显示
     showCategoryName='true' # 通知时候显示
+    shouldShowSpendHours="true"
     RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
-    # sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}"
+    # sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldShowSpendHours \"${shouldShowSpendHours}\" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}"
     # exit
-    # echo "${YELLOW}正在执行命令(获取分支自身的详细信息):《 ${BLUE}sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" ${YELLOW}》${NC}"
-    Normal_BRANCH_LOG_STRING_VALUE=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
+    # echo "${YELLOW}正在执行命令(获取分支自身的详细信息):《 ${BLUE}sh ${get_branch_self_detail_info_script_path} -iBranchMap \"${iBranchMap}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -shouldShowSpendHours \"${shouldShowSpendHours}\" -shouldMD \"${shouldMarkdown}\" -resultSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -resultArrayKey \"${RESULT_BRANCH_ARRAY_SALE_BY_KEY}\" ${YELLOW}》${NC}"
+    Normal_BRANCH_LOG_STRING_VALUE=$(sh ${get_branch_self_detail_info_script_path} -iBranchMap "${iBranchMap}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -shouldShowSpendHours "${shouldShowSpendHours}" -shouldMD "${shouldMarkdown}" -resultSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}" -resultArrayKey "${RESULT_BRANCH_ARRAY_SALE_BY_KEY}")
     # exit
     # Normal_BRANCH_LOG_STRING_VALUE="哈哈"
     # Normal_BRANCH_LOG_STRING_VALUE="❓【33天<font color=warning>@test1</font>】<font color=warning>dev_login_err</font>:<font color=comment>[02.09已提测]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=warning>①登录失败错误提示</font>"
@@ -106,20 +107,21 @@ outlineJsonString=$(printf "%s" "${iBranchMap}" | jq -r ".outlines[0]")
 # echo "========${outlineJsonString}"
 weekSpendHour=$(sh "$getOutlineSpend_scriptPath" -outline "${outlineJsonString}")
 if [ $? != 0 ]; then
-    exit_script
+    weekSpendHour="?"
 fi 
-echo "${GREEN}恭喜：您该功能的耗时如下:${BLUE} ${weekSpendHour} ${GREEN}。${NC}"
+echo "${GREEN}恭喜：您该功能的耗时如下:${BLUE} ${weekSpendHour}h ${GREEN}。${NC}"
 # exit
 
 
 log_title "2.获取单个分支的描述信息"
 getSingleBranchDescription_scriptPath=${CategoryFun_HomeDir_Absolute}/get10_branch_self_detail_info_outline.sh
 testState="product"
-# sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}"
+shouldShowSpendHours="true"
+# sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" -shouldShowSpendHours "${shouldShowSpendHours}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}"
 # exit
-des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
+des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" -shouldShowSpendHours "${shouldShowSpendHours}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
 if [ $? != 0 ]; then
-    exit_script
+    exit 1
 fi 
 echo "${GREEN}恭喜：您的分支描述信息如下:${NC}"
 echo "${BLUE}${des_info_string}${NC}"

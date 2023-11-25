@@ -39,10 +39,11 @@ while [ -n "$1" ]
 do
     case "$1" in
         -branchMap|--branchMap) branchMap=$2; shift 2;;
+        -testS|--test-state) TEST_STATE=$2; shift 2;;   # 这个分支的当前测试状态(测试中、测试通过显示不同颜色)
+        -shouldShowSpendHours|--should-show-spend-hours) shouldShowSpendHours=$2; shift 2;;
         -shouldMD|--should-markdown) shouldMarkdown=$2; shift 2;;
         -resultSaveToJsonF|--result-save-to-json-file-path) RESULT_BRANCH_SALE_TO_JSON_FILE_PATH=$2; shift 2;; # 为简化换行符的保真(而不是显示成换行,导致后面计算数组个数麻烦),将结果保存在的JSON文件
         -resultArrayKey|--result-array-save-by-key) RESULT_ARRAY_SALE_BY_KEY=$2; shift 2;;   # 数组结果,用什么key保存到上述文件
-        -testS|--test-state) TEST_STATE=$2; shift 2;;   # 这个分支的当前测试状态(测试中、测试通过显示不同颜色)
         --) continue ;;
         *) break ;;
     esac
@@ -113,12 +114,16 @@ if [ -n "${branchOutlinesString}" ]; then
         else
             iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle}"
         fi
-        weekSpendHours=$(sh "$getOutlineSpend_scriptPath" -outline "${iBranchOutline_String}")
-        if [ $? != 0 ]; then
-            weekSpendHours=0
-            # echo "${weekSpendHours}"
+
+        lowercase_shouldShowSpendHours=$(echo "$shouldShowSpendHours" | tr '[:upper:]' '[:lower:]') # 将值转换为小写形式
+        if [ "${lowercase_shouldShowSpendHours}" == "true" ]; then
+            weekSpendHours=$(sh "$getOutlineSpend_scriptPath" -outline "${iBranchOutline_String}")
+            if [ $? != 0 ]; then
+                weekSpendHours="?"
+                # echo "${weekSpendHours}"
+            fi
+            iBranchOutlineLog+="[${weekSpendHours}h]"
         fi
-        iBranchOutlineLog+="[${weekSpendHours}]"
         #echo "$((branchOutlineIndex+1)) iBranchOutlineLog=${iBranchOutlineLog}"
         iBranchOutlineLog=$(markdown_fontColor "${shouldMarkdown}" "${iBranchOutlineLog}" "${markdownFontColor}")
 
