@@ -6,20 +6,15 @@ sh ./get10_branch_self_detail_info.sh -commonFunHomeDir "${CommonFun_HomeDir_Abs
 !
 
 
-# 当前【shell脚本】的工作目录
-# $PWD代表获取当前路径，当cd后，$PWD也会跟着更新到新的cd路径。这个和在终端操作是一样的道理的
-CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
-#echo "CurrentDIR_Script_Absolute=${CurrentDIR_Script_Absolute}"
-#CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute}/..
-CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute%/*} # 使用此方法可以避免路径上有..
-# CommonFun_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
-# echo "CommonFun_HomeDir_Absolute=${CommonFun_HomeDir_Absolute} ✅"
+CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
 
 
-qbase_function_log_msg_script_path="${CommonFun_HomeDir_Absolute}/log/function_log_msg.sh"
+
+qbase_function_log_msg_script_path="${qbase_homedir_abspath}/log/function_log_msg.sh"
 source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultValueToJsonFile
 
-markdownFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/markdown/function_markdown.sh"
+markdownFun_script_file_Absolute="${qbase_homedir_abspath}/markdown/function_markdown.sh"
 if [ ! -f "${markdownFun_script_file_Absolute}" ];then
     echo "❌Error:您的处理markdown的脚本文件 ${markdownFun_script_file_Absolute} 不存在，请检查！"
 fi
@@ -82,119 +77,6 @@ function getBranchPersonnelInformation() {
 
 
 
-# 获取指定单个branch的分支概要信息 {name:xxx,outline:yyy},并添加到指定的key中,而不是覆盖（测试此方法，请使用 tssh_branch_detail_info_result.sh 中已实现的单例测试)
-function getSingleBranchDescription() {
-    #echo "$FUNCNAME"
-    while [ -n "$1" ]
-    do
-        case "$1" in
-            -branchMap|--branchMap) branchMap=$2; shift 2;;
-            -shouldMD|--should-markdown) shouldMarkdown=$2; shift 2;;
-            -resultSaveToJsonF|--result-save-to-json-file-path) RESULT_BRANCH_SALE_TO_JSON_FILE_PATH=$2; shift 2;; # 为简化换行符的保真(而不是显示成换行,导致后面计算数组个数麻烦),将结果保存在的JSON文件
-            -resultArrayKey|--result-array-save-by-key) RESULT_ARRAY_SALE_BY_KEY=$2; shift 2;;   # 数组结果,用什么key保存到上述文件
-            -testS|--test-state) TEST_STATE=$2; shift 2;;   # 这个分支的当前测试状态(测试中、测试通过显示不同颜色)
-            --) break ;;
-            *) echo $1,$2; break ;;
-        esac
-    done
-
-
-    if [ "${TEST_STATE}" == 'test_prefect' ]; then
-        markdownFontColor="info"
-    elif [ "${TEST_STATE}" == 'test_pass' ]; then
-        markdownFontColor="info"
-    elif [ "${TEST_STATE}" == 'test_submit' ]; then
-        markdownFontColor="warning"
-    else
-        markdownFontColor="warning"
-    fi
-    
-    branchDesResult=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".des") # -r 去除字符串引号
-    branchOutlinesString=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".outlines") # -r 去除字符串引号
-    if [ -z "${branchDesResult}" ] && [ -z "${branchOutlinesString}" ]; then
-        Normal_BRANCH_DESCRIPT_STRING_VALUE=""
-        Escape_BRANCH_DESCRIPT_STRING_VALUE="[]"
-        echo "------------分支描述和概要都是空-------------\n${branchMap}"
-        return 0
-    fi
-    
-    #echo "------------分支描述或概要至少一个有值-------------"
-    Normal_BRANCH_DESCRIPT_STRING_VALUE=''
-    Escape_BRANCH_DESCRIPT_STRING_VALUE="["
-    # 🖍：非常重要的注释(一定不要删)：经在json_string下的test里的测试脚本 test_sh_json_string.sh 中，对数组元素进行 markdown，应该在遍历markdown的过程中就遍历转义并拼接的字符串，而不能在遍历markdown的结束后，使用新的markdown元素组成的数组来遍历转义并拼接。
-    if [ -n "${branchDesResult}" ] && [ "${branchDesResult}" != "详见outlines" ]; then
-        branchDesResult=$(markdown_fontColor "${shouldMarkdown}" "${branchDesResult}" "${markdownFontColor}")
-        Normal_BRANCH_DESCRIPT_STRING_VALUE+="${branchDesResult}\n" # 字符串拼接，不用转义
-        Escape_BRANCH_DESCRIPT_STRING_VALUE+="\"${branchDesResult}\","  # 要转义
-    fi
-    
-    if [ -n "${branchOutlinesString}" ]; then
-        branchOutlinesCount=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".outlines|length")
-        #echo "branchOutlinesCount=${branchOutlinesCount}"
-        
-        outlineIndexs="①,②,③,④,⑤,⑥,⑦,⑧,⑨,⑩"
-        outlineIndexArray=(${outlineIndexs//,/ }) # 使用,替换空格，并形成数组
-        #echo "***********************outlineIndexArray=${outlineIndexArray[*]}"
-        
-        for ((branchOutlineIndex=0;branchOutlineIndex<branchOutlinesCount;branchOutlineIndex++))
-        do
-            iBranchOutline_String=$(echo ${iBranchMap} | ${JQ_EXEC} -r ".outlines[$branchOutlineIndex]")
-            #echo "$((branchOutlineIndex+1)) iBranchOutline_String=${iBranchOutline_String}"
-            
-            if [ $branchOutlineIndex -lt ${#outlineIndexArray[@]} ]; then
-                iBranchOutlineIndex=${outlineIndexArray[branchOutlineIndex]}
-            else
-                iBranchOutlineIndex="⑩"
-            fi
-            iBranchOutlineTitle=$(echo ${iBranchOutline_String} | ${JQ_EXEC} -r ".title")
-            iBranchOutlineUrl=$(echo ${iBranchOutline_String} | ${JQ_EXEC} -r ".url")
-            if [ -n "${iBranchOutlineUrl}" ] && [ "${iBranchOutlineUrl}" != "null" ]; then
-                if [ "${shouldMarkdown}" == "true" ]; then
-                    iBranchOutlineLog="${iBranchOutlineIndex}[${iBranchOutlineTitle}](${iBranchOutlineUrl})"
-                else
-                    iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle} ${iBranchOutlineUrl}"
-                fi
-            else
-                iBranchOutlineLog="${iBranchOutlineIndex}${iBranchOutlineTitle}"
-            fi
-            #echo "$((branchOutlineIndex+1)) iBranchOutlineLog=${iBranchOutlineLog}"
-            iBranchOutlineLog=$(markdown_fontColor "${shouldMarkdown}" "${iBranchOutlineLog}" "${markdownFontColor}")
-
-            # 重点，因为\n没法直接保真，所以要转义下(已在test_sh_brances_info_log.sh中测试过)
-            Normal_BRANCH_DESCRIPT_STRING_VALUE+="${iBranchOutlineLog}\n" # 字符串拼接，不用转义
-            Escape_BRANCH_DESCRIPT_STRING_VALUE+="\"${iBranchOutlineLog}\","  # 要转义
-        done
-    fi
-    
-    # 去除最后两个字符,即换行符"\n"
-    if [ ${#Normal_BRANCH_DESCRIPT_STRING_VALUE} -gt 1 ]; then 
-        Normal_BRANCH_DESCRIPT_STRING_VALUE=${Normal_BRANCH_DESCRIPT_STRING_VALUE: 0:${#Normal_BRANCH_DESCRIPT_STRING_VALUE}-2}
-    fi
-
-#     # 去除最后一个字符,即逗号","
-#     if [ -n "${Escape_BRANCH_DESCRIPT_STRING_VALUE}" ] && [ "${Escape_BRANCH_DESCRIPT_STRING_VALUE}" != "[" ]; then
-#         Escape_BRANCH_DESCRIPT_STRING_VALUE=${Escape_BRANCH_DESCRIPT_STRING_VALUE: 0:${#Escape_BRANCH_DESCRIPT_STRING_VALUE}-1}
-#     fi
-#     Escape_BRANCH_DESCRIPT_STRING_VALUE+="]"
-    
-#     #echo "=======当前分支的描述如下：\n无转义Normal_BRANCH_DESCRIPT_STRING_VALUE=${Normal_BRANCH_DESCRIPT_STRING_VALUE}\n有转义Escape_BRANCH_DESCRIPT_STRING_VALUE=${Escape_BRANCH_DESCRIPT_STRING_VALUE}"
-
-
-#     if [ -f "${RESULT_BRANCH_SALE_TO_JSON_FILE_PATH}" ] && [ -n "${Escape_BRANCH_DESCRIPT_STRING_VALUE}" ]; then
-# #        BRANCH_OUTLINES_LOG_JSON="{\"${branchName}\": ${Escape_BRANCH_DESCRIPT_STRING_VALUE}}"
-#         BRANCH_OUTLINES_ELEMENT_LOG_JSON="{\"name\": \"${branchName}\", \"outline\": ${Escape_BRANCH_DESCRIPT_STRING_VALUE}}"
-#         BRANCH_OUTLINES_LOG_JSON="[${BRANCH_OUTLINES_ELEMENT_LOG_JSON}]"
-#         debug_log "正在执行命令(测试分支信息的保存)：《 sh ${JsonUpdateFun_script_file_Absolute} -f \"${RESULT_BRANCH_SALE_TO_JSON_FILE_PATH}\" -k \"${RESULT_ARRAY_SALE_BY_KEY}\" -v \"${BRANCH_OUTLINES_LOG_JSON}\" --skip-value-check \"true\" 》"
-#         sh ${JsonUpdateFun_script_file_Absolute} -f "${RESULT_BRANCH_SALE_TO_JSON_FILE_PATH}" -k "${RESULT_ARRAY_SALE_BY_KEY}" -v "${BRANCH_OUTLINES_LOG_JSON}" --skip-value-check "true"
-#         if [ $? != 0 ]; then
-#             return 1
-#         fi
-#         if [ "${isRelease}" == true ]; then
-#             echo "恭喜:最后获取(.branch此时更新为)markdown:${shouldMarkdown}的 ${PURPLE}.${RESULT_ARRAY_SALE_BY_KEY} ${GREEN}值(在 ${BLUE}${RESULT_BRANCH_SALE_TO_JSON_FILE_PATH} ${GREEN}文件中)如下:"
-#             cat ${RESULT_BRANCH_SALE_TO_JSON_FILE_PATH} | jq ".${RESULT_ARRAY_SALE_BY_KEY}" | jq '.'
-#         fi
-#     fi
-}
 
 
 function getSingleBranchLog_flag() {
@@ -421,11 +303,12 @@ branchName=$(markdown_fontColor "${shouldMarkdown}" "${branchName}" "${markdownF
 debug_log "✅哈哈哈 2②:${branchName}"
 
 # ③分支描述 {name:xxx,outline:yyy} ,并添加(而不是覆盖)保存到指定文件的指定key中
-getSingleBranchDescription -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}"
+getSingleBranchDescription_scriptPath=${CurCategoryFun_HomeDir_Absolute}/get10_branch_self_detail_info_outline.sh
+des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
 if [ $? != 0 ]; then
     exit_script
 fi 
-des_info_string="${Normal_BRANCH_DESCRIPT_STRING_VALUE} " # 添加空格，避免分支描述中有网页地址，导致以text输出的时候，地址的其他内容被当成地址的一部分
+des_info_string+=" " # 添加空格，避免分支描述中有网页地址，导致以text输出的时候，地址的其他内容被当成地址的一部分
 # debug_log "✅哈哈哈 2③:${des_info_string}"
 # printf "%s" "${des_info_string}"
 # logResultObjectStringToJsonFile "${des_info_string}"

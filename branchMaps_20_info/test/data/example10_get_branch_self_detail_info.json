@@ -1,0 +1,40 @@
+{
+  "create_time": "02.09",
+  "submit_test_time": "null",
+  "pass_test_time": "null",
+  "merger_pre_time": "null",
+  "type": "hotfix",
+  "name": "dev_login_err",
+  "des": "详见outlines",
+  "outlines": [
+    {
+      "url": "https://www.baidu.com/",
+      "title": "功能点一"
+    },
+    {
+      "url": "https://www.baidu.com/",
+      "title": "功能点二",
+      "weekSpend": [
+        {
+          "range_time": "2023.11.20 - 2023.11.26",
+          "hour": 4
+        }
+      ]
+    },
+    {
+      "weekSpend": [
+        {
+          "range_time": "2023.11.20 - 2023.11.26",
+          "hour": 12
+        }
+      ],
+      "title": "修复点一"
+    }
+  ],
+  "answer": {
+    "name": "producter1"
+  },
+  "tester": {
+    "name": "test1"
+  }
+}

@@ -3,8 +3,8 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-25 02:04:22
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-09-09 22:21:08
- # @FilePath: /AutoPackage-CommitInfo/bulidScriptCommon/brances_info/brances_info_log/test/tssh_branch_detail_info_result.sh
+ # @LastEditTime: 2023-11-26 01:44:16
+ # @FilePath: example10_get_branch_self_detail_info.sh
  # @Description: 测试分支本身的详情信息
 ### 
 
@@ -26,35 +26,28 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 Example_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
 CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
 qbase_homedir_abspath=${CategoryFun_HomeDir_Absolute%/*}    # 使用 %/* 方法可以避免路径上有..
-CommonFun_HomeDir_Absolute=${CategoryFun_HomeDir_Absolute%/*}
 
-# qscript_path_get_filepath="${CommonFun_HomeDir_Absolute}/qscript_path_get.sh"
+# qscript_path_get_filepath="${qbase_homedir_abspath}/qscript_path_get.sh"
 # qbase_function_log_msg_script_path="$(sh ${qscript_path_get_filepath} qbase function_log_msg)"
-qbase_function_log_msg_script_path="${CommonFun_HomeDir_Absolute}/log/function_log_msg.sh"
+qbase_function_log_msg_script_path="${qbase_homedir_abspath}/log/function_log_msg.sh"
 source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFile 、 logResultObjectStringToJsonFile
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
-Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_branch_info.json"
-TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_result.json"
+Develop_Branch_FILE_PATH="${Example_HomeDir_Absolute}/data/example10_get_branch_self_detail_info.json"
+TEST_DATA_RESULT_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result.json"
 chmod +rw "${TEST_DATA_RESULT_FILE_PATH}" # 增加读写权限
 
 
-JsonUpdateFun_script_file_Absolute="${CommonFun_HomeDir_Absolute}/value_update_in_file/update_json_file.sh"
+JsonUpdateFun_script_file_Absolute="${qbase_homedir_abspath}/value_update_in_file/update_json_file.sh"
 if [ ! -f "${JsonUpdateFun_script_file_Absolute}" ];then
     echo "❌Error:您的处理更新json文件内从的脚本文件 ${JsonUpdateFun_script_file_Absolute} 不存在，请检查！"
     exit 1
 fi
-get_branch_self_detail_info_script_path=${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get10_branch_self_detail_info.sh
+get_branch_self_detail_info_script_path=${qbase_homedir_abspath}/branchMaps_20_info/get10_branch_self_detail_info.sh
 
 
 
-buildContainBranchMaps=$(cat ${Develop_Branchs_FILE_PATH} | jq -r '.package_merger_branchs') # -r 去除字符串引号
-if [ -z "${buildContainBranchMaps}" ]; then
-    echo "ERROR: 没有获取到分支信息，请检查文件 ${Develop_Branchs_FILE_PATH} 的 .package_merger_branchs 字段"
-    exit 1
-fi
-logBranchIndex=0
-iBranchMap=$(echo "${buildContainBranchMaps}" | jq -r ".[$((logBranchIndex))]") # -r 去除字符串引号
+iBranchMap=$(cat ${Develop_Branch_FILE_PATH} | jq -r '.') # -r 去除字符串引号
 branchName=$(echo ${iBranchMap} | jq -r ".name") # -r 去除字符串引号
 # echo "----------------------测试的数据buildContainBranchMaps=${buildContainBranchMaps}"
 # echo "----------------------测试的数据iBranchMap=${iBranchMap}"
@@ -107,11 +100,36 @@ function test_getSingleBranchLog() {
 }
 
 
+log_title "1.获取分支功能点的耗时"
+getOutlineSpend_scriptPath=${CategoryFun_HomeDir_Absolute}/get10_branch_self_detail_info_outline_spend.sh
+outlineJsonString=$(printf "%s" "${iBranchMap}" | jq -r ".outlines[0]")
+# echo "========${outlineJsonString}"
+weekSpendHour=$(sh "$getOutlineSpend_scriptPath" -outline "${outlineJsonString}")
+if [ $? != 0 ]; then
+    exit_script
+fi 
+echo "${GREEN}恭喜：您该功能的耗时如下:${BLUE} ${weekSpendHour} ${GREEN}。${NC}"
+# exit
 
 
-log_title "1.获取单个分支信息, text 形式"
-test_getSingleBranchLog "false"
+log_title "2.获取单个分支的描述信息"
+getSingleBranchDescription_scriptPath=${CategoryFun_HomeDir_Absolute}/get10_branch_self_detail_info_outline.sh
+testState="product"
+# sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}"
+# exit
+des_info_string=$(sh "$getSingleBranchDescription_scriptPath" -branchMap "${iBranchMap}" --test-state "${testState}" --should-markdown "${shouldMarkdown}" -resultSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -resultArrayKey "${RESULT_ARRAY_SALE_BY_KEY}")
+if [ $? != 0 ]; then
+    exit_script
+fi 
+echo "${GREEN}恭喜：您的分支描述信息如下:${NC}"
+echo "${BLUE}${des_info_string}${NC}"
+# exit
 
 echo "\n\n"
-log_title "2.获取单个分支信息, text 形式"
+log_title "3.获取单个分支信息, text 形式"
+test_getSingleBranchLog "false"
+
+
+echo "\n\n"
+log_title "4.获取单个分支信息, text 形式"
 test_getSingleBranchLog "true"
