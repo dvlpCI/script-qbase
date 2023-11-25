@@ -222,29 +222,30 @@ function checkBranchMapOutlineSpends() {
         # echo "iOutline=${iOutline}"
         iOutline_title=$(echo "${iOutline}" | jq -r '.title')
         # echo "iOutline_title=${iOutline_title}"
-        iOutline_spends=$(echo "${iOutline}" | jq -r '.weekSpendHours')
+        iOutline_spends=$(echo "${iOutline}" | jq -r '.weekSpend')
         iOutline_spendCount=$(echo "${iOutline_spends}" | jq -r '. | length')
         if [ -z "${iOutline_spends}" ] || [ "${iOutline_spends}" == "null" ]; then
             iOutlineErrorMessage="\"${iOutline_title}\"在这${create_time_to_now_weekCount}周里各消耗时长都未填写，请为其补上 weekSpendHours 属性及其数组值"
             spendErrorMessageArray[${#spendErrorMessageArray[@]}]=${iOutlineErrorMessage}
             continue
         fi
-        iOutline_spendsMessage=$(echo "${iOutline_spends}" | jq -r '. | @json')
-        iOutlineErrorMessage="\"${iOutline_title}\"在这${create_time_to_now_weekCount}周里各消耗时长分别是${iOutline_spendsMessage},数据个数不对"
-        # 比较 iOutline_spendCount 和 create_time_to_now_weekCount
-        if [ "$iOutline_spendCount" -ne $create_time_to_now_weekCount ]; then
-            spendErrorMessageArray[${#spendErrorMessageArray[@]}]=${iOutlineErrorMessage}
-            continue
-        fi
 
-        for((j=0;j<iOutline_spendCount;j++));
-        do
-            iOutline_spendHour=$(echo "${iOutline_spends}" | jq -r '.['$j']')
-            # echo "iOutline_spendHour=${iOutline_spendHour}"
-            if [ "${iOutline_spendHour}" -gt 40 ]; then
-                spendErrorMessageArray[${#spendErrorMessageArray[@]}]=${iOutlineErrorMessage}
-            fi
-        done
+        # 有填写就行，不用每周都填，因为可能有个需求是前一个月的，后面停了一段时间，现在才又开始，所以以下代码注释掉
+        # iOutline_spendsMessage=$(echo "${iOutline_spends}" | jq -r '. | @json')
+        # # 比较 iOutline_spendCount 和 create_time_to_now_weekCount
+        # if [ "$iOutline_spendCount" -ne $create_time_to_now_weekCount ]; then
+        #     spendErrorMessageArray[${#spendErrorMessageArray[@]}]="\"${iOutline_title}\"在这${create_time_to_now_weekCount}周里各消耗时长分别是${iOutline_spendsMessage},数据个数不对"
+        #     continue
+        # fi
+
+        # for((j=0;j<iOutline_spendCount;j++));
+        # do
+        #     iOutline_spendHour=$(echo "${iOutline_spends}" | jq -r '.['$j']')
+        #     # echo "iOutline_spendHour=${iOutline_spendHour}"
+        #     if [ "${iOutline_spendHour}" -gt 40 ]; then
+        #         spendErrorMessageArray[${#spendErrorMessageArray[@]}]="\"${iOutline_title}\"在这${create_time_to_now_weekCount}周里您的消耗时长分别是${iOutline_spendsMessage},耗时太长，请留意"
+        #     fi
+        # done
     done
 
     missingSpendOutineCount=${#spendErrorMessageArray[@]}
