@@ -92,39 +92,39 @@ function debug_log() {
 # shell 参数具名化
 while [ -n "$1" ]
 do
-        case "$1" in
-                -ipa|--ipa-file-path) ipa_file_path=$2; shift 2;;
-                -updateDesString|--updateDesString) updateDesString=$2; shift 2;; # 上传安装包时候附带的说明文案，优先使用此值。
-                -updateDesFromFilePath|--updateDesFromFilePath) updateDesFromFilePath=$2; shift 2;; # 说明文案使用来源于哪个文件
-                -updateDesFromFileKey|--updateDesFromFileKey) updateDesFromFileKey=$2; shift 2;; # 说明文案使用来源于文件的哪个key
-                
+    case "$1" in
+        -ipa|--ipa-file-path) ipa_file_path=$2; shift 2;;
+        -updateDesString|--updateDesString) updateDesString=$2; shift 2;; # 上传安装包时候附带的说明文案，优先使用此值。
+        -updateDesFromFilePath|--updateDesFromFilePath) updateDesFromFilePath=$2; shift 2;; # 说明文案使用来源于哪个文件
+        -updateDesFromFileKey|--updateDesFromFileKey) updateDesFromFileKey=$2; shift 2;; # 说明文案使用来源于文件的哪个key
+        
 
-                -pgyerHelpOwner|--pgyer-owner) pgyerOwner=$2; shift 2;; # 非必传值
-                -pgyerHelpChannelKey|--pgyer-ChannelKey) pgyerChannelKey=$2; shift 2;; # 非必传值
-                -pgyerApiKey|--pgyer-api-key) pgyerApiKey=$2; shift 2;;
-                -pgyerChannelShortcut|--pgyer-channel) pgyerChannelShortcut=$2; shift 2;;
-				-pgyerShouldUploadFast|--should-upload-fast) pgyerShouldUploadFast=$2; shift 2;;
+        -pgyerHelpOwner|--pgyer-owner) pgyerOwner=$2; shift 2;; # 非必传值
+        -pgyerHelpChannelKey|--pgyer-ChannelKey) pgyerChannelKey=$2; shift 2;; # 非必传值
+        -pgyerApiKey|--pgyer-api-key) pgyerApiKey=$2; shift 2;;
+        -pgyerChannelShortcut|--pgyer-channel) pgyerChannelShortcut=$2; shift 2;;
+        -pgyerShouldUploadFast|--should-upload-fast) pgyerShouldUploadFast=$2; shift 2;;
 
 
-                -CosREGION|--Cos-CosUploadToREGION) CosUploadToREGION=$2; shift 2;; # ap-shanghai
-                -CosBUCKETName|--Cos-CosUploadToBUCKETName) CosUploadToBUCKETName=$2; shift 2;; # prod-xhw-image-1302324914
-                -CosBUCKETDir|--Cos-UploadToRelDir) CosUploadToBUCKETDir=$2; shift 2;; # 文件上传到桶的哪个相对目录下 mcms/download/app/
-                -CosResultHostUrl|--Cos-ResultHostUrl) CosResultHostUrl=$2; shift 2;; # 上传结果对应的地址前缀（最后完整url，使用该前缀+上述目录拼接而成）
+        -CosREGION|--Cos-CosUploadToREGION) CosUploadToREGION=$2; shift 2;; # ap-shanghai
+        -CosBUCKETName|--Cos-CosUploadToBUCKETName) CosUploadToBUCKETName=$2; shift 2;; # prod-xhw-image-1302324914
+        -CosBUCKETDir|--Cos-UploadToRelDir) CosUploadToBUCKETDir=$2; shift 2;; # 文件上传到桶的哪个相对目录下 mcms/download/app/
+        -CosResultHostUrl|--Cos-ResultHostUrl) CosResultHostUrl=$2; shift 2;; # 上传结果对应的地址前缀（最后完整url，使用该前缀+上述目录拼接而成）
 
-                -TransporterUserName|--Transporter-username) Transporter_USERNAME=$2; shift 2;; # 用户账号
-                -TransporterPassword|--Transporter-password) Transporter_PASSWORD=$2; shift 2;; # 使用的是秘钥，形如 "djjj-bjkz-rghr-aish"
+        -TransporterUserName|--Transporter-username) Transporter_USERNAME=$2; shift 2;; # 用户账号
+        -TransporterPassword|--Transporter-password) Transporter_PASSWORD=$2; shift 2;; # 使用的是秘钥，形如 "djjj-bjkz-rghr-aish"
 
-                -LogPostToRobotUrl|--Log-PostTo-RobotUrl) LogPostToRobotUrl=$2; shift 2;; # 上传过程中的日志发送到哪个机器人
-                -LogPostTextHeader|--Log-Post-TextHeader) LogPostTextHeader=$2; shift 2;; # 上传过程中对日志进行补充的标题
-                --) break ;;
-                *) break ;;
-        esac
+        -LogPostToRobotUrl|--Log-PostTo-RobotUrl) LogPostToRobotUrl=$2; shift 2;; # 上传过程中的日志发送到哪个机器人
+        -LogPostTextHeader|--Log-Post-TextHeader) LogPostTextHeader=$2; shift 2;; # 上传过程中对日志进行补充的标题
+        --) break ;;
+        *) break ;;
+    esac
 done
 
 uploadToAllProcessLog=""
 
 if [ ! -f "${ipa_file_path}" ]; then
-    exit_script_with_response_error_message "Error:要上传的文件 -f 的参数值 ${ipa_file_path} 不能为空，请检查后再上传！"
+    exit_script_with_response_error_message "Error:要上传的安装包文件 -ipa 的参数值 ${ipa_file_path} 不能为空，请检查后再上传！"
 fi
 
 
