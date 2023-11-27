@@ -135,6 +135,7 @@ function get_required_branch_file_paths_from_dir() {
     responseJsonString='{
 
     }'
+    resultBranchFilePaths_ErrorPaths=()
     for ((i=0;i<requestBranchNameCount;i++))
     do
         branchNameFileJsonString='{
@@ -144,6 +145,7 @@ function get_required_branch_file_paths_from_dir() {
         requestBranchName=${requestBranchNameArray[i]}
         branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --arg branchName "$requestBranchName" '. + { "branchName": $branchName }')
 
+        # echo "${YELLOW}正在执行命令（获取分支信息):《${BLUE} sh \"$qbase_get_filePath_mapping_branchName_from_dir_scriptPath\" -requestBranchName \"${requestBranchName}\" -branchMapsFromDir \"${BranceMaps_From_Directory_PATH}\" ${YELLOW}》${NC} "
         mappingBranchName_JsonStrings=$(sh "$qbase_get_filePath_mapping_branchName_from_dir_scriptPath" -requestBranchName "${requestBranchName}" -branchMapsFromDir "${BranceMaps_From_Directory_PATH}")
         if [ $? != 0 ]; then
             mappingBranchName_FilePaths=()

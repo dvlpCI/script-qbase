@@ -45,12 +45,12 @@ function truncate_string() {
 }
 
 if [ -z "${originString}" ]; then
-    echo "${RED}缺少 ${BLUE}-string ${RED}参数，请检查${NC}"
+    echo "${RED} intercept_string 缺少${BLUE} -string ${RED}参数，请检查${NC}"
     exit_script
 fi
 
 if [ -z "${maxLength}" ]; then
-    echo "${RED}缺少 ${BLUE}-maxLength ${RED}参数，请检查${NC}"
+    echo "${RED}缺少${BLUE} -maxLength ${RED}参数，请检查${NC}"
     exit_script
 fi
 

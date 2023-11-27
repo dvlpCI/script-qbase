@@ -46,8 +46,8 @@ if [ $? != 0 ]; then
     echo "${allFileContent_JsonStrings}" #此时此值是错误原因
     exit 1
 fi
-echo "allFileContent_JsonStrings 的值如下:"
-echo "${allFileContent_JsonStrings}" | jq '.'
+# echo "allFileContent_JsonStrings 的值如下:"
+# echo "${allFileContent_JsonStrings}" | jq '.'
 
 
 # jsonStringWhereJsonMappingBranchName=$(printf "%s" "${allFileContent_JsonStrings}" | jq '. | map(select(.name == "'"${inBranchName}"'"))')
@@ -72,7 +72,7 @@ do
         continue
     fi
 
-    if [ -n "${jsonStringWhereJsonMappingBranchName}" ]; then
+    if [ "${jsonStringWhereJsonMappingBranchName}" != "[" ]; then
         jsonStringWhereJsonMappingBranchName+=", "
     fi
     jsonStringWhereJsonMappingBranchName+=${iFileContentJsonString}
