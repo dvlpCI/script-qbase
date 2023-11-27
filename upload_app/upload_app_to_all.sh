@@ -150,8 +150,8 @@ debug_log "ShoudUploadToCos=${ShoudUploadToCos}"
 
 
 ShoudUploadToPgyer=false
-if [ -z "${pgyerApiKey}" ] || [ -z "${pgyerChannelShortcut}" ]; then
-    uploadToAllProcessLog+="温馨提示：您的包不会上传到蒲公英pgyer。（因为您设置用来上传ipa的cos参数有缺失，各值如下: pgyerApiKey=${pgyerApiKey} pgyerChannelShortcut=${pgyerChannelShortcut} )。"
+if [ -z "${pgyerApiKey}" ]; then
+    uploadToAllProcessLog+="温馨提示：您的包不会上传到蒲公英pgyer。因为您缺失将ipa上传到pgyer的必备 pgyerApiKey 参数。(附 apiKey 和 channelShortcut 分别如下: pgyerApiKey=${pgyerApiKey} pgyerChannelShortcut=${pgyerChannelShortcut} )。"
 else
     ShoudUploadToPgyer=true
     if [ -z "${pgyerShouldUploadFast}" ]; then
