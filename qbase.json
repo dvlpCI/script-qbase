@@ -55,6 +55,12 @@
                     "example": "sh xxx.sh -string \"$string3\" -maxLength 30"
                 },
                 {
+                    "des": "检查字符串是否符合某个正则",
+                    "key": "isStringMatchPatterns",
+                    "rel_path": "./foundation/isStringMatchPatterns.sh",
+                    "example": "sh xxx.sh -inputString \"${input_string}\" -patternsString \"${patternsString}\" "
+                },
+                {
                     "des": "中文转拼音(py脚本)",
                     "key": "convert_to_pinyin",
                     "rel_path": "./foundation/convert_to_pinyin.py",
