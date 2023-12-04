@@ -155,6 +155,13 @@ function get_required_branch_file_paths_from_dir() {
             mappingBranchName_FilePaths=()
             branchFiles='[]'
         else
+            # 使用jq验证JSON格式
+            echo "$mappingBranchName_JsonStrings" | jq empty > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                echo "您 get_filePath_mapping_branchName_from_dir 返回的字符串结果不符合JSON格式，请检查 ${mappingBranchName_JsonStrings}"
+                return 1
+            fi
+
             # echo "mappingBranchName_JsonStrings=${mappingBranchName_JsonStrings}"
             mappingBranchName_FilePathsString=$(printf "%s" "${mappingBranchName_JsonStrings}" | jq -r ".[].fileUrl")   # 记得使用-r去除双引号，避免后续路径使用时出错
             # echo "mappingBranchName_FilePathsString=${mappingBranchName_FilePathsString}"
@@ -172,7 +179,7 @@ function get_required_branch_file_paths_from_dir() {
             branchFiles=$(printf "%s\n" "${mappingBranchName_FilePaths[@]}" | jq -R . | jq -s .)
             # branchFiles='["a"]'
         fi
-        # echo "🚗🚗🚗🚗 mappingBranchName_FilePaths 个数 ${#mappingBranchName_FilePaths[@]} ,分别为 ${mappingBranchName_FilePaths}"
+        # echo "🚗🚗🚗🚗 mappingBranchName_FilePaths 个数 ${#mappingBranchName_FilePaths[@]} ,分别为 ${mappingBranchName_FilePaths[*]}"
         # echo "🚗🚗🚗🚗 branchFiles=${branchFiles}"
         branchNameFileJsonString=$(printf "%s" "$branchNameFileJsonString" | jq --argjson branchFiles "$branchFiles" '. + { "branchFiles": $branchFiles }')
         # printf "%s" "$branchNameFileJsonString" | jq -r .

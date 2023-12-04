@@ -66,7 +66,7 @@ do
         echo "${RED}Error❌:获取文件${BLUE} ${branchFileAbsolutePathOrUrl} ${RED}中的 ${BLUE}.name ${RED}失败，其可能不是json格式，请检查并修改或移除，以确保获取分支信息的源文件夹${BLUE} $BranceMaps_From_Directory_PATH ${RED}内的所有json文件都是合规的。${NC}";
         continue
     fi
-    echo "$((i+1)).${branchName}"
+    # echo "$((i+1)).${branchName}"
     # last_field="${mappingName##*/}" # 获取元素的最后一个字段
     if [ "$mappingName" != "$branchName" ]; then
         continue
