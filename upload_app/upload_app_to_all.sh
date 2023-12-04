@@ -226,13 +226,10 @@ function uploadToCos() {
     # https://console.cloud.tencent.com/cos/bucket?bucket=prod-xhw-image-1302324914&region=ap-shanghai&path=%252Fmcms%252Fdownload%252Fapp%252F
     # https://images.xxx.com/mcms/download/app/
 
-    # 去掉开头的斜杠（/），如果开头是以/开头的
-    if [[ ${CosUploadToBUCKETDir} == /* ]]; then
-        CosUploadToBUCKETDir=${CosUploadToBUCKETDir#/}
-    fi
-    # 去掉结尾的斜杠（/），如果结尾是以/结尾的
-    if [[ ${CosUploadToBUCKETDir} == */ ]]; then
-        CosUploadToBUCKETDir=${CosUploadToBUCKETDir%/}
+    if [[ "${CosUploadToBUCKETDir}" != */ ]]; then
+        addDataToLastJsonWithCompontentKey "1" "您的bucketDir的值 ${CosUploadToBUCKETDir} 没有以/结尾" "无法进行上传cos，无地址" "cos"
+        postWechatMessage "无法进行上传cos，您的bucketDir的值 ${CosUploadToBUCKETDir} 没有以/结尾......[${ipa_file_path}]"
+        return 1
     fi
 
     coscmdPath=$(which coscmd)
@@ -247,12 +244,21 @@ function uploadToCos() {
     if [ ${cosErrorCode} = 0 ]   # 上个命令的退出状态，或函数的返回值。
     then
         # 去掉开头的斜杠（/），如果开头是以/开头的
-        if [[ ${CosResultHostUrl} == /* ]]; then
+        if [[ "${CosResultHostUrl}" == /* ]]; then
             CosResultHostUrl=${CosResultHostUrl#/}
         fi
         # 去掉结尾的斜杠（/），如果结尾是以/结尾的
-        if [[ ${CosResultHostUrl} == */ ]]; then
+        if [[ "${CosResultHostUrl}" == */ ]]; then
             CosResultHostUrl=${CosResultHostUrl%/}
+        fi
+
+        # 去掉开头的斜杠（/），如果开头是以/开头的
+        if [[ "${CosUploadToBUCKETDir}" == /* ]]; then
+            CosUploadToBUCKETDir=${CosUploadToBUCKETDir#/}
+        fi
+        # 去掉结尾的斜杠（/），如果结尾是以/结尾的
+        if [[ "${CosUploadToBUCKETDir}" == */ ]]; then
+            CosUploadToBUCKETDir=${CosUploadToBUCKETDir%/}
         fi
         cosResponseResultCode=0
         UPLOAD_FILE_Name=$(basename "$ipa_file_path") 
