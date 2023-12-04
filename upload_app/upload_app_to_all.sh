@@ -226,6 +226,15 @@ function uploadToCos() {
     # https://console.cloud.tencent.com/cos/bucket?bucket=prod-xhw-image-1302324914&region=ap-shanghai&path=%252Fmcms%252Fdownload%252Fapp%252F
     # https://images.xxx.com/mcms/download/app/
 
+    # 去掉开头的斜杠（/），如果开头是以/开头的
+    if [[ ${CosUploadToBUCKETDir} == /* ]]; then
+        CosUploadToBUCKETDir=${CosUploadToBUCKETDir#/}
+    fi
+    # 去掉结尾的斜杠（/），如果结尾是以/结尾的
+    if [[ ${CosUploadToBUCKETDir} == */ ]]; then
+        CosUploadToBUCKETDir=${CosUploadToBUCKETDir%/}
+    fi
+
     coscmdPath=$(which coscmd)
     debug_log "正在执行命令(上传安装包到cos):《 ${coscmdPath} -b ${CosUploadToBUCKETName} -r ${CosUploadToREGION} upload -r ${ipa_file_path} ${CosUploadToBUCKETDir} 》"
     responseJsonString=$(${coscmdPath} -b "${CosUploadToBUCKETName}" -r "${CosUploadToREGION}" upload -r "${ipa_file_path}" "${CosUploadToBUCKETDir}")
@@ -237,13 +246,21 @@ function uploadToCos() {
     cosErrorCode=$?
     if [ ${cosErrorCode} = 0 ]   # 上个命令的退出状态，或函数的返回值。
     then
+        # 去掉开头的斜杠（/），如果开头是以/开头的
+        if [[ ${CosResultHostUrl} == /* ]]; then
+            CosResultHostUrl=${CosResultHostUrl#/}
+        fi
+        # 去掉结尾的斜杠（/），如果结尾是以/结尾的
+        if [[ ${CosResultHostUrl} == */ ]]; then
+            CosResultHostUrl=${CosResultHostUrl%/}
+        fi
         cosResponseResultCode=0
         UPLOAD_FILE_Name=$(basename "$ipa_file_path") 
         cosResponseResultAppNetworkUrl="${CosResultHostUrl}/${CosUploadToBUCKETDir}/${UPLOAD_FILE_Name}"
         cosResponseResultMessage="Success: ${ipa_file_path} 文件上传cos成功，路径为${cosResponseResultAppNetworkUrl}"
     else
         cosResponseResultCode=1
-        cosResponseResultMessage="Failure: ${ipa_file_path} 文件上传cos失败，将不继续操作。附失败原因如下:《 ${cosErrorCode}:${responseJsonString} 》。 (若要查看本地配置文件，请查看目录： ~/.cos.conf)"
+        cosResponseResultMessage="Failure: ${ipa_file_path} 文件上传cos失败，将不继续操作。附失败原因如下:【 ${cosErrorCode}:${responseJsonString} 】，执行的命令如下：《 ${coscmdPath} -b \"${CosUploadToBUCKETName}\" -r \"${CosUploadToREGION}\" upload -r \"${ipa_file_path}\" \"${CosUploadToBUCKETDir}\" 》。 (若要查看本地配置文件，请查看目录： ~/.cos.conf)"
         cosResponseResultAppNetworkUrl="上传cos失败，无地址"
     fi
     
