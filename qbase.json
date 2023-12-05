@@ -61,6 +61,12 @@
                     "example": "sh xxx.sh -inputString \"${input_string}\" -patternsString \"${patternsString}\" "
                 },
                 {
+                    "des": "如果字符串是以-开头，则其下个字符串不能以-开头",
+                    "key": "checkInputArgsValid",
+                    "rel_path": "./foundation/checkInputArgsValid.sh",
+                    "example": "sh xxx.sh -a a -b b -c -d "
+                },
+                {
                     "des": "中文转拼音(py脚本)",
                     "key": "convert_to_pinyin",
                     "rel_path": "./foundation/convert_to_pinyin.py",

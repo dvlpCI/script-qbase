@@ -80,8 +80,10 @@ echo "${searchFromDateString}"
 
 echo "\n"
 log_title "getAppVersionAndBuildNumber"
-resultBranchNames=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getAppVersionAndBuildNumber test)
-echo "${GREEN}《给app的版本号和build号》的结果如下：${BLUE} $resultBranchNames ${NC}"
+appVersionAndBuildNumberJson=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getAppVersionAndBuildNumber test)
+echo "${GREEN}《给app的版本号和build号》的结果如下：${BLUE} $appVersionAndBuildNumberJson ${NC}"
+packageVersion=$(echo ${appVersionAndBuildNumberJson} | jq -r ".version")
+packageBuildNumber=$(echo ${appVersionAndBuildNumberJson} | jq -r ".buildNumber")
 
 
 echo "\n"
@@ -89,5 +91,5 @@ log_title "getBranchNamesAccordingToRebaseBranch"
 # sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true --verbose
 # 要使用输出值的时候，不用添加 --verbose
 echo "${YELLOW}正在执行命令:《${BLUE} sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true test --verbose ${YELLOW}》${NC}"
-resultBranchNames=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true)
-echo "${GREEN}《获取当前分支【在rebase指定分支后】的所有分支名》的结果如下：${BLUE} $resultBranchNames ${NC}"
+appVersionAndBuildNumberJson=$(sh ${qbase_HomeDir_Absolute}/qbase.sh -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch main --add-value 1 -onlyName true)
+echo "${GREEN}《获取当前分支【在rebase指定分支后】的所有分支名》的结果如下：${BLUE} $appVersionAndBuildNumberJson ${NC}"

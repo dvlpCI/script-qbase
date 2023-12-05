@@ -330,6 +330,11 @@ elif [ "${firstArg}" == "-path" ]; then
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 elif [ "${firstArg}" == "-quick" ]; then
+    inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)
+    if [ $? != 0 ]; then
+        echo "${inputArgsErrorMessage}"
+        exit 1
+    fi
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
