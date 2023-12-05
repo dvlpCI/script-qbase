@@ -28,9 +28,14 @@ qbase_isStringMatchPatterns_scriptPath=${CategoryFun_HomeDir_Absolute}/isStringM
 
 inputString="v1.2.0_0811"
 patternsJson='[
-    "v2*",
+    "v1.2.0_0811",
     "version/*",
-    "v1.2.0_0811"
+    "v2*"
+]'
+
+inputString="pack"
+patternsJson='[
+    "df*"
 ]'
 patternsString=$(echo "${patternsJson}" | jq -r ".[]")
 echo "patternsString=${patternsString}"
