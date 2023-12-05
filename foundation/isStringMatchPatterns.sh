@@ -30,9 +30,17 @@ patterns=(${patternsString})
 # 判断分支名是否满足任意一个模式
 matchedToPattern=""
 for pattern in "${patterns[@]}"; do
-    if [[ $input_string =~ $pattern ]]; then
-        matchedToPattern=$pattern
-        break
+    if [[ $pattern == *"*" ]]; then
+        nosuffixstar_pattern=${pattern%"*"}
+        if [[ $input_string == $nosuffixstar_pattern* ]]; then  # 判断$input_string是否以$pattern开头
+            matchedToPattern=$pattern
+            break
+        fi
+    else
+        if [[ $input_string == "$pattern" ]]; then
+            matchedToPattern=$pattern
+            break
+        fi
     fi
 done
 
@@ -43,6 +51,6 @@ if [ -n "${matchedToPattern}" ]; then
     printf "%s" "${matchedToPattern}"
     exit 0
 else
-    # echo "${input_string} 分支名不满足正则数组中的任何模式(所有模式如下: ${patterns[*]} )"
+    echo "很抱歉:您的 ${input_string} 分支名不满足自定义的正则数组中的任何模式(所有模式如下: ${patterns[*]} )"
     exit 1
 fi
