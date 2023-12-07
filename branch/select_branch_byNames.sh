@@ -79,10 +79,9 @@ if [ -n "${ignoreBranchNameOrRules}" ]; then
         printf "%s" "${branchNameMatchResultJson}"
         exit 1
     fi
-
     if ! jq -e . <<< "$branchNameMatchResultJson" >/dev/null 2>&1; then
-        echo "❌qbase_select_stings_by_rules_scriptPath 失败，返回的结果不是json"
-        # echo "❌branchNameMatchResultJson=${branchNameMatchResultJson}"
+        echo "❌ qbase_select_stings_by_rules_scriptPath 失败，返回的结果不是json。其内容如下:"
+        echo "$branchNameMatchResultJson"
         exit 1
     fi
     # echo "✅branchNameMatchResultJson=${branchNameMatchResultJson}"

@@ -82,11 +82,14 @@ exit_script_with_response_error_message() { # 退出脚本的方法，省去当�
 }
 
 function debug_log() {
-	if [ "${isDebugThisScript}" == true ]; then
-		echo "$1"
-	fi
+	echo "$1" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
 }
 
+function hide_log() {
+	if [ "${isDebugThisScript}" == true ]; then
+		echo "$1" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
+	fi
+}
 
 
 # shell 参数具名化
@@ -141,7 +144,10 @@ debug_log "ShoudUploadToAppStrore=${ShoudUploadToAppStrore}"
 
 
 ShoudUploadToCos=false
-if [ -z "${CosUploadToREGION}" ] || [ -z "${CosUploadToBUCKETName}" ] || [ -z "${CosUploadToBUCKETDir}" ] || [ -z "${CosResultHostUrl}" ]; then
+if [ -z "${CosUploadToREGION}" ] || [ "${CosUploadToREGION}" == "null" ] \
+    || [ -z "${CosUploadToBUCKETName}" ] || [ "${CosUploadToBUCKETName}" == "null" ] \
+    || [ -z "${CosUploadToBUCKETDir}" ] || [ "${CosUploadToBUCKETDir}" == "null" ] \
+    || [ -z "${CosResultHostUrl}" ] || [ "${CosResultHostUrl}" == "null" ] ; then
     uploadToAllProcessLog+="温馨提示：您的包不会上传到腾讯Cos。（因为您设置用来上传ipa的cos参数有缺失，各值如下: CosREGION=${CosUploadToREGION} CosBUCKETName=${CosUploadToBUCKETName} CosBUCKETDir=${CosUploadToBUCKETDir} CosResultHostUrl=${CosResultHostUrl} )。"
 else
     ShoudUploadToCos=true
@@ -150,7 +156,7 @@ debug_log "ShoudUploadToCos=${ShoudUploadToCos}"
 
 
 ShoudUploadToPgyer=false
-if [ -z "${pgyerApiKey}" ]; then
+if [ -z "${pgyerApiKey}" ] || [ "${pgyerApiKey}" == "null" ] ; then
     uploadToAllProcessLog+="温馨提示：您的包不会上传到蒲公英pgyer。因为您缺失将ipa上传到pgyer的必备 pgyerApiKey 参数。(附 apiKey 和 channelShortcut 分别如下: pgyerApiKey=${pgyerApiKey} pgyerChannelShortcut=${pgyerChannelShortcut} )。"
 else
     ShoudUploadToPgyer=true
@@ -199,13 +205,21 @@ function uploadToPgyer() {
 #    echo "替换英文分号后pgyerChangeLog=\n${pgyerChangeLog}" # 注意:如果蒲公英更新说明里有分号;，则分号后的文案不能被提交上去
 
     debug_log "=====================您的的蒲公英上传位置为PgyerOwner=${pgyerOwner},pgyerChannelShortcut=${pgyerChannelShortcut},pgyerChannelKey=${pgyerChannelKey}"
-    debug_log "${BLUE}正在执行命令(上传安装包到蒲公英上)：《${YELLOW} sh ${qbase_upload_app_to_pgyer_script_path} -f \"${ipa_file_path}\" -k \"${pgyerApiKey}\" --pgyer-channel \"${pgyerChannelShortcut}\" -d \"${pgyerChangeLog}\" --should-upload-fast \"${pgyerShouldUploadFast}\" ${BLUE}》...${NC}\n"
+    hide_log "${BLUE}正在执行命令(上传安装包到蒲公英上)：《${YELLOW} sh ${qbase_upload_app_to_pgyer_script_path} -f \"${ipa_file_path}\" -k \"${pgyerApiKey}\" --pgyer-channel \"${pgyerChannelShortcut}\" -d \"${pgyerChangeLog}\" --should-upload-fast \"${pgyerShouldUploadFast}\" ${BLUE}》...${NC}\n"
     responseJsonString=$(sh ${qbase_upload_app_to_pgyer_script_path} -f "${ipa_file_path}" -k "${pgyerApiKey}" --pgyer-channel "${pgyerChannelShortcut}" -d "${pgyerChangeLog}" --should-upload-fast "${pgyerShouldUploadFast}")
     # responseJsonString='{
     #     "code": 0,
     #     "message": "上传pgyer成功",
     #     "appNetworkUrl": "https://www.xcxwo.com/app/qrcodeHistory/9680a4ad4436cad0cf4e5f8a9eb937d36d55b653cf425fda298db7818232d818"
     # }'
+    if ! jq -e . <<< "$responseJsonString" >/dev/null 2>&1; then
+        payerResponseResultCode=1
+        payerResponseResultMessage="qbase_upload_app_to_pgyer_script_path 失败，返回的结果不是json。其内容如下:$responseJsonString"
+        payerResponseResultAppNetworkUrl="上传pgyer失败，无地址"
+        addDataToLastJsonWithCompontentKey "$payerResponseResultCode" "$payerResponseResultMessage" "$payerResponseResultAppNetworkUrl" "pgyer"
+        postWechatMessage "上传pgyer失败，$payerResponseResultMessage......[${ipa_file_path}]"
+        return 1
+    fi
     
     payerResponseResultCode=$(echo ${responseJsonString} | jq -r '.code')
     payerResponseResultMessage=$(echo ${responseJsonString} | jq -r '.message')
