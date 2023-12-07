@@ -134,7 +134,8 @@ fi
 ShoudUploadToAppStrore=false
 app_file_extension="${ipa_file_path##*.}" # 获取文件的后缀名
 if [ "$app_file_extension" = "ipa" ]; then
-    if [ -z "${Transporter_USERNAME}" ] || [ -z "${Transporter_PASSWORD}" ]; then
+    if [ -z "${Transporter_USERNAME}" ] || [ "${Transporter_USERNAME}" == "null" ] \
+    || [ -z "${Transporter_PASSWORD}" ] || [ "${Transporter_PASSWORD}" == "null" ]; then
         uploadToAllProcessLog+="温馨提示：您的此iOS包不会上传到AppStore。（因为您设置用来上传ipa的 Transporter 用户名和密码缺失，请先补充，所以此次无法自动上传。附:Transporter_USERNAME=${Transporter_USERNAME} Transporter_PASSWORD=${Transporter_PASSWORD} )。"
     else
         ShoudUploadToAppStrore=true
@@ -205,7 +206,7 @@ function uploadToPgyer() {
 #    echo "替换英文分号后pgyerChangeLog=\n${pgyerChangeLog}" # 注意:如果蒲公英更新说明里有分号;，则分号后的文案不能被提交上去
 
     debug_log "=====================您的的蒲公英上传位置为PgyerOwner=${pgyerOwner},pgyerChannelShortcut=${pgyerChannelShortcut},pgyerChannelKey=${pgyerChannelKey}"
-    hide_log "${BLUE}正在执行命令(上传安装包到蒲公英上)：《${YELLOW} sh ${qbase_upload_app_to_pgyer_script_path} -f \"${ipa_file_path}\" -k \"${pgyerApiKey}\" --pgyer-channel \"${pgyerChannelShortcut}\" -d \"${pgyerChangeLog}\" --should-upload-fast \"${pgyerShouldUploadFast}\" ${BLUE}》...${NC}\n"
+    debug_log "${BLUE}正在执行命令(上传安装包到蒲公英上)：《${YELLOW} sh \${qbase_upload_app_to_pgyer_script_path} -f \"${ipa_file_path}\" -k \"${pgyerApiKey}\" --pgyer-channel \"${pgyerChannelShortcut}\" -d \"${pgyerChangeLog}\" --should-upload-fast \"${pgyerShouldUploadFast}\" ${BLUE}》...${NC}\n"
     responseJsonString=$(sh ${qbase_upload_app_to_pgyer_script_path} -f "${ipa_file_path}" -k "${pgyerApiKey}" --pgyer-channel "${pgyerChannelShortcut}" -d "${pgyerChangeLog}" --should-upload-fast "${pgyerShouldUploadFast}")
     # responseJsonString='{
     #     "code": 0,
@@ -291,7 +292,7 @@ function uploadToCos() {
 function uploadToAppStore() {
     postWechatMessage "正在上传appstore......[${ipa_file_path}]"
 
-    printf "${BLUE}正在执行命令(上传安装包到testFlight上)：《${YELLOW} sh ${qbase_upload_app_to_testflight_script_path} -ipa \"${ipa_file_path}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" ${BLUE}》...${NC}\n"
+    debug_log "${BLUE}正在执行命令(上传安装包到testFlight上)：《${YELLOW} sh \${qbase_upload_app_to_testflight_script_path} -ipa \"${ipa_file_path}\" -TransporterUserName \"${Transporter_USERNAME}\" -TransporterPassword \"${Transporter_PASSWORD}\" ${BLUE}》...${NC}\n"
     responseJsonString=$(sh ${qbase_upload_app_to_testflight_script_path} -ipa "${ipa_file_path}" -TransporterUserName "${Transporter_USERNAME}" -TransporterPassword "${Transporter_PASSWORD}")
     
     tfResponseResultCode=$(echo ${responseJsonString} | jq -r '.code')
