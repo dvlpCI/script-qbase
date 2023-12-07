@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
-# @LastEditors: dvlproad
-# @LastEditTime: 2023-11-16 11:27:17
+ # @LastEditors: dvlproad
+ # @LastEditTime: 2023-12-07 14:34:26
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 ###
 
@@ -332,7 +332,7 @@ elif [ "${firstArg}" == "-path" ]; then
 elif [ "${firstArg}" == "-quick" ]; then
     inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)
     if [ $? != 0 ]; then
-        echo "🚗🚗🚗🚗🚗🚗 如若后续执行发生错误，可能原因为: ${inputArgsErrorMessage}"
+        echo "🚗🚗🚗🚗🚗🚗 如若后续执行发生错误，可能原因为: ${inputArgsErrorMessage}" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
     fi
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
