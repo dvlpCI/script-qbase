@@ -38,10 +38,15 @@ do
 done
 
 # # 使用jq验证JSON格式
+# 方法一：
 # echo "$Checked_JSON_VALUE" | jq empty > /dev/null 2>&1
 # if [ $? -ne 0 ]; then
+# 方法二：
+# if ! jq -e . <<< "$Checked_JSON_VALUE" >/dev/null 2>&1; then
 #     echo "❌Error:您的 -checkedJsonValue 参数值 ${Checked_JSON_VALUE} 字符串不符合JSON格式，请检查"
 #     exit 1
 # fi
+
+
 
 check_jsonString_valid "${Checked_JSON_VALUE}" "${SCRIPT_RESULT_JSON_FILE}"

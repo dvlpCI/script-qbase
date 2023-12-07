@@ -107,7 +107,7 @@ function get_all_json_file_content_inDir_mapping_branchName() {
 
     jsonStringWhereJsonMappingBranchName=""
     jsonStringWhereJsonMappingBranchName+="["
-    for((fileContentIndex=0;fileContentIndex<$allFileContent_Count;fileContentIndex++));  # 用fileContentIndex这么长，而不用i的目的是避免其他for方法调用此方法，调用方用i,这边也用i导致被重新赋值而错误
+    for((fileContentIndex=0;fileContentIndex<allFileContent_Count;fileContentIndex++));  # 用fileContentIndex这么长，而不用i的目的是避免其他for方法调用此方法，调用方用i,这边也用i导致被重新赋值而错误
     do
         iFileContentJsonString=$(printf "%s" "${allFileContent_JsonStrings}" | jq ".[${fileContentIndex}]")
         # echo "$((fileContentIndex+1)).${iFileContentJsonString}"
@@ -184,12 +184,18 @@ do
     # fi
     # continue
     
+    getBranchJsonStringsErrorMessage=""
     iBranchJsonStrings=$(get_all_json_file_content_inDir_mapping_branchName -dirUrl "${iDirUrl}" -access-token "${access_token}" -inBranchName "${iRequestBranchName}")
     if [ $? != 0 ]; then
         # echo "$((i+1)).结果❌${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iBranchJsonStrings} ${NC}"
-        
-        # 此时 iBranchJsonStrings 是错误信息字符串
-        iBranchJsonStrings=$(echo "$iBranchJsonStrings" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
+        getBranchJsonStringsErrorMessage=${iBranchJsonStrings}  # 此时 iBranchJsonStrings 是错误信息字符串
+    else
+        if ! jq -e . <<< "$iBranchJsonStrings" >/dev/null 2>&1; then
+            getBranchJsonStringsErrorMessage="❌ get_all_json_file_content_inDir_mapping_branchName 失败，返回的结果不是json。其内容如下:$iBranchJsonStrings"
+        fi
+    fi
+    if [ -n "${getBranchJsonStringsErrorMessage}" ]; then
+        iBranchJsonStrings=$(echo "$getBranchJsonStringsErrorMessage" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
         errorJsonString='{
             "branchName": "'"${iRequestBranchName}"'",
             "errorMessage": "'"${iBranchJsonStrings}"'"
@@ -202,6 +208,7 @@ do
         allBranchJsonErrorMessage+="\"${iRequestBranchName}: ${iBranchJsonStrings}\""  # 此时此值是错误信息
         continue
     fi
+
     # echo "$((i+1)).结果✅${BLUE} ${iRequestBranchName} ${NC}-----${BLUE} ${iBranchJsonStrings} ${NC}"
     jsonStringCount=$(printf "%s" "${iBranchJsonStrings}" | jq '. | length')
     for((j=0;j<jsonStringCount;j++));

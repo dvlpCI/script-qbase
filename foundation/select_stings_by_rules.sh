@@ -32,7 +32,11 @@ fi
 # originStrings="test/test1 test1/test1"
 # patternsString="unuse/* test/*"
 
-originStringArray=($originStrings)
+# readarray -t originStringArray <<< "$originStrings"           # 非Mac上
+IFS=$'\n' read -d '' -ra originStringArray <<< "$originStrings" # Mac上 字符串转数组。这样，* 将作为数组的一个元素而不会被展开
+# echo "originStrings======${originStrings}"
+# echo "originStringArray======${originStringArray[*]}"
+
 originStringCount=${#originStringArray[@]}
 # echo "$(basename "$0")脚本: originStrings=${originStrings}"
 

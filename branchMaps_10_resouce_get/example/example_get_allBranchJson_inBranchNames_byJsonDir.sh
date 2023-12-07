@@ -65,13 +65,13 @@ function getRequestBranchNames() {
     fi
     # echo "======branchNamesString=${branchNamesString}==="
     
+    # 测试 select_branch_byNames 命令
     # sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}"
     # if [ $? -ne 0 ]; then
     #     return 1
     # else
     #     return 0
     # fi
-
     # echo "${YELLOW}正在执行命令(筛选符合条件的分支名):《${BLUE} sh $qbase_select_branch_byNames_scriptPath -branchNames \"${branchNamesString}\" -ignoreBranchNameOrRules \"${ignoreBranchNameOrRules}\" -create-startDate \"${create_start_date}\" -lastCommit-startDate \"${lastCommit_start_date}\" ${YELLOW}》${NC}"
     branchGitInfoString=$(sh $qbase_select_branch_byNames_scriptPath -branchNames "${branchNamesString}" -ignoreBranchNameOrRules "${ignoreBranchNameOrRules}" -create-startDate "${create_start_date}" -lastCommit-startDate "${lastCommit_start_date}")
     if [ $? != 0 ]; then
@@ -79,11 +79,12 @@ function getRequestBranchNames() {
         return 1
     fi
     if ! jq -e . <<< "$branchGitInfoString" >/dev/null 2>&1; then
-        echo "qbase_select_branch_byNames_scriptPath 失败，返回的结果不是json"
-        echo "❌branchGitInfoString=${branchGitInfoString}"
+        echo "❌ qbase_select_branch_byNames_scriptPath 失败，返回的结果不是json。其内容如下:"
+        echo "$branchGitInfoString"
         return 1
     fi
-    # echo "✅恭喜：您从分支名中筛选符合条件的分支信息(含修改情况)的结果如下:${branchGitInfoString}"
+    # echo "所有分支的匹配和不匹配以及错误的结果分别如下:"
+    # printf "%s\n" "${branchGitInfoString}" | jq "."
     
     errorBranchGitInfoString=$(printf "%s" "${branchGitInfoString}" | jq -r ".errors")
     # echo "======errorBranchGitInfoString=${errorBranchGitInfoString}"
@@ -109,7 +110,7 @@ function getRequestBranchNames() {
 function testGithub {
     log_title "1.github"
     # 获取要请求的分支列表
-    ignoreBranchNameOrRules="unuse/* test/*"
+    ignoreBranchNameOrRules="unuse/* origin/unuse/* test/* origin/test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
     requestBranchNames=$(getRequestBranchNames)
@@ -128,7 +129,7 @@ function testGithub {
 function testGitee {
     log_title "2.gitee"
     # 获取要请求的分支列表
-    ignoreBranchNameOrRules="unuse/* test/*"
+    ignoreBranchNameOrRules="unuse/* origin/unuse/* test/* origin/test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
     # requestBranchNames="master test3 test/test1"
@@ -145,7 +146,7 @@ function testGitee {
 function testGitlab {
     log_title "3.gitlab"
     # 获取要请求的分支列表
-    ignoreBranchNameOrRules="unuse/* test/*"
+    ignoreBranchNameOrRules="unuse/* origin/unuse/* test/* origin/test/*"
     create_start_date=""        # 若有值，创建时间早于该值不显示
     lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
     requestBranchNames="origin/chore/ipa_backup origin/chore/pack origin/dev_route_trantive"
