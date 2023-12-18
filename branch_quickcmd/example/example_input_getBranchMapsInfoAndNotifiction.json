@@ -1,0 +1,113 @@
+{
+    "action_sript_bin": "qbase",
+    "action_sript_file_des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
+    "actions_envs_des": "要操作的环境",
+    "actions_envs_values": [
+        {
+            "env_id": "getBranchMapsInfoAndNotifiction",
+            "env_name": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
+            "env_action_ids": [
+                "-quick",
+                "-branchMapsInJsonF",
+                "-branchMapsInKey",
+                "-showCategoryName",
+                "-showFlag",
+                "-showName",
+                "-showTime",
+                "-showAt",
+                "-shouldMD",
+                "-robot",
+                "-at"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "-quick",
+            "des": "要使用的命令",
+            "actionType": "fixed",
+            "resultForParam": "-quick",
+            "fixedType": "fixed-value",
+            "fixedValue": "getBranchMapsInfoAndNotifiction"
+        },
+        {
+            "id": "-branchMapsInJsonF",
+            "des": "分支map数组所在的json文件路径",
+            "actionType": "custom",
+            "resultForParam": "-branchMapsInJsonF"
+        },
+        {
+            "id": "-branchMapsInKey",
+            "des": "分支map数组在json文件的哪个字段",
+            "actionType": "fixed",
+            "resultForParam": "-branchMapsInKey",
+            "fixedType": "fixed-value",
+            "fixedValue": "online_branches"
+        },
+        {
+            "id": "-showCategoryName",
+            "des": "是否显示分类名",
+            "actionType": "fixed",
+            "resultForParam": "-showCategoryName",
+            "fixedType": "fixed-value",
+            "fixedValue": true
+        },
+        {
+            "id": "-showFlag",
+            "des": "是否显示标识",
+            "actionType": "fixed",
+            "resultForParam": "-showFlag",
+            "fixedType": "fixed-value",
+            "fixedValue": true
+        },
+        {
+            "id": "-showName",
+            "des": "是否显示分支名",
+            "actionType": "fixed",
+            "resultForParam": "-showName",
+            "fixedType": "fixed-value",
+            "fixedValue": true
+        },
+        {
+            "id": "-showTime",
+            "des": "时间显示方式(all、only_last、none)",
+            "actionType": "fixed",
+            "resultForParam": "-showTime",
+            "fixedType": "fixed-value",
+            "fixedValue": "none"
+        },
+        {
+            "id": "-showAt",
+            "des": "显示发送给谁",
+            "actionType": "fixed",
+            "resultForParam": "-showAt",
+            "fixedType": "fixed-value",
+            "fixedValue": true
+        },
+        {
+            "id": "-shouldMD",
+            "des": "用什么格式采集信息(markdown、text)",
+            "actionType": "fixed",
+            "resultForParam": "-shouldMD",
+            "fixedType": "fixed-value",
+            "fixedValue": true
+        },
+
+        {
+            "id": "-robot",
+            "des": "获取到的分支信息是否发送，及发送到哪",
+            "actionType": "fixed",
+            "resultForParam": "-robot",
+            "fixedType": "fixed-value",
+            "fixedValue": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
+        },
+        {
+            "id": "-at",
+            "des": "如果发送的话，@哪些人",
+            "actionType": "fixed",
+            "resultForParam": "-at",
+            "fixedType": "fixed-value",
+            "fixedValue": "[\"lichaoqian\", \"lichaoqian\"]"
+        }
+    ]
+}

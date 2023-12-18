@@ -31,7 +31,7 @@ CYAN='\033[0;36m'
 
 def dealScriptByScriptConfig(pack_input_params_file_path):
     if not os.path.exists(pack_input_params_file_path):
-        print(f"{RED}您的参数文件(内含脚本及脚本的参数)不存在，请检查 {YELLOW}{pack_input_params_file_path}{NC}")
+        print(f"{RED}您的参数文件(内含脚本及脚本的参数)不存在，请检查{YELLOW} {pack_input_params_file_path} {NC}")
         openFile(pack_input_params_file_path)
         return False
 
@@ -39,10 +39,10 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
         with open(pack_input_params_file_path) as f:
             data = json.load(f)
     except FileNotFoundError:
-        print(f"{RED}Error: File {YELLOW}{pack_input_params_file_path}{RED} not found. {NC}")
+        print(f"{RED}Error: File{YELLOW} {pack_input_params_file_path} {RED}not found. {NC}")
         return False
     except json.JSONDecodeError:
-        print(f"{RED}Error: Failed to load JSON data from file {YELLOW}{pack_input_params_file_path}{RED} {NC}")
+        print(f"{RED}Error: Failed to load JSON data from file{YELLOW} {pack_input_params_file_path} {RED}{NC}")
         return False
 
 
@@ -74,7 +74,7 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
             if param != "null" and param != "":
                 command += [f"{param}"]
         if 'resultValue' not in scriptParamMap:
-            print(f"{RED}resultValue 参数未设置，请检查配置文件 {YELLOW}{pack_input_params_file_path}{NC}")
+            print(f"{RED}resultValue 参数未设置，请检查配置文件{YELLOW} {pack_input_params_file_path} {NC}")
             return False
         else:
             value = scriptParamMap["resultValue"]
@@ -97,13 +97,13 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
     
     # print(f"这不是本地命令，所以将继续寻找实际的脚本")
     if 'action_sript_file_rel_this_dir' not in data:
-        print(f"{RED}发生错误:{pack_input_params_file_path} 文件中不存在'action_sript_file_rel_this_dir'键，请检查{NC}")
+        print(f"{RED}发生错误: {pack_input_params_file_path} 文件中不存在'action_sript_file_rel_this_dir'键，请检查{NC}")
         return False
     action_sript_file_rel_this_dir=data['action_sript_file_rel_this_dir']
     # 获取脚本的实际绝对路径
     action_script_file_absPath=getAbsPathByFileRelativePath(pack_input_params_file_path, action_sript_file_rel_this_dir)
     if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
-        print(f"{RED}发生错误:脚本文件不存在，原因为计算出来的相对目录不存在。请检查您的 {YELLOW}{pack_input_params_file_path}{NC} 中的 {BLUE}action_sript_file_rel_this_dir{RED} 属性值 {BLUE}{action_sript_file_rel_this_dir}{RED} 是否正确。（其会导致计算相对于 {YELLOW}{pack_input_params_file_path}{RED} 的该属性值路径 {BLUE}{action_script_file_absPath}{RED} 不存在)。{NC}")
+        print(f"{RED}发生错误:脚本文件不存在，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_rel_this_dir {RED}属性值{BLUE} {action_sript_file_rel_this_dir} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {action_script_file_absPath} {RED}不存在)。{NC}")
         openFile(pack_input_params_file_path)
         # print(f"{RED}=======这里报错了，应该要退出方法{NC}")
         return False
@@ -185,7 +185,7 @@ def getActionById(actions, actionId, pack_input_params_file_path):
         person = matchPersons[0]
     else:
         # 对匹配的元素进行操作
-        print(f"{RED}发生错误：在{json.dumps(actions, indent=2)}中没有id为 {YELLOW}{actionId}{RED} 的操作项，请检查 {YELLOW}{pack_input_params_file_path}{RED} 文件！{NC}")
+        print(f"{RED}发生错误：在{json.dumps(actions, indent=2)}中没有id为{YELLOW} {actionId} {RED}的操作项，请检查{YELLOW} {pack_input_params_file_path} {RED}文件！{NC}")
         openFile(pack_input_params_file_path)
         return None
 
@@ -243,7 +243,7 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
             "resultValue": param_value,
         }
     else:
-        print(f"{RED}错误:'fixedType'不支持类型为 {BLUE}{param_type} {RED}的处理（其目前只支持 {BLUE}dir-path-rel-this-file {RED}和 {BLUE}file-path-rel-this-file {RED}），请检查并修改。{NC}")
+        print(f"{RED}错误:'fixedType'不支持类型为{BLUE} {param_type} {RED}的处理（其目前只支持{BLUE} dir-path-rel-this-file {RED}和{BLUE} file-path-rel-this-file {RED}），请检查并修改。{NC}")
         return None
     
 
@@ -254,7 +254,7 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
     operateActionTypeDes="选择"
     # ③如果是选择，选择项有哪些，然后提示进行"选择"输入(只需要输入)
     if "chooseValues" not in operateHomeMap:
-        print(f"{RED}发生错误:{BLUE}{pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中不存在key为 {BLUE}.chooseValues {RED}的值，请先检查补充")
+        print(f"{RED}发生错误:{BLUE} {pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中不存在key为{BLUE} .chooseValues {RED}的值，请先检查补充")
         openFile(pack_input_params_file_path)
         return None
     operateChooseMaps = operateHomeMap['chooseValues']
@@ -267,7 +267,7 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
 
     for i, chooseMap in enumerate(operateChooseMaps):
         if 'des' not in chooseMap:
-            print(f"{i+1}. {YELLOW}{BLUE}{pack_input_params_file_path} {YELLOW}的 {BLUE}{chooseMap} {YELLOW}缺失 {BLUE}des {YELLOW}值，请后续补充，以便区分用途{NC}")
+            print(f"{i+1}.{YELLOW}{BLUE} {pack_input_params_file_path} {YELLOW}的{BLUE} {chooseMap} {YELLOW}缺失{BLUE} des {YELLOW}值，请后续补充，以便区分用途{NC}")
         else:
             chooseName = chooseMap['des'] #这里只是打印此字段的值，便于选择
             print(f"{i+1}. {chooseName}")
@@ -276,7 +276,7 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
     if len(operateChooseMaps) == 1:
         chooseValueMap = operateChooseMaps[0]
         if 'value' not in chooseValueMap:
-            print(f"{RED}发生错误:{BLUE}{pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中的 {RED}的\n{BLUE}{chooseValueMap}\n{RED}不存在key为 {BLUE}.value {RED}的值，请先检查补充")
+            print(f"{RED}发生错误:{BLUE} {pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中的{RED}的\n{BLUE}{chooseValueMap}\n{RED}不存在key为{BLUE} .value {RED}的值，请先检查补充")
             return None
         else:
             resultValue = chooseValueMap["value"]
@@ -292,7 +292,7 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
                 continue
 
             if person_input == "0":
-                resultValue=input("请输入%s名（退出q/Q）：" % (operateDes))
+                resultValue=input("请输入%s的值（退出q/Q）：" % (operateDes))
                 if resultValue == "q" or resultValue == "Q":
                     exit()
                 break
@@ -304,7 +304,7 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
             else:
                 chooseValueMap = operateChooseMaps[index]
                 if 'value' not in chooseValueMap:
-                    print(f"{RED}发生错误:{BLUE}{pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中的 {RED}的\n{BLUE}{chooseValueMap}\n{RED}不存在key为 {BLUE}.value {RED}的值，请先检查补充。")
+                    print(f"{RED}发生错误:{BLUE} {pack_input_params_file_path} {RED}的\n{BLUE}{operateHomeMap}\n{RED}中的\n{BLUE}{chooseValueMap}\n{RED}不存在key为{BLUE} .value {RED}的值，请先检查补充。")
                     return None
                 else:
                     resultValue = chooseValueMap["value"]
@@ -324,7 +324,7 @@ def __getInputParamMapFromFile(operateHomeMap):
     operateActionTypeDes="输入"
     operateDes = operateHomeMap['des']
     while True:
-        resultValue = input("请%s%s名（退出q/Q）：" % (operateActionTypeDes, operateDes))
+        resultValue = input("请%s%s的值（退出q/Q）：" % (operateActionTypeDes, operateDes))
         if resultValue == "q" or resultValue == "Q":
             exit()
         break
