@@ -24,3 +24,31 @@ brew upgrade qbase
 # 4、删除
 brew uninstall qbase
 ```
+
+
+
+## Shell 结果要点
+
+### 1、结果
+
+```shell
+// printf "%s" 会保留\n等
+printf "%s" "${responseJsonString}"
+```
+
+
+### 2、日志
+
+```shell
+# 使用>&2将echo输出重定向到标准错误，作为日志
+
+function debug_log() {
+	echo "$1" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
+}
+
+
+
+# 2>/dev/null 只将标准错误输出重定向到 /dev/null，保留标准输出。
+# >/dev/null 2>&1 将标准输出和标准错误输出都重定向到 /dev/null，即全部丢弃。
+```
+
