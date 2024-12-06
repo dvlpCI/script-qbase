@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-12-07 14:34:26
+ # @LastEditTime: 2024-12-07 03:37:00
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 ###
 
@@ -329,7 +329,11 @@ if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
 elif [ "${firstArg}" == "-path" ]; then
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
-elif [ "${firstArg}" == "-quick" ]; then
+elif [ "${firstArg}" == "-quick-eg" ]; then     # 查看快捷命令
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} 》"
+    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF}
+
+elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)
     if [ $? != 0 ]; then
         echo "🚗🚗🚗🚗🚗🚗 如若后续执行发生错误，可能原因为: ${inputArgsErrorMessage}" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
@@ -337,8 +341,8 @@ elif [ "${firstArg}" == "-quick" ]; then
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
-elif [ "${firstArg}" == "-help" ]; then
-    echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quickCmd":"'"快捷命令"'","-path":"'"支持的脚本"'"}'
+elif [ "${firstArg}" == "-help" ] || [ "${firstArg}" == "help" ]; then
+    echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quick-eg":"'"查看可使用的快捷命令"'","-path":"'"支持的脚本"'"}'
 else
     echo "${qbase_latest_version}"
 fi
