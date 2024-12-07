@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-14 13:37:20
+ # @LastEditTime: 2024-12-07 15:45:48
 # @Description: 根据 rebase 分支，获取当前分支所含的所有分支名
 ###
 
@@ -15,6 +15,107 @@ YELLOW="\033[33m"
 BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
+
+# 使用说明函数
+show_usage() {
+    printf "${PURPLE}"
+    # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
+    printf "%-20s %s\n" "Options:" ""
+    printf "%-30s %s\n" "-v|--verbose" "Enable verbose mode"
+    printf "%-30s %s\n" "-h|--help" "Display this help and exit"
+    printf "%-30s %s\n" "-rebaseBranch|--rebase-branch" "必填：要reabase的分支名"
+    printf "%-30s %s\n" "-addValue|--add-value" "可选；要增加的时间值"
+    printf "%-30s %s\n" "-addType|--add-type" "可选；时间增加的类型"
+    printf "%-30s %s\n" "-onlyName|--only-name" "可选；名字是否只取最后部分，不为true时候为全名"
+    # printf "%-20s %s\n" "Arguments:" ""
+    # printf "%-20s %s\n" "file" "Input file path"
+    # printf "%-20s %s\n" "output" "Output file path"
+    printf "${NC}"
+}
+
+# 获取参数值的函数
+get_argument() {
+    option="$1"
+    value="$2"
+
+    # 检查参数是否为空或是选项
+    if [ -z "$value" ] || [ "${value#-}" != "$value" ]; then
+        echo "${RED}Error: Argument for $option is missing${NC}"
+        return 1 # 返回错误状态
+    fi
+    echo "$value"
+    return 0
+}
+# 定义错误处理函数
+handle_error() {
+    local option="$1"
+    echo "${RED}Error:您指定了以下参数，却漏了为其复制，请检查${YELLOW} ${option} ${RED}${NC}"
+    exit 1
+}
+
+
+# 处理具名参数
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -v|--verbose)
+            verbose="true"
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        -rebaseBranch|--rebase-branch)
+            # 知识点：如果 get_argument "$1" "$2" 返回失败（非零退出码），那么 handle_error "$1" 会被执行。
+            REBASE_BRANCH=$(get_argument "$1" "$2") || handle_error "$1"
+            shift 2 # 知识点：这里不能和 REBASE_BRANCH 同一行，否则会出如果执行脚本脚本卡住
+            ;;
+        -addValue|--add-value) 
+            add_value=$(get_argument "$1" "$2") || handle_error "$1" 
+            shift 2;;
+        -addType|--add-type) 
+            add_type=$(get_argument "$1" "$2") || handle_error "$1" 
+            shift 2;;
+        -onlyName|--only-name) 
+            ONLY_NAME=$(get_argument "$1" "$2") || handle_error "$1"
+            shift 2;;
+        --) # 结束解析具名参数
+            shift
+            break
+            ;;
+        -*)
+            echo "${RED}Error: Invalid option $1${NC}"
+            show_usage
+            exit 1
+            ;;
+        *) # 普通参数
+            if [ -z "$file" ]; then
+                file="$1"
+            elif [ -z "$output" ]; then
+                output="$1"
+            else
+                echo "${RED}Error: Too many arguments provided.${NC}"
+                show_usage
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# 检查是否提供了必要的参数
+# if [ -z "$file" ] || [ -z "$output" ]; then
+#     echo "${RED}Error: Missing required arguments.${NC}"
+#     show_usage
+#     exit 1
+# fi
+
+# 脚本主逻辑
+[ "$verbose" = "true" ] && echo "${GREEN}Verbose mode is on.${NC}"
+
+# exit 0
+
+
 
 CurCategoryFun_HomeDir_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurCategoryFun_HomeDir_Absolute%/*}   # 使用 %/* 方法可以避免路径上有..
@@ -86,23 +187,24 @@ function optimizeBranchNames() {
 
 
 # shell 参数具名化           
-while [ -n "$1" ]
-do
-    case "$1" in
-        -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
-        -addValue|--add-value) add_value="$2" shift 2;;
-        -addType|--add-type) add_type="$2" shift 2;;
-        -onlyName|--only-name) ONLY_NAME=$2; shift 2;; # 名字是否只取最后部分，不为true时候为全名
-        --) break ;;
-        *) break ;;
-    esac
-done
+# while [ -n "$1" ]
+# do
+#     case "$1" in
+#         -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
+#         -addValue|--add-value) add_value="$2" shift 2;;
+#         -addType|--add-type) add_type="$2" shift 2;;
+#         -onlyName|--only-name) ONLY_NAME=$2; shift 2;; # 名字是否只取最后部分，不为true时候为全名
+#         --) break ;;
+#         *) break ;;
+#     esac
+# done
 
 
 _verbose_log "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《${BLUE} sh ${qbase_rebasebranch_last_commit_date_scriptPath} -rebaseBranch \"${REBASE_BRANCH}\" ${YELLOW}》${NC}"
 lastCommitDate=$(sh ${qbase_rebasebranch_last_commit_date_scriptPath} -rebaseBranch "${REBASE_BRANCH}")
 if [ $? != 0 ]; then
     echo "${lastCommitDate}" # 此时值为错误信息
+    show_usage
     exit 1
 fi
 _verbose_log "${GREEN}恭喜获得:${BLUE}main${GREEN} 分支最后一次提交commit的时间:${BLUE} ${lastCommitDate} ${GREEN}。${NC}"

@@ -111,6 +111,11 @@ do
     esac
 done
 
+if [ ! -f "${branchMapsInJsonFile}" ];then
+    echo "❌${RED}Error:您要处理的json文件 ${branchMapsInJsonFile} 不存在，请检查！${NC}"
+    # printf "%s" "红红火火恍恍惚惚哈哈哈哈哈哈"
+    exit 1
+fi
 branchMapArray=$(cat ${branchMapsInJsonFile} | jq -r "${branchMapsInKey}") # -r 去除字符串引号
 # echo "✅哈哈哈哈 131"
 # echo "执行文件信息获取《 ${BLUE}cat ${branchMapsInJsonFile} | jq -r \"${branchMapsInKey}\" ${NC}》所得的值如下:\n${branchMapArray} ${NC}"

@@ -46,7 +46,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
     command = [str(item) for item in command]   # 将布尔类型的元素转换为字符串，避免 ' '.join(command) 和 subprocess.run(command) 中出现不是字符串的值而出错
     try:
         cmdString=' '.join(command)
-        print(cmdString)
+        # print(f"{BLUE}您的命令字符串为:{YELLOW} {cmdString} {NC}")
     except TypeError as e:
         print(f"{RED}Error:将{BLUE} {command} {RED}数组拼接成字符串时出错，出错原因为:{BLUE} {str(e)} {RED}。{NC}")
         return False
@@ -54,7 +54,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
     print(f"\n{BLUE}开始执行脚本，执行过程中输出内容如下：{NC}")
     if verbose==True:
         escaped_command = cmdString.replace("(", r"\(").replace(")", r"\)")
-        print(f"{BLUE}正在执行选中的命令:《{YELLOW} {escaped_command} {BLUE}》{NC}")
+        print(f"{BLUE}您正在执行的命令字符串为:《{YELLOW} {escaped_command} {BLUE}》{NC}")
 
 
     # 调用 subprocess.run() 函数执行 shell 命令

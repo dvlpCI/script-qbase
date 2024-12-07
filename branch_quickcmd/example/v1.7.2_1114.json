@@ -1,0 +1,203 @@
+{
+  "online_branches": [
+    {
+      "create_time": "11.10",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "version",
+      "name": "version/v1.7.2_1114",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/execution-task-104.html",
+          "title": "版本分支"
+        }
+      ],
+      "answer": {
+        "name": "产品1"
+      },
+      "tester": {
+        "name": "测试4"
+      }
+    },
+    {
+      "create_time": "11.09",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/apns_extension_ghb",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/story-view-782.html",
+          "title": "APP推送漏斗数据转化较低，需要集成两个SDK，配置抵达回执"
+        },
+        {
+          "title": "修复iOS推送无图片"
+        }
+      ],
+      "answer": {
+        "name": "产品1"
+      },
+      "tester": {
+        "name": "测试4"
+      }
+    },
+    {
+      "create_time": "11.10",
+      "submit_test_time": "11.10",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "hotfix",
+      "name": "hotfix/hzq_fix",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/story-view-868.html",
+          "title": "直播分享，会重复打开直播页面"
+        },
+        {
+          "url": "https://chandao.xxx.com/story-view-883-0-0-story.html",
+          "title": "【消息】私信发送文字消息，触发风控时显提示“发言中有非法语句”，去除该提示；"
+        }
+      ],
+      "answer": {
+        "name": "测试3"
+      },
+      "tester": {
+        "name": "测试3"
+      }
+    },
+    {
+      "create_time": "11.10",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/order_self_owned_virtual_goods",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/task-view-1332.html",
+          "title": "【电商】自营虚拟商品交易流程"
+        }
+      ],
+      "answer": {
+        "name": "产品2"
+      },
+      "tester": {
+        "name": "测试3"
+      }
+    },
+    {
+      "create_time": "11.09",
+      "submit_test_time": "11.09",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/optimize_exposure",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "title": "信息流推荐位支持轮播及添加曝光埋点",
+          "url": "https://chandao.xxx.com/task-view-1321.html"
+        }
+      ],
+      "answer": {
+        "name": "产品1"
+      },
+      "tester": {
+        "name": "测试3"
+      }
+    },
+    {
+      "create_time": "11.09",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/buriedpoint_new_1107",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/task-view-1326.html",
+          "title": "【社交】APP埋点需求"
+        }
+      ],
+      "answer": {
+        "name": "产品1"
+      },
+      "tester": {
+        "name": "测试3"
+      }
+    },
+    {
+      "create_time": "11.02",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/order_contact_merchant",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/task-view-1331.html",
+          "title": "【电商】用户咨询商家入口UI修改"
+        }
+      ],
+      "answer": {
+        "name": "产品2"
+      },
+      "tester": {
+        "name": "测试4"
+      }
+    },
+    {
+      "create_time": "11.10",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/network_time",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "url": "https://chandao.xxx.com/task-view-1333.html",
+          "title": "核心页面的网络耗时统计--各个接口耗时计算"
+        }
+      ],
+      "answer": {
+        "name": "CTO"
+      },
+      "tester": {
+        "name": "测试4"
+      }
+    },
+    {
+      "create_time": "11.01",
+      "submit_test_time": "null",
+      "pass_test_time": "null",
+      "merger_pre_time": "null",
+      "type": "feature",
+      "name": "feature/apm_network_duration_ghb",
+      "des": "详见outlines",
+      "outlines": [
+        {
+          "title": "核心页面的网络耗时统计(总)",
+          "url": "https://chandao.xxx.com/task-view-1327.html"
+        },
+        {
+          "title": "修复找人送礼内存问题"
+        }
+      ],
+      "answer": {
+        "name": "CTO"
+      },
+      "tester": {
+        "name": "测试4"
+      }
+    }
+  ]
+}

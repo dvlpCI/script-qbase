@@ -4,7 +4,7 @@
 # @Author: dvlproad dvlproad@163.com
 # @Date: 2023-04-12 22:15:22
  # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-07 03:43:13
+ # @LastEditTime: 2024-12-07 19:47:48
 # @FilePath: qbrew_menu.sh
 # @Description: 输出 qbrew 库中 qbase.json 、 qtool.json 的菜单，并可选择查看哪项的使用示例
 ###
@@ -102,12 +102,27 @@ evalActionByInput() {
         if [ -n "${tCatalogOutlineMap}" ]; then
             tCatalogOutlineKey=$(echo "$tCatalogOutlineMap" | jq -r ".key")
             tCatalogOutlineAction=$(echo "$tCatalogOutlineMap" | jq -r ".example")
-            # printf "正在执行命令：${BLUE}%s${NC}\n" "${tCatalogOutlineAction}"
-            # 使用 输出方法的返回值，并能正确换行
-            
-            printf "${CYAN}【${BLUE}%s${CYAN}】使用示例：\n${PURPLE} %s\n${NC}" "${tCatalogOutlineKey}" "${tCatalogOutlineAction}"    # printf 的正确换行
-            # printf "%s" "${tCatalogOutlineAction}"    # printf 的正确换行
-            # exit 0
+            relpath=$(echo "$tCatalogOutlineMap" | jq -r ".rel_path")
+            if [ -z "${relpath}" ] || [ "${relpath}" == "null" ]; then
+                echo "${RED}Error:您的 ${map} 缺失描述脚本相对位置的 rel_path 属性值。请检查 ${NC}"
+                # cat "$qpackageJsonF" | jq '.quickCmd'
+                # cat "$qpackageJsonF" | jq '.'
+                exit 1
+            fi
+            relpath="${relpath//.\//}"  # 去掉开头的 "./"
+            quickCmd_script_path="$qpackage_homedir_abspath/$relpath"
+            if [ ! -f "$quickCmd_script_path" ]; then
+                echo "Error:您的json路径配置出错了，请检查。"
+                return 1
+            fi
+
+            # echo "您正在调用《 sh ${quickCmd_script_path} --help 》"
+            printf "${CYAN}【${BLUE}%s${CYAN}】使用示例：\n${NC}" "${tCatalogOutlineKey}"    # printf 的正确换行
+            sh ${quickCmd_script_path} "--help"
+            if [ $? != 0 ]; then
+                printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
+                return 0
+            fi            
         else
             printf "${YELLOW}%s\n${NC}" "此选项，无使用示例。你可选择查看其他选项的使用示例。\n"
             # exit 1
@@ -116,12 +131,14 @@ evalActionByInput() {
 }
 
 # 显示工具选项
-qtool_menu_using_json_file_path=$1
-tool_menu "${qtool_menu_using_json_file_path}"
+qbrew_json_file_path=$1
+# qpackage__name=$(basename "${qbrew_json_file_path}")
+qpackage_homedir_abspath=$(dirname "${qbrew_json_file_path}")
+tool_menu "${qbrew_json_file_path}"
 
 # 开始选择
-evalActionByInput "${qtool_menu_using_json_file_path}"
-# chooseResult=$(evalActionByInput "${qtool_menu_using_json_file_path}")
+evalActionByInput "${qbrew_json_file_path}"
+# chooseResult=$(evalActionByInput "${qbrew_json_file_path}")
 # if [ $? != 0 ]; then
 #     printf "${YELLOW}%s\n${NC}" "此选项，无使用示例。你可选择查看其他选项的使用示例。\n"
 #     exit 1

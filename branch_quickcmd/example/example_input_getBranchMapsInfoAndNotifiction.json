@@ -1,5 +1,5 @@
 {
-    "action_sript_bin": "qbase",
+    "action_sript_file_absPath": "~/Project/script-qbase/qbase.sh",
     "action_sript_file_des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
     "actions_envs_des": "要操作的环境",
     "actions_envs_values": [
@@ -99,7 +99,7 @@
             "actionType": "fixed",
             "resultForParam": "-robot",
             "fixedType": "fixed-value",
-            "fixedValue": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
+            "fixedValue": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx76da-1ff4-417a-922a-d5ced384xxxx"
         },
         {
             "id": "-at",

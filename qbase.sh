@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-07 03:37:00
+ # @LastEditTime: 2024-12-07 16:58:09
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 ###
 
@@ -179,21 +179,26 @@ if [ ! -d "${qbase_homedir_abspath}" ]; then
     echo "您的 qbase 库的根目录 ${qbase_homedir_abspath} 计算错误，请检查"
     exit 1
 fi
-qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
-if [ $? != 0 ]; then
-    echo "${qtargetScript_allVersion_homedir}" # 此时此值是错误信息
-    exit 1
-fi
-# echo "您的 qtargetScript_allVersion_homedir = ${qtargetScript_allVersion_homedir}"
-qtarget_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
-if [ $? != 0 ]; then
-    echo "${qtarget_latest_version}" # 此时此值是错误信息
-    exit 1
-fi
-qtarget_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qtarget_latest_version}" "${packageCodeNameArg}")
-if [ $? != 0 ]; then
-    echo "${qtarget_homedir_abspath}" # 此时此值是错误信息
-    exit 1
+
+if [ "$0" == "${CurrentScript_absolute_path}" ] && [ "${packageArg}" == "qbase" ]; then 
+    qtarget_homedir_abspath="${qbase_homedir_abspath}"
+else
+    qtargetScript_allVersion_homedir=$(getqscript_allVersionHomeDir_abspath "${packageArg}")
+    if [ $? != 0 ]; then
+        echo "${qtargetScript_allVersion_homedir}" # 此时此值是错误信息
+        exit 1
+    fi
+    # echo "您的 qtargetScript_allVersion_homedir = ${qtargetScript_allVersion_homedir}"
+    qtarget_latest_version=$(getMaxVersionNumber_byDir "${qtargetScript_allVersion_homedir}")
+    if [ $? != 0 ]; then
+        echo "${qtarget_latest_version}" # 此时此值是错误信息
+        exit 1
+    fi
+    qtarget_homedir_abspath=$(getHomeDir_abspath_byVersion "${qtargetScript_allVersion_homedir}" "${qtarget_latest_version}" "${packageCodeNameArg}")
+    if [ $? != 0 ]; then
+        echo "${qtarget_homedir_abspath}" # 此时此值是错误信息
+        exit 1
+    fi
 fi
 if [ ! -d "${qtarget_homedir_abspath}" ]; then
     echo "❌Error:您的 ${packageArg} 库的根目录 ${qtarget_homedir_abspath} 计算错误，请检查"

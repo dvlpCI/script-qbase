@@ -80,6 +80,7 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
             value = scriptParamMap["resultValue"]
             command += [value]
        
+    # print(f"{PURPLE}>>>>>>>>>>>>>温馨提示：接下来您将根据传入的脚本文件{BLUE} {pack_input_params_file_path} {PURPLE}里的参数及该参数的固定或者输入值组合成的命令进行其生成的结果命令字符串执行。参数为：{BLUE} {command} {PURPLE}。<<<<<<<<<<<<<<{NC}")  
     resultCode=callScriptCommond(command, action_script_file_absPath, verbose=True)
     if resultCode==False:
         return False
@@ -94,6 +95,16 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
         # check_command(action_sript_bin) # TODO不正确
         return action_sript_bin
     
+    
+    if 'action_sript_file_absPath' in data:
+        action_script_file_absPath=data['action_sript_file_absPath']
+        action_script_file_absPath = os.path.abspath(os.path.expanduser(action_script_file_absPath))    # 转换为完整路径
+        if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
+            print(f"{RED}发生错误:脚本文件不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_absPath {RED}属性值{BLUE} {action_script_file_absPath} {RED}是否正确。{NC}")
+            openFile(pack_input_params_file_path)
+            # print(f"{RED}=======这里报错了，应该要退出方法{NC}")
+            return False
+        return action_script_file_absPath
     
     # print(f"这不是本地命令，所以将继续寻找实际的脚本")
     if 'action_sript_file_rel_this_dir' not in data:
