@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-07 16:58:09
+ # @LastEditTime: 2024-12-07 20:54:07
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 ###
 
@@ -331,12 +331,22 @@ versionCmdStrings=("--version" "-version" "-v" "version")
 helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
+
+elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
+    passwordStrings=("qian" "chaoqian" "lichaoqian")
+    if ! printf "%s\n" "${passwordStrings[@]}" | grep -wq "$1"; then    # 检查是否不包含，另前面已执行 shift 1  去除前一个参数，所以第二个是 $1
+        echo "${RED}查看${BLUE} -path-eg ${RED}需要在命令中携带正确的密码${NC}"
+        exit 1
+    fi
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} support_script_path 》"
+    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} "support_script_path"
 elif [ "${firstArg}" == "-path" ]; then
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
+
 elif [ "${firstArg}" == "-quick-eg" ]; then     # 查看快捷命令
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} 》"
-    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF}
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} quickCmd 》"
+    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} "quickCmd"
 
 elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)

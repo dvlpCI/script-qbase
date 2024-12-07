@@ -19,7 +19,7 @@ CYAN="\033[0;36m"
 
 # 使用说明函数
 show_usage() {
-    printf "${PURPLE}"
+    printf "${YELLOW}%s${PURPLE}\n" "qbase -quick getBranchMapsInfoAndNotifiction -branchMapsInJsonF xxxx/v1.7.2_1114.json -branchMapsInKey online_branches -showCategoryName True -showFlag True -showName True -showTime none -showAt True -shouldMD True -robot https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx76da-1ff4-417a-922a-d5ced384xxxx -at [\"lichaoqian\", \"lichaoqian\"]"
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     printf "%-20s %s\n" "Options:" ""
     printf "%-50s %s\n" "-v|--verbose" "Enable verbose mode"

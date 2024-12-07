@@ -18,8 +18,7 @@ CYAN="\033[0;36m"
 
 # 使用说明函数
 show_usage() {
-    printf "${PURPLE}"
-    # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
+    printf "${YELLOW}%s${PURPLE}\n" "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-rel_path 1 -onlyName true --verbose"
     printf "%-20s %s\n" "Options:" ""
     printf "%-30s %s\n" "-v|--verbose" "Enable verbose mode"
     printf "%-30s %s\n" "-h|--help" "Display this help and exit"
