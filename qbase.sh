@@ -334,12 +334,17 @@ if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
 
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     passwordStrings=("qian" "chaoqian" "lichaoqian")
-    if ! printf "%s\n" "${passwordStrings[@]}" | grep -wq "$1"; then    # 检查是否不包含，另前面已执行 shift 1  去除前一个参数，所以第二个是 $1
+    if ! printf "%s\n" "${passwordStrings[@]}" | grep -wq "$1"; then    # 检查是否不包含，另前面已执行 shift 1  去除前一个参数，所以当前的第二个参数是 $1
         echo "${RED}查看${BLUE} -path-eg ${RED}需要在命令中携带正确的密码${NC}"
         exit 1
     fi
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} support_script_path 》"
-    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} "support_script_path"
+
+    # categoryData=$(cat "$qpackageJsonF" | jq ".support_script_path")
+    # qpackage_homedir_abspath=$(dirname "${qpackageJsonF}")
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType support_script_path 》"
+    sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${qpackageJsonF}" -categoryType "support_script_path"
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData \"${categoryData}\" -relPath-baseDirPath \"${qpackage_homedir_abspath}\" 》"
+    # sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData "${categoryData}" -relPath-baseDirPath "${qpackage_homedir_abspath}"
 elif [ "${firstArg}" == "-path" ]; then
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg

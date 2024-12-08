@@ -18,6 +18,8 @@ CYAN="\033[0;36m"
 
 # 使用说明函数
 show_usage() {
+    # printf "${BLUE}%s${NC}\n" "对指定文件中匹配的指定字符串的所有行,从匹配到的位置开始将该行替换成新的字符串。"
+    # printf "${BLUE}%s${NC}\n" "使用场景：对代码文件进行环境修改。"
     printf "${YELLOW}%s${PURPLE}\n" "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-rel_path 1 -onlyName true --verbose"
     printf "%-20s %s\n" "Options:" ""
     printf "%-30s %s\n" "-v|--verbose" "Enable verbose mode"

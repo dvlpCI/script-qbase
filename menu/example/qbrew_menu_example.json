@@ -1,0 +1,42 @@
+{
+    "action_sript_file_rel_this_dir": "../qbrew_menu.sh",
+    "action_sript_file_des": "更新指定项目的版本号、build号、app展示名、代码环境",
+    "actions_envs_des": "要更新哪个项目",
+    "actions_envs_values": [
+        {
+            "env_id": "CJAutoPackageDemo",
+            "env_name": "",
+            "env_action_ids": [
+                "-file",
+                "-categoryType",
+                "-execChoosed"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "-file",
+            "des": "对哪个json文件进行操作",
+            "actionType": "fixed",
+            "resultForParam": "-file",
+            "fixedType": "file-path-rel-this-file",
+            "fixedValue": "./cutom_command_menu_example.json"
+        },
+        {
+            "id": "-categoryType",
+            "des": "可选?：对该文件的哪个分类进行操作",
+            "actionType": "fixed",
+            "resultForParam": "-categoryType",
+            "fixedType": "fixed-value",
+            "fixedValue": "custom"
+        },
+        {
+            "id": "-execChoosed",
+            "des": "可选：是否直接执行选中的命令，true:是",
+            "actionType": "fixed",
+            "resultForParam": "-execChoosed",
+            "fixedType": "fixed-value",
+            "fixedValue": "true"
+        }
+    ]
+}

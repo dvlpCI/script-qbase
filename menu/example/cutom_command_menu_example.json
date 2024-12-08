@@ -1,0 +1,25 @@
+{
+    "custom": [
+        {
+            "type": "normal",
+            "des": "自定义要执行的普通脚本",
+            "values": [
+                {
+                    "des": "输出当前目录下的文件",
+                    "key": "ls",
+                    "command": "ls"
+                },
+                {
+                    "des": "查看 pod 的版本",
+                    "key": "pod --version",
+                    "command": "pod --version"
+                },
+                {
+                    "des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
+                    "key": "getBranchMapsInfoAndNotifiction",
+                    "rel_path": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh"
+                }
+            ]
+        }
+    ]
+}

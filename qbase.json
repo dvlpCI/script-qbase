@@ -31,8 +31,7 @@
                 {
                     "des": "输出 qbrew 库中 qbase.json 、 qtool.json 的菜单，并可选择查看哪项的使用示例",
                     "key": "qbrew_menu",
-                    "rel_path": "./menu/qbrew_menu.sh",
-                    "example": "sh xxx.sh $packageJsonF quickCmd"
+                    "rel_path": "./menu/qbrew_menu.sh"
                 },
                 {
                     "des": "获取 package 的指定 key 的脚本文件路径",

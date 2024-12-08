@@ -19,6 +19,7 @@ CYAN="\033[0;36m"
 # 使用说明函数
 show_usage() {
     printf "${BLUE}%s${NC}\n" "对 project.pbxproj 更新版本号、build号、app展示名"
+    # printf "${BLUE}%s${NC}\n" "使用场景：对代码文件进行环境修改。"
     printf "${YELLOW}%s${PURPLE}\n" "sh xx.sh -pbxproj xxx/Beyond.xcodeproj/project.pbxproj -ver 1.7.3 -bid 24010809 -appNameOld Beyond -appNameNew Beyond开发版"
     printf "%-20s %s\n" "Options:" ""
     printf "%-30s %s\n" "-v|--verbose" "Enable verbose mode"
