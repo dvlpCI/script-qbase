@@ -119,6 +119,9 @@ evalActionByInput() {
         if [ -n "${tCatalogOutlineMap}" ]; then
             tCatalogOutlineKey=$(echo "$tCatalogOutlineMap" | jq -r ".key")
             tCatalogOutlineAction=$(echo "$tCatalogOutlineMap" | jq -r ".example")
+            if [ -z "${tCatalogOutlineAction}" ] || [ "${tCatalogOutlineAction}" == "null" ]; then
+                tCatalogOutlineAction="暂时没有 ${tCatalogOutlineKey} 的演示示例"
+            fi
             relpath=$(echo "$tCatalogOutlineMap" | jq -r ".rel_path")
             if [ -z "${relpath}" ] || [ "${relpath}" == "null" ]; then
                 echo "${RED}Error:您的 ${tCatalogOutlineMap} 缺失描述脚本相对位置的 rel_path 属性值。请检查 ${NC}"

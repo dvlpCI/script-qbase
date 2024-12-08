@@ -1,0 +1,12 @@
+{
+    "version": "package unknow version",
+    "buildNumber": "package unknow buildNumber",
+    "app_display_name_old": "package unknow app_display_name_old",
+    "app_display_name_new": "package unknow app_display_name_new",
+    "pbxproj_path_rel_this_dir": "../../../../Project/AutoPackage-iOS/CJAutoPackageDemo/CJAutoPackageDemo.xcodeproj/project.pbxproj",
+    "env_file_path_rel_this_dir": "../../../../Project/AutoPackage-iOS/CJAutoPackageDemo/CJAutoPackageDemo/Module/Environment/CJDemoEnvironmentManager.m",
+    "env_network_match_string": "NSString * const CJDemoEnvironmentCurrent       = @\"Develop1\"; ",
+    "env_network_new_string": "NSString * const CJDemoEnvironmentCurrent       = @\"myNewNetworkType\";",
+    "env_uploadplatform_match_string": "Copyright ©",
+    "env_uploadplatform_new_string": "Copyright © 2024 dvlproad. All rights reserved."
+  }

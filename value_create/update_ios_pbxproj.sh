@@ -3,7 +3,7 @@
  # @Author: dvlproad
  # @Date: 2023-03-20 17:53:45
  # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-08 02:52:07
+ # @LastEditTime: 2024-12-08 17:18:42
  # @Description: 对 project.pbxproj 更新版本号、build号、app展示名
 ### 
 
@@ -105,7 +105,7 @@ while [ "$#" -gt 0 ]; do
             exit 1
             ;;
         *) # 普通参数
-            echo "${RED}Error: Too many arguments provided.${NC}"
+            echo "${RED}Error: Too many arguments provided. 多提供了【$1】${NC}"
             show_usage
             exit 1
             ;;
@@ -167,7 +167,10 @@ fi
 
 # 修改app展示名
 if [ -n "$appNameOld" ] && [ -n "$appNameNew" ]; then
-    sed -i '' "s/${appNameOld}/${appNameNew}/g" $pbxprojPath
+    # 增加 "INFOPLIST_KEY_CFBundleDisplayName = "前缀，确保只替换以该前缀开头的语句
+    appNameOldLine="INFOPLIST_KEY_CFBundleDisplayName = ${appNameOld}"
+    appNameNewLine="INFOPLIST_KEY_CFBundleDisplayName = ${appNameNew}"
+    sed -i '' "s/${appNameOldLine}/${appNameNewLine}/g" $pbxprojPath
     if [ $? -eq 0 ]; then
         echo "✅ ${appNameOld} updated to${BLUE} ${appNameNew} ${NC}in $pbxprojPath"
     else

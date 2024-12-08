@@ -1,0 +1,60 @@
+{
+    "action_sript_file_rel_this_dir": "../update_ios_pbxproj.sh",
+    "action_sript_file_des": "对 project.pbxproj 更新版本号、build号、app展示名",
+    "actions_envs_des": "对 project.pbxproj 更新版本号、build号、app展示名",
+    "actions_envs_values": [
+        {
+            "env_id": "update_ios_pbxproj",
+            "env_name": "对 project.pbxproj 更新版本号、build号、app展示名",
+            "env_action_ids": [
+                "-pbxproj",
+                "-ver",
+                "-bid",
+                "-appNameOld",
+                "-appNameNew"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "-pbxproj",
+            "des": "要修改的 project.pbxproj 文件路径",
+            "actionType": "fixed",
+            "resultForParam": "-pbxproj",
+            "fixedType": "fileOrDir-path-absPath",
+            "fixedValue": "~/Project/AutoPackage-iOS/CJAutoPackageDemo/CJAutoPackageDemo.xcodeproj/project.pbxproj"
+        },
+        {
+            "id": "-ver",
+            "des": "新的版本号",
+            "actionType": "fixed",
+            "resultForParam": "-ver",
+            "fixedType": "fixed-value",
+            "fixedValue": "1.7.3"
+        },
+        {
+            "id": "-bid",
+            "des": "新的build号",
+            "actionType": "fixed",
+            "resultForParam": "-bid",
+            "fixedType": "fixed-value",
+            "fixedValue": "24010809"
+        },
+        {
+            "id": "-appNameOld",
+            "des": "旧的app展示名,当要修改展示名时必填",
+            "actionType": "fixed",
+            "resultForParam": "-appNameOld",
+            "fixedType": "fixed-value",
+            "fixedValue": "CJAutoPackageDemo"
+        },
+        {
+            "id": "-appNameNew",
+            "des": "新的app展示名",
+            "actionType": "fixed",
+            "resultForParam": "-appNameNew",
+            "fixedType": "fixed-value",
+            "fixedValue": "CJAutoPackageDemo开发版"
+        }
+    ]
+}

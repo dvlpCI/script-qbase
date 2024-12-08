@@ -98,7 +98,7 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
     
     if 'action_sript_file_absPath' in data:
         action_script_file_absPath=data['action_sript_file_absPath']
-        action_script_file_absPath = os.path.abspath(os.path.expanduser(action_script_file_absPath))    # 转换为完整路径
+        action_script_file_absPath = os.path.abspath(os.path.expanduser(action_script_file_absPath))    # 将 ~ 转换为完整路径
         if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
             print(f"{RED}发生错误:脚本文件不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_absPath {RED}属性值{BLUE} {action_script_file_absPath} {RED}是否正确。{NC}")
             openFile(pack_input_params_file_path)
@@ -230,10 +230,15 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
     operateDes = operateHomeMap['des']
 
     param_type = operateHomeMap['fixedType']
-    if param_type == "dir-path-rel-this-file" or param_type == "file-path-rel-this-file":
-        # 如果是相对目录
-        param_value = operateHomeMap['fixedValue']
-        dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value)
+    if param_type == "fileOrDir-path-absPath" or param_type == "dir-path-rel-this-file" or param_type == "file-path-rel-this-file":    
+        if param_type == "fileOrDir-path-absPath":
+            dir_path = operateHomeMap['fixedValue']
+            dir_path = os.path.abspath(os.path.expanduser(dir_path))    # 将 ~ 转换为完整路径
+        elif param_type == "dir-path-rel-this-file" or param_type == "file-path-rel-this-file":
+            # 如果是相对目录
+            param_value = operateHomeMap['fixedValue']
+            dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value)
+
         if dir_path == None or not os.path.exists(dir_path):
             print(f"{RED}参数指向的文件获取失败，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}")
             # openFile(pack_input_params_file_path)

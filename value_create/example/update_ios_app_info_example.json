@@ -1,0 +1,24 @@
+{
+    "action_sript_file_rel_this_dir": "../update_ios_app_info.sh",
+    "action_sript_file_des": "更新指定项目的版本号、build号、app展示名、代码环境",
+    "actions_envs_des": "要更新哪个项目",
+    "actions_envs_values": [
+        {
+            "env_id": "CJAutoPackageDemo",
+            "env_name": "",
+            "env_action_ids": [
+                "appInfoParamJsonFile_absPath"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "appInfoParamJsonFile_absPath",
+            "des": "更新CJAutoPackageDemo项目的版本号、build号、app展示名、代码环境",
+            "actionType": "fixed",
+            "resultForParam": "--app-params",
+            "fixedType": "file-path-rel-this-file",
+            "fixedValue": "./update_ios_app_info_json.json"
+        }
+    ]
+}
