@@ -125,18 +125,6 @@
             ]
         },
         {
-            "type": "rel_path",
-            "des": "值的创建、获取、修改",
-            "values": [
-                {
-                    "des": "获取给app的版本号和build号",
-                    "key": "getAppVersionAndBuildNumber",
-                    "rel_path": "./value_create/value_create_app_version_and_build.sh",
-                    "example": "qbase -quick getAppVersionAndBuildNumber"
-                }
-            ]
-        },
-        {
             "type": "package",
             "des": "脚本包",
             "values": [
@@ -149,6 +137,28 @@
                     "key": "install_package",
                     "des": "检查安装环境，且未安装时候需要进行安装",
                     "rel_path": "./package/install_package.sh"
+                }
+            ]
+        },
+        {
+            "type": "rel_path",
+            "des": "值的创建、获取、修改",
+            "values": [
+                {
+                    "des": "获取给app的版本号和build号",
+                    "key": "getAppVersionAndBuildNumber",
+                    "rel_path": "./value_create/value_create_app_version_and_build.sh",
+                    "example": "qbase -quick getAppVersionAndBuildNumber"
+                },
+                {
+                    "des": "对 project.pbxproj 更新版本号、build号、app展示名",
+                    "key": "update_ios_pbxproj",
+                    "rel_path": "./value_create/update_ios_pbxproj.sh"
+                },
+                {
+                    "des": "对指定文件中匹配的指定字符串的所有行,从匹配到的位置开始将该行替换成新的字符串",
+                    "key": "update_line_that_match_text",
+                    "rel_path": "./value_create/update_line_that_match_text.sh"
                 }
             ]
         },

@@ -1,0 +1,17 @@
+{
+    "action_sript_file_rel_this_dir": "../value_create_app_version_and_build.sh",
+    "action_sript_file_des": "获取给app的版本号和build号",
+    "actions_envs_des": "获取给app的版本号和build号",
+    "actions_envs_values": [
+        {
+            "env_id": "value_create_app_version_and_build",
+            "env_name": "获取给app的版本号和build号",
+            "env_action_ids": [
+                
+            ]
+        }
+    ],
+    "actions": [
+        
+    ]
+}

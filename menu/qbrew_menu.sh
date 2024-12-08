@@ -18,6 +18,12 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+
+CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+qbase_homedir_abspath=${CurrentDIR_Script_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
+
+qbase_execScript_by_configJsonFile_scriptPath=$qbase_homedir_abspath/pythonModuleSrc/dealScript_by_scriptConfig.py
+
 # 生成随机 RGB 颜色并转换为 ANSI 颜色码
 generate_random_color() {
     red=$((RANDOM % 256))   # 随机生成 0-255 的红色分量
@@ -137,6 +143,30 @@ evalActionByInput() {
                 return 0
             fi
             echo "${helpString}"
+
+            quickCmd_script_dir_path=$(dirname "$quickCmd_script_path")
+            quickCmd_script_file_name=$(basename "$relpath")
+            quickCmd_script_file_name_no_ext="${quickCmd_script_file_name%.*}"
+            input_params_from_file_path="$quickCmd_script_dir_path/example/${quickCmd_script_file_name_no_ext}_example.json"
+            if [ ! -f "$input_params_from_file_path" ]; then
+                printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
+                return 0
+            else
+                printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
+                while [ "$valid_option" = false ]; do
+                    read -r -p "本脚本提供演示示例，若要演示请输入yes|YES|y|Y : " exec_demo_option
+
+                    if [ "${exec_demo_option}" == yes ] || [ "${exec_demo_option}" == "YES" ]; then
+                        # echo "${CYAN}======================正在使用${BLUE} ${qbase_execScript_by_configJsonFile_scriptPath} ${CYAN}执行${BLUE} ${input_params_from_file_path} ${CYAN}======================${NC}"
+                        python3 $qbase_execScript_by_configJsonFile_scriptPath $input_params_from_file_path
+                        printf "\n"
+                        break
+                    else
+                        # 非 yes 等全部视为不执行
+                        break
+                    fi
+                done
+            fi
 
             # 尝试执行脚本的 --help 命令
             # help_output=$("$quickCmd_script_path" --help 2>&1)

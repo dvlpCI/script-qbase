@@ -1,0 +1,42 @@
+{
+    "action_sript_file_rel_this_dir": "../update_line_that_match_text.sh",
+    "action_sript_file_des": "对代码文件进行环境修改",
+    "actions_envs_des": "对代码文件进行环境修改",
+    "actions_envs_values": [
+        {
+            "env_id": "update_line_that_match_text",
+            "env_name": "对代码文件进行环境修改",
+            "env_action_ids": [
+                "-file",
+                "-matchString",
+                "-newString"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "-file",
+            "des": "要修改的文件路径",
+            "actionType": "fixed",
+            "resultForParam": "-file",
+            "fixedType": "file-path-rel-this-file",
+            "fixedValue": "./update_line_that_match_text_example.dart"
+        },
+        {
+            "id": "-matchString",
+            "des": "匹配的字符串",
+            "actionType": "fixed",
+            "resultForParam": "-matchString",
+            "fixedType": "fixed-value",
+            "fixedValue": "static var networkType = PackageNetworkType."
+        },
+        {
+            "id": "-newString",
+            "des": "要替换成什么新字符串",
+            "actionType": "fixed",
+            "resultForParam": "-newString",
+            "fixedType": "fixed-value",
+            "fixedValue": "static var networkType = PackageNetworkType.myNewNetworkType"
+        }
+    ]
+}
