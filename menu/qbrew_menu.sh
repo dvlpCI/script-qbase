@@ -153,12 +153,17 @@ tool_menu() {
 
     # 使用 jq 命令解析 JSON 数据并遍历
     # catalog_count=$(jq ".${qbrew_categoryType} | length" "$qtool_menu_json_file_path")    # 使用 jq 提取动态字段的值
-    catalogCount=$(echo "$categoryData" | jq "length")
+    catalogCount=$(printf "%s" "$categoryData" | jq "length")
     # echo "catalogCount=${catalogCount}"
     for ((i = 0; i < ${catalogCount}; i++)); do
-        iCatalogMap=$(echo "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
-        iCatalogOutlineMaps=$(echo "$iCatalogMap" | jq -r ".values")
-        iCatalogOutlineCount=$(echo "$iCatalogOutlineMaps" | jq '.|length')
+        iCatalogMap=$(printf "%s" "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
+        if [ $? != 0 ] || [ -z "${iCatalogMap}" ]; then
+            echo "❌${RED}Error1:执行命令jq出错了，常见错误：您的内容文件中，有斜杠，但使用jq时候却没使用printf \"%s\"，而是使用echo。解决方法1：去掉斜杠；解决方法2：一个斜杠，应该用四个斜杠标识；更好的解决方法：使用printf \"%s\"。请检查>>>>>>>${NC}\n ${iCatalogMap} ${RED}\n<<<<<<<<<<<<<请检查以上内容。${NC} "
+            # echo "cat \"$qbrew_json_file_path\" | jq \".${qbrew_categoryType}\" | jq -r \".[${i}]\" | jq -r \".values\""
+            exit 1
+        fi
+        iCatalogOutlineMaps=$(printf "%s" "$iCatalogMap" | jq -r ".values")
+        iCatalogOutlineCount=$(printf "%s" "$iCatalogOutlineMaps" | jq '.|length')
         if [ $i = 0 ]; then
             iCatalogColor=${BLUE}
         elif [ $i = 1 ]; then
@@ -173,9 +178,9 @@ tool_menu() {
             iCatalogColor=$(generate_random_color)
         fi
         for ((j = 0; j < ${iCatalogOutlineCount}; j++)); do
-            iCatalogOutlineMap=$(echo "$iCatalogOutlineMaps" | jq -r ".[${j}]") # 添加 jq -r 的-r以去掉双引号
-            iCatalogOutlineName=$(echo "$iCatalogOutlineMap" | jq -r ".key")
-            iCatalogOutlineDes=$(echo "$iCatalogOutlineMap" | jq -r ".des")
+            iCatalogOutlineMap=$(printf "%s" "$iCatalogOutlineMaps" | jq -r ".[${j}]") # 添加 jq -r 的-r以去掉双引号
+            iCatalogOutlineName=$(printf "%s" "$iCatalogOutlineMap" | jq -r ".key")
+            iCatalogOutlineDes=$(printf "%s" "$iCatalogOutlineMap" | jq -r ".des")
             
             iBranchOption="$((i + 1)).$((j + 1))|${iCatalogOutlineName}"
             printf "${iCatalogColor}%-50s%s${NC}\n" "${iBranchOption}" "$iCatalogOutlineDes" # 要拼接两个字符串，并在拼接的结果中，如果第一个字符串不够 15 位则自动补充空格到 15 位
@@ -197,21 +202,21 @@ evalActionByInput() {
         fi
 
         # 定义菜单选项
-        catalogCount=$(echo "$categoryData" | jq "length")
+        catalogCount=$(printf "%s" "$categoryData" | jq "length")
         tCatalogOutlineMap=""
         for ((i = 0; i < ${catalogCount}; i++)); do
-            iCatalogMap=$(echo "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
-            iCatalogOutlineMaps=$(echo "$iCatalogMap" | jq -r ".values")
-            iCatalogOutlineCount=$(echo "$iCatalogOutlineMaps" | jq '.|length')
+            iCatalogMap=$(printf "%s" "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
+            iCatalogOutlineMaps=$(printf "%s" "$iCatalogMap" | jq -r ".values")
+            iCatalogOutlineCount=$(printf "%s" "$iCatalogOutlineMaps" | jq '.|length')
             hasFound=false
             for ((j = 0; j < ${iCatalogOutlineCount}; j++)); do
-                iCatalogOutlineMap=$(echo "$iCatalogOutlineMaps" | jq -r ".[${j}]") # 添加 jq -r 的-r以去掉双引号
-                iCatalogOutlineName=$(echo "$iCatalogOutlineMap" | jq -r ".key")
+                iCatalogOutlineMap=$(printf "%s" "$iCatalogOutlineMaps" | jq -r ".[${j}]") # 添加 jq -r 的-r以去掉双引号
+                iCatalogOutlineName=$(printf "%s" "$iCatalogOutlineMap" | jq -r ".key")
 
                 iBranchOptionId="$((i + 1)).$((j + 1))"
                 iBranchOptionName="${iCatalogOutlineName}"
 
-                if [ "${option}" = ${iBranchOptionId} ] || [ "${option}" == ${iBranchOptionName} ]; then
+                if [ "${option}" = "${iBranchOptionId}" ] || [ "${option}" == "${iBranchOptionName}" ]; then
                     tCatalogOutlineMap=$iCatalogOutlineMap
                     hasFound=true
                     break
@@ -231,7 +236,7 @@ evalActionByInput() {
 
 deal_for_choose() {
     if [ -n "${execChoosed}" ] && [ "${execChoosed}" == "true" ]; then
-        tCatalogOutlineCommand=$(echo "$tCatalogOutlineMap" | jq -r ".command")
+        tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
         eval "${tCatalogOutlineCommand}"
     else
@@ -250,12 +255,12 @@ show_usage_for_choose() {
         return 1
     fi
 
-    tCatalogOutlineKey=$(echo "$tCatalogOutlineMap" | jq -r ".key")
-    tCatalogOutlineAction=$(echo "$tCatalogOutlineMap" | jq -r ".example")
+    tCatalogOutlineKey=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".key")
+    tCatalogOutlineAction=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".example")
     if [ -z "${tCatalogOutlineAction}" ] || [ "${tCatalogOutlineAction}" == "null" ]; then
         tCatalogOutlineAction="暂时没有 ${tCatalogOutlineKey} 的演示示例"
     fi
-    relpath=$(echo "$tCatalogOutlineMap" | jq -r ".rel_path")
+    relpath=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".rel_path")
     if [ -z "${relpath}" ] || [ "${relpath}" == "null" ]; then
         echo "${RED}Error:您的 ${tCatalogOutlineMap} 缺失描述脚本相对位置的 rel_path 属性值。请检查 ${NC}"
         # cat "$qpackageJsonF" | jq '.quickCmd'

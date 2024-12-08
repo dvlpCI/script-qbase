@@ -1,0 +1,35 @@
+{
+    "custom": [
+        {
+            "type": "normal",
+            "des": "自定义要执行的普通脚本",
+            "values": [
+                {
+                    "des": "输出当前目录下的文件",
+                    "key": "ls",
+                    "command": "ls"
+                },
+                {
+                    "des": "查看 pod 的版本",
+                    "key": "pod --version",
+                    "command": "pod --version"
+                },
+                {
+                    "des": "查看 Project 文件",
+                    "key": "goProject",
+                    "command": "open /Users/qian/Project/"
+                },
+                {
+                    "des": "查看 pp 文件(路径的斜杠，通过将整个路径包在\"\"中)",
+                    "key": "goPP",
+                    "command": "open \"/Users/qian/Library/MobileDevice/Provisioning Profiles/\""
+                },
+                {
+                    "des": "查看 pp 文件(路径的斜杠，通过再加个斜杠来转义)",
+                    "key": "goPP",
+                    "command": "open /Users/qian/Library/MobileDevice/Provisioning\\ Profiles/"
+                }
+            ]
+        }
+    ]
+}

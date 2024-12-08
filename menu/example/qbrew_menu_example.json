@@ -20,7 +20,7 @@
             "actionType": "fixed",
             "resultForParam": "-file",
             "fixedType": "file-path-rel-this-file",
-            "fixedValue": "./cutom_command_menu_example.json"
+            "fixedValue": "./custom_command_menu_example.json"
         },
         {
             "id": "-categoryType",
