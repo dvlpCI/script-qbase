@@ -22,8 +22,8 @@ CYAN="\033[0;36m"
 # 使用说明函数
 show_usage() {
     printf "${BLUE}%s${NC}\n" "对指定文件中的脚本进行选择,进行案例输出或者直接执行。"
-    printf "${BLUE}%s${NC}\n" "使用场景：①系统脚本的示例演示;②自定义菜单中的命令的直接执行。"
-    printf "${YELLOW}%s${PURPLE}\n" "sh xxx.sh -file qbase.json -categoryType support_script_path execIt"
+    printf "${BLUE}%s${NC}\n" "使用场景: ①系统脚本的示例演示; ②自定义菜单中的命令的直接执行。"
+    printf "${BLUE}%s${BLUE}\n" "使用示例: sh xxx.sh -file qbase.json -categoryType support_script_path -execChoosed true"
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     # printf "%-20s %s\n" "Options:" ""
     # printf "%-50s %s\n" "-v|--verbose" "Enable verbose mode"
@@ -198,7 +198,7 @@ evalActionByInput() {
         read -r -p "请选择您想要查看的操作编号或id(若要退出请输入Q|q) : " option
 
         if [ "${option}" == q ] || [ "${option}" == "Q" ]; then
-            exit 2
+            return 109  # 109 代表有列表的退出
         fi
 
         # 定义菜单选项
@@ -240,9 +240,12 @@ deal_for_choose() {
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
         eval "${tCatalogOutlineCommand}"
     else
-        show_usage_for_choose
+        result=$(show_usage_for_choose >&2)
+        if [ $? != 0 ]; then
+            return $result
+        fi
     fi
-    
+   
 }
 
 # 显示选中的脚本的使用方法
@@ -265,7 +268,7 @@ show_usage_for_choose() {
         echo "${RED}Error:您的 ${tCatalogOutlineMap} 缺失描述脚本相对位置的 rel_path 属性值。请检查 ${NC}"
         # cat "$qpackageJsonF" | jq '.quickCmd'
         # cat "$qpackageJsonF" | jq '.'
-        exit 1
+        return 1
     fi
     relpath="${relpath//.\//}"  # 去掉开头的 "./"
     quickCmd_script_path=$(realpath "${relPath_baseDirPath}/$relpath") # 拼接相对路径为完整路径并转换为绝对路径
@@ -275,12 +278,16 @@ show_usage_for_choose() {
     fi
 
     # echo "您正在调用《 sh ${quickCmd_script_path} --help 》"
-    printf "${CYAN}【${BLUE}%s${CYAN}】使用示例：\n${NC}" "${tCatalogOutlineKey}"    # printf 的正确换行
+    printf "${CYAN}【${BLUE} %s ${CYAN}】使用示例：\n${NC}" "${tCatalogOutlineKey}"    # printf 的正确换行
     
+    # getAppVersionAndBuildNumber 的执行结果为 printf "%s" "${appVersionJson}"
+    # 使用  >&2 相当于将脚本执行过程中的输出内容作为日志，而不是返回值
     # helpString=$(sh ${quickCmd_script_path} --help 2>&1)
+    # helpString=$(sh ${quickCmd_script_path} --help >&2) 
     helpString=$(sh ${quickCmd_script_path} --help)
     if [ $? != 0 ] || [ -z "${helpString}" ]; then
-        printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
+        printf "${PURPLE} 脚本方法示例：%s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
+        # printf ">>>>>>>>>>>helpString= %s\n <<<<<<<" "${helpString}"
         return 0
     fi
     echo "${helpString}"
@@ -293,13 +300,22 @@ show_usage_for_choose() {
         printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
         return 0
     else
-        printf "${PURPLE} %s\n${NC}" "${tCatalogOutlineAction}"    # printf 的正确换行
         while [ "$valid_option" = false ]; do
-            read -r -p "本脚本提供演示示例，若要演示请输入yes|YES|y|Y : " exec_demo_option
+            read -r -p "本脚本提供演示示例，若要演示请输入yes|YES : " exec_demo_option
 
             if [ "${exec_demo_option}" == yes ] || [ "${exec_demo_option}" == "YES" ]; then
                 # echo "${CYAN}======================正在使用${BLUE} ${qbase_execScript_by_configJsonFile_scriptPath} ${CYAN}执行${BLUE} ${input_params_from_file_path} ${CYAN}======================${NC}"
-                python3 $qbase_execScript_by_configJsonFile_scriptPath $input_params_from_file_path
+                resultCode=$(python3 $qbase_execScript_by_configJsonFile_scriptPath $input_params_from_file_path >&2)
+                # 获取input_params_from_file_path 这个json文件中 action_sript_file_rel_this_dir 的值
+                # 如果刚刚执行的脚本是 qbrew_menu.sh 等，则因为该脚本有自己的菜单输出，所以我们在其结束时，额外自己补充上本页面的菜单。
+                # if [[ "$resultCode" -eq 109 ]]; then    # 如果所执行的脚本有列表，则在退出后，重新展示本菜单
+                dealScriptPath=$(jq -r '.action_sript_file_rel_this_dir' $input_params_from_file_path)
+                dealScriptPath=$(basename "${dealScriptPath}")
+                # echo "🚑🚑🚑🚑🚑🚑🚑 dealScriptPath: ${dealScriptPath}"
+                if [ "${dealScriptPath}" == "qbrew_menu.sh" ]; then
+                    echo "您已结束所要执行的脚本，并且是退出方式的结束，请重新选择您要执行的"
+                    tool_menu "${categoryData}"
+                fi
                 printf "\n"
                 break
             else
@@ -349,5 +365,3 @@ evalActionByInput "${categoryData}"
 # fi
 # echo "${CYAN}使用示例:${PURPLE} ${chooseResult} ${NC}"
 
-# 退出程序
-exit 0

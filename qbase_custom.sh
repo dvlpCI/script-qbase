@@ -116,16 +116,15 @@ checkEnvValue() {
     fi
 }
 
-checkEnvValue
+result=$(checkEnvValue)
+if [ $? -ne 0 ]; then
+    echo "${result}"
+    exit 2
+fi
 
 
-
-
-        
-
-# echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType quickCmd -execChoosed "true"》"
-
-# sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${QBASE_CUSTOM_MENU} -categoryType "quickCmd" -execChoosed "true"
+# echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file \"${QBASE_CUSTOM_MENU}\" -categoryType custom -execChoosed "true"》"
+sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${QBASE_CUSTOM_MENU}" -categoryType "custom" -execChoosed "true"
 
 
 

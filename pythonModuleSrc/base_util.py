@@ -76,7 +76,10 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         return False
 
     # 判断 shell 命令的返回值，并输出结果
-    if result.returncode != 0:
+    if result.returncode == 109:  # 109:为有列表的正常退出
+        # print(f"{GREEN}温馨提示:您的脚本命令正常退出，且退出前有列表，returncode={result.returncode}。{NC}")
+        return True
+    elif result.returncode != 0:
         print(f"{RED}抱歉:您的脚本命令执行失败，returncode={result.returncode}。 请检查您所执行的命令《{YELLOW} {cmdString} {RED}》{NC}")
         exit(1)
     # elif result is not None and "exit 1" in result.stdout:

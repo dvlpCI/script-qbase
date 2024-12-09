@@ -17,6 +17,10 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+BOLD='\033[1m'
+UNDERLINE='\033[4m'
+RESET='\033[0m'
+
 # -package 的测试，详见 qbase_example_quickCmd.sh
 if [ "$1" == "-package" ]; then
     packageArg=$2 # 去除第一个参数之前，先保留下来
@@ -329,13 +333,34 @@ allArgsExceptFirstArg="$@"  # 将去除前一个参数，剩余的参数赋值�
 # }
 
 
+# 使用说明函数
+show_usage() {
+    INDENT_LEVEL=4  # 设置缩进的空格数量
+    INDENT=$(printf "%*s" $INDENT_LEVEL "")
+
+    # printf "Usage:"
+    # printf "\n"
+    # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
+    printf "%-20s %s\n" "Commands:" ""
+    printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ custom" "执行自定义的命令菜单（若不存在会引导添加）"
+    printf "\n"
+    printf "%-20s %s\n" "Options:" ""
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-verbose" "Show more debugging information"
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "--help" "Show help banner of specified command"
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-quick-eg" "查看可使用的快捷命令"
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-path-eg" "查看可使用的脚本，需要密码"
+    # printf "%-20s %s\n" "Arguments:" ""
+    # printf "%-20s %s\n" "file" "Input file path"
+    # printf "%-20s %s\n" "output" "Output file path"
+    printf "${NC}"
+}
 
 # echo "打印变量firstArg的值:$firstArg"  # 打印变量b的值
 # echo "打印变量allArgsExceptFirstArg的值:$allArgsExceptFirstArg"  # 打印变量b的值
 
 # 如果是获取版本号
 versionCmdStrings=("--version" "-version" "-v" "version")
-helpCmdStrings=("-help" "help")
+helpCmdStrings=("--help" "-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 
@@ -371,11 +396,40 @@ elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
-elif [ "${firstArg}" == "-help" ] || [ "${firstArg}" == "help" ]; then
-    echo '请输入您想查看的命令，支持的命令及其含义分别为 {"-quick-eg":"'"查看可使用的快捷命令"'","-path":"'"支持的脚本"'"}'
+elif [ "${firstArg}" == "--help" ] || [ "${firstArg}" == "-help" ] || [ "${firstArg}" == "help" ]; then
+# elif echo "${helpCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then # 判断结果有误
+    show_usage
 else
     echo "${qbase_latest_version}"
 fi
 
 
 
+# 使用介绍的格式，可参考 pod
+# Function to display the usage
+# show_usage() {
+#     cat <<EOF
+# Usage:
+#   mytool [command] [options]
+
+# Commands:
+#   init          Initialize the environment.
+#   build         Build the project.
+#   run           Run the application.
+#   test          Run the test suite.
+#   clean         Clean up generated files.
+
+# Options:
+#   -h, --help    Show help information.
+#   -v, --version Display the version number.
+
+# Examples:
+#   mytool init
+#   mytool build --release
+#   mytool run
+#   mytool test --coverage
+#   mytool clean
+
+# For more information, visit https://example.com/docs/mytool.
+# EOF
+# }
