@@ -1,6 +1,17 @@
 {
     "custom": [
         {
+            "type": "command",
+            "des": "自定义命令的操作",
+            "values": [
+                {
+                    "des": "增加自定义的命令",
+                    "key": "add custom command",
+                    "command": "open $QBASE_CUSTOM_MENU"
+                }
+            ]
+        },
+        {
             "type": "normal",
             "des": "自定义要执行的普通脚本",
             "values": [
