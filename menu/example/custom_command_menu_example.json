@@ -15,19 +15,40 @@
                     "command": "pod --version"
                 },
                 {
+                    "des": "查看 ~/.ssh 文件夹",
+                    "key": "open ~/.ssh",
+                    "command": "open ~/.ssh"
+                },
+                {
+                    "des": "查看 homebrew 的 Taps 文件夹",
+                    "key": "open /opt/homebrew/Library",
+                    "command": "open /opt/homebrew/Library"
+                },
+                {
                     "des": "查看 Project 文件",
                     "key": "goProject",
-                    "command": "open /Users/qian/Project/"
+                    "command": "open ~/Project/"
                 },
                 {
                     "des": "查看 pp 文件(路径的斜杠，通过将整个路径包在\"\"中)",
-                    "key": "goPP",
-                    "command": "open \"/Users/qian/Library/MobileDevice/Provisioning Profiles/\""
+                    "key": "goPP(方法1)",
+                    "command": "open \"~/Library/MobileDevice/Provisioning Profiles/\""
                 },
                 {
                     "des": "查看 pp 文件(路径的斜杠，通过再加个斜杠来转义)",
-                    "key": "goPP",
-                    "command": "open /Users/qian/Library/MobileDevice/Provisioning\\ Profiles/"
+                    "key": "goPP(方法2)",
+                    "command": "open ~/Library/MobileDevice/Provisioning\\ Profiles/"
+                }
+            ]
+        },
+        {
+            "type": "usual",
+            "des": "自定义要执行的日常脚本",
+            "values": [
+                {
+                    "des": "打开上传包的网站(pgyer)",
+                    "key": "打开上传包的网站(pgyer)",
+                    "command": "open https://www.pgyer.com/"
                 }
             ]
         }

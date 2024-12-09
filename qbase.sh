@@ -5,6 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-07 20:54:07
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
+# @注意：修改本文件后，记得重新生成 qbase 二进制文件
 ###
 
 # 定义颜色常量(qbase 不是所要执行的直接脚本，所以不要使用颜色)
@@ -152,6 +153,12 @@ function getqscript_allVersionHomeDir_abspath() {
 }
 
 # CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
+# 检查 realpath 命令是否安装，未安装则提示用什么命令在终端进行安装
+if ! command -v realpath &> /dev/null; then
+    echo "${RED}温馨提示：您当前的系统中未安装 realpath 命令，请使用《${BLUE} brew install coreutils ${RED}》命令在终端进行安装。${NC}"
+    exit 1
+fi
+
 CurrentScript_absolute_path=$(realpath "$0")
 # echo "$0 🆚 ${CurrentScript_absolute_path}"
 if [ "$0" == "${CurrentScript_absolute_path}" ]; then
@@ -350,8 +357,8 @@ elif [ "${firstArg}" == "-path" ]; then
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 
 elif [ "${firstArg}" == "-quick-eg" ]; then     # 查看快捷命令
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} quickCmd 》"
-    sh $qbase_homedir_abspath/menu/qbrew_menu.sh ${qpackageJsonF} "quickCmd"
+    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType quickCmd 》"
+    sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType "quickCmd"
 
 elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)

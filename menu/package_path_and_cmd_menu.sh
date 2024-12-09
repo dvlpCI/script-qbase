@@ -44,11 +44,24 @@ if [ ! -f "${qpackageJsonF}" ]; then
     exit 1
 fi
 
+# 检查jq是否安装
+if ! command -v jq &> /dev/null; then
+    echo ""
+    echo "${RED}Error:jq is not installed. Please install it with command:${BLUE} brew install jq${NC}"
+    exit 1
+fi
+
 
 qpackageJsonFileName=$(basename "$qpackageJsonF")
 qpackageName="${qpackageJsonFileName%.*}"
 debug_log "${YELLOW}正在执行命令(从 ${qpackageJsonF} 中获取 key 为 $specified_value 的map)《${BLUE} cat \"$qpackageJsonF\" | jq --arg value \"$specified_value\" '.quickCmd[].values[], .support_script_path[].values[] | select(.key == \$value)' ${YELLOW}》${NC}"
 map=$(cat "$qpackageJsonF" | jq --arg value "$specified_value" '.quickCmd[].values[], .support_script_path[].values[] | select(.key == $value)')
+# 判断 specified_value 是否为空
+if [ -z "${specified_value}" ]; then
+    map=$(cat "$qpackageJsonF" | jq '.quickCmd[].values[], .support_script_path[].values[]')
+    echo "${RED}Error:在 ${qpackageName} 库支持的命令如下，请指定你要获取的 key ,请检查。${BLUE}\n ${map} ${NC}"
+    exit 1 
+fi
 debug_log "${YELLOW}1.从 ${qpackageName} 库的 quickCmd 和 support_script_path 中查找 key 为 $specified_value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
 if [ -z "${map}" ] || [ "${map}" == "null" ]; then
     echo "${RED}Error:在 ${qpackageName} 库的 quickCmd 和 support_script_path 的 values 下都没有 key 为${BLUE} $specified_value ${RED}的map,请检查。 ${NC}"

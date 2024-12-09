@@ -178,7 +178,8 @@ fi
 relpath="${relpath//.\//}"  # 去掉开头的 "./"
 quickCmd_script_path="$qpackage_homedir_abspath/$relpath"
 if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
-    echo "抱歉：暂不支持 ${packagePathAction} ${packagePathKey} 快捷命令，请检查。"
+    echo "抱歉：暂不支持 ${packagePathAction} 对 ${packagePathKey} 的快捷命令，请检查。"
+    #echo "${RED}提示${YELLOW}（仅供个人调试时候打开）${RED}：暂不支持的原因为：${BLUE} ${quickCmd_script_path} ${RED}文件不存在，请检查 qbase.json 文件中的路径配置是否正确。${NC}"
     exit 1
 fi
 
