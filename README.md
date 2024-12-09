@@ -52,3 +52,19 @@ function debug_log() {
 # >/dev/null 2>&1 将标准输出和标准错误输出都重定向到 /dev/null，即全部丢弃。
 ```
 
+```
+为了避免jq在处理json文件中的内容有\的问题时候，请使用
+$(printf "%s" "$categoryData" | jq "length") 而不是 $(echo "$categoryData" | jq "length")
+
+示例：
+catalogCount=$(printf "%s" "$categoryData" | jq "length")
+# echo "catalogCount=${catalogCount}"
+for ((i = 0; i < ${catalogCount}; i++)); do
+	iCatalogMap=$(printf "%s" "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
+	if [ $? != 0 ] || [ -z "${iCatalogMap}" ]; then
+		echo "❌${RED}Error1:执行命令jq出错了，常见错误：您的内容文件中，有斜杠，但使用jq时候却没使用printf \"%s\"，而是使用echo。解决方法1：去掉斜杠；解决方法2：一个斜杠，应该用四个斜杠标识；更好的解决方法：使用printf \"%s\"。请检查>>>>>>>${NC}\n ${iCatalogMap} ${RED}\n<<<<<<<<<<<<<请检查以上内容。${NC} "
+		# echo "cat \"$qbrew_json_file_path\" | jq \".${qbrew_categoryType}\" | jq -r \".[${i}]\" | jq -r \".values\""
+		exit 1
+	fi
+done
+```

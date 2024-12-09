@@ -339,6 +339,9 @@ helpCmdStrings=("-help" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 
+elif [ "${firstArg}" == "custom" ]; then
+    sh $qbase_homedir_abspath/qbase_custom.sh
+
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     passwordStrings=("qian" "chaoqian" "lichaoqian")
     if ! printf "%s\n" "${passwordStrings[@]}" | grep -wq "$1"; then    # 检查是否不包含，另前面已执行 shift 1  去除前一个参数，所以当前的第二个参数是 $1
