@@ -53,6 +53,17 @@
             ]
         },
         {
+            "type": "git",
+            "des": "git命令",
+            "values": [
+                {
+                    "des": "大概命令： ② git checkout -b test/ad  ④ git push -u origin test/ad",
+                    "key": "查看完整的如何本地git提交的命令",
+                    "command": "echo \"①查看远程是否已有要关联的本地分支 git branch -r \\n②创建本地分支 git checkout -b test/ad \\n③添加并提交更改：git add . && git commit -m \"Initial commit for test/ad\" \\n④推送到远程分支 git push -u origin test/ad \""
+                }
+            ]
+        },
+        {
             "type": "usual",
             "des": "自定义要执行的日常脚本",
             "values": [
