@@ -49,6 +49,11 @@
                     "des": "查看 pp 文件(路径的斜杠，通过再加个斜杠来转义)",
                     "key": "goPP(方法2)",
                     "command": "open ~/Library/MobileDevice/Provisioning\\ Profiles/"
+                },
+                {
+                    "des": "查看压缩包结构，避免使用系统解压工具导致被默认解压到与压缩包同名的文件夹内，而导致看不到原本内容是对文件夹内的进行压缩，还是对文件夹进行压缩",
+                    "key": "unzip -q xxx.zip 或 unar -e GBK xxx.zip(需先 brew install unar 安装)",
+                    "command": "echo \"unzip -q /path/to/your/yourfilename.zip\" 或 \"unar -e GBK /path/to/your/yourfilename.zip(需先 brew install unar 安装)\""
                 }
             ]
         },
