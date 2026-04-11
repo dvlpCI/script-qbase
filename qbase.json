@@ -136,6 +136,12 @@
                     "key": "install_package",
                     "des": "检查安装环境，且未安装时候需要进行安装",
                     "rel_path": "./package/install_package.sh"
+                },
+                {
+                    "key": "check_remote_version",
+                    "des": "检查/更新 Homebrew 包的远程版本",
+                    "rel_path": "./package/package_remote_version.sh",
+                    "example": "qbase -quick check_remote_version -a check -p qbase -v"
                 }
             ]
         },
