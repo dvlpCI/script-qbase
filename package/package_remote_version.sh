@@ -436,8 +436,7 @@ cat << EOF
   "local_version": "${LOCAL_VERSION_ESCAPED:-null}",
   "remote_version": "$REMOTE_VERSION_ESCAPED",
   "has_update": $HAS_UPDATE,
-  "tap_repo": "$TAP_REPO_ESCAPED",
-  "action": "$ACTION"
+  "tap_repo": "$TAP_REPO_ESCAPED"
 }
 EOF
 

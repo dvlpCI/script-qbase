@@ -28,6 +28,7 @@ function delay() {
   sleep "$delay"
 }
 
+# 背景：当变量含有特殊字符（如反斜杠 \n、\\）时，echo 会错误解释它们。
 function logResultValueToConsole() {
     delay # 延迟,避免其他地方调用该方法，导致输出到同文件名上
 
@@ -44,9 +45,19 @@ function logResultValueToConsole() {
 
     # 删除文件temp_file_abspath
     rm -rf ${temp_file_abspath}
+
+    # TODO: 将以上代码全去掉，直接用 printf "%s" "$1" 应该就能正确输出原始值，不需要临时文件。临时文件的方式确实有点过度。
+    # printf "%s" "$1"
 }
 
 
+
+# 用途：将结果信息【覆盖方式的】写到执行脚本同级目录下的一个新建json文件（当前时间.json）里，然后输出文件内容，并打印文件路径到控制台
+# 参数：
+# - 要输入要文件的信息参数: 需要
+# - 文件参数:             不需要，统一为（当前时间.json）
+# 引用该方法的正式脚本文件目前有: 暂无
+# TODO: 因为 > 是覆盖，>> 是追加，且日志文件写入方式一般是追加而不是覆盖，所以建议改为 >>  ${temp_file_abspath}。
 function logResultValueToFile() {
     delay # 延迟,避免其他地方调用该方法，导致输出到同文件名上
 
