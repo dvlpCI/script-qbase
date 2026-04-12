@@ -6,7 +6,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-08 22:01:11
 # @FilePath: qbrew_menu.sh
-# @Description: 输出 qbrew 库中 qbase.json 、 qtool.json 的菜单，并可选择查看哪项的使用示例
+# @Description: 1、先打印出 JSON文件指定分类为菜单(如qbrew 库中 qbase.json 、 qtool.json 的 support_script_path )，供用户选择。2、再在用户选择后了分类里的事项后，通过 -execChoosed 的参数值决定如何处理。情况①true:立即执行该事项command字段指定的命令 ；情况②false:则查看所选事项指定的脚本的使用帮助和执行其演示示例
 ###
 
 # 定义颜色常量
