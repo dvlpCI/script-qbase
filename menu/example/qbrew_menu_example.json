@@ -1,10 +1,10 @@
 {
     "action_sript_file_rel_this_dir": "../qbrew_menu.sh",
-    "action_sript_file_des": "更新指定项目的版本号、build号、app展示名、代码环境",
-    "actions_envs_des": "要更新哪个项目",
+    "action_sript_file_des": "打印json文件里的指定的分类为菜单，供用户选择，并在用户选择后了分类里的事项后，立即执行该事项command字段指定的命令",
+    "actions_envs_des": "要打印的菜单分类",
     "actions_envs_values": [
         {
-            "env_id": "CJAutoPackageDemo",
+            "env_id": "menu_category",
             "env_name": "",
             "env_action_ids": [
                 "-file",

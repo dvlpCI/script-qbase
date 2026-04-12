@@ -3,27 +3,29 @@
 ###
 # @Author: dvlproad dvlproad@163.com
 # @Date: 2023-04-12 22:15:22
-# @LastEditors: dvlproad
-# @LastEditTime: 2023-08-05 01:55:55
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-13 02:34:20
 # @FilePath: package/check_version.sh
-# @Description: 检查或更新 Homebrew 软件包
+# @Description: 对指定的 Homebrew 软件包进行远程检查更新
+# @Note: 检查更新原理见 [https://dvlproad.github.io/代码管理/库管理/homebrew](https://dvlproad.github.io/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86/%E5%BA%93%E7%AE%A1%E7%90%86/homebrew)
 ###
 
 # 显示帮助信息
 show_help() {
     cat << EOF
-用法: $0 -a <action> -p <包名> [选项]
+用法: $0 -p <包名> [选项]
 
 必需参数:
-    -a, --action ACTION   指定操作类型 (check 或 update)
-                          - check: 仅检查是否有新版本
-                          - update: 检查并在有新版本时更新
     -p, --package NAME    指定软件包名称 (例如: qbase)
 
 可选参数:
     -l, --log-file FILE   指定日志文件路径（如果不指定，日志只输出到终端）
     -v, --verbose         显示详细日志信息（包括 INFO 级别）
     -h, --help            显示此帮助信息
+
+说明:
+    执行后会先检查本地版本和远程版本，
+    若发现新版本会让用户确认是否更新。
 
 核心命令:
     如果你不想使用此脚本，可以直接在终端执行以下命令来手动检查版本：
@@ -39,18 +41,17 @@ show_help() {
 
 输出格式:
     JSON 格式，包含以下字段:
-    - status: "update-available" 或 "up-to-date" 或 "error" 或 "updated"
+    - status: "update-available" 或 "up-to-date" 或 "error" 或 "updated" 或 "cancelled"
     - package: 包名
     - local_version: 本地版本（可能为 null）
     - remote_version: 远程版本（错误时为 null）
     - has_update: true/false
     - tap_repo: 仓库地址（错误时为 null）
-    - action: 执行的操作 (check/update)
     - error: 错误信息（仅当 status 为 error 时存在）
 
 退出码:
-    0: 已是最新版本 或 更新成功
-    1: 发现新版本（仅 check 操作）
+    0: 已是最新版本 或 更新成功 或 取消更新
+    1: 发现新版本
     2: 发生错误（包括参数错误）
 
 日志说明:
@@ -60,10 +61,10 @@ show_help() {
     - 详细模式: 需要 -v/--verbose 才会在终端显示 INFO 日志
 
 示例:
-    $0 -a check -p qbase                          # 只检查版本
-    $0 -a check -p qbase -v                       # 检查并显示详细日志
-    $0 -a update -p qbase                         # 检查并在有新版本时更新
-    $0 -a update -p qbase -l ./check.log          # 更新并记录日志
+    $0 -p qbase                          # 检查版本，发现新版本会提示更新
+    $0 -p qbase -v                       # 检查版本并显示详细日志
+    $0 -p qbase -l ./check.log           # 检查版本并记录日志到文件
+    $0 -p qbase -v -l ./check.log        # 检查版本，显示详细日志并记录到文件
 EOF
 }
 
@@ -84,7 +85,6 @@ else
 fi
 
 # 初始化变量
-ACTION=""
 PACKAGE_NAME=""
 LOG_FILE=""
 VERBOSE=false
@@ -212,14 +212,6 @@ do_update() {
 # 解析具名参数
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -a|--action)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-        log_error "错误: -a/--action 参数缺少值"
-        exit 2
-            fi
-            ACTION="$2"
-            shift 2
-            ;;
         -p|--package)
             if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
         log_error "错误: -p/--package 参数缺少值"
@@ -253,18 +245,10 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# 检查必需参数 -a
-if [ -z "$ACTION" ]; then
-log_error "错误: 缺少必需参数 -a/--action"
-log_error "可选的值为: check 或 update"
+# 检查必需参数 -p
+if [ -z "$PACKAGE_NAME" ]; then
+log_error "错误: 缺少必需参数 -p/--package"
 log_error "使用 '$(basename "$0") --help' 查看帮助"
-exit 2
-fi
-
-# 验证 ACTION 参数值
-if [ "$ACTION" != "check" ] && [ "$ACTION" != "update" ]; then
-log_error "错误: -a/--action 参数值无效，必须是 check 或 update"
-log_error "当前值: $ACTION"
 exit 2
 fi
 
@@ -289,15 +273,13 @@ if [ -n "$LOG_FILE" ]; then
     if [ -n "$LOG_FILE" ]; then
         rotate_log
         log_info "========== 脚本开始执行 =========="
-        log_info "操作: $ACTION"
         log_info "软件包: $PACKAGE_NAME"
         log_info "参数: $*"
         log_info "日志文件: $LOG_FILE"
     fi
 fi
 
-log_key "开始执行操作: $ACTION"
-log_key "目标软件包: $PACKAGE_NAME"
+log_key "开始检查软件包版本: $PACKAGE_NAME"
 
 # 获取软件包信息
 log_info "执行命令: brew info $PACKAGE_NAME"
@@ -308,7 +290,7 @@ stop_timer
 if [ -z "$BREW_INFO" ]; then
     ERROR_MSG="未找到软件包 '$PACKAGE_NAME'，请先安装或检查包名"
     log_error "$ERROR_MSG"
-    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":null,\"action\":\"$ACTION\"}"
+    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":null}"
     exit 2
 fi
 
@@ -323,7 +305,7 @@ if [ -z "$TAP_REPO" ]; then
     log_error "$ERROR_MSG"
     log_info "brew info 输出内容:"
     echo "$BREW_INFO" | while IFS= read -r line; do log_info "brew info: $line"; done
-    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":null,\"action\":\"$ACTION\"}"
+    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":null}"
     exit 2
 fi
 
@@ -357,7 +339,7 @@ if [ -z "$REMOTE_VERSION" ]; then
     ERROR_MSG="无法获取远程版本，请检查仓库地址或 formula 文件格式"
     log_error "$ERROR_MSG"
     log_error "Formula URL: $FORMULA_URL"
-    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":\"$TAP_REPO\",\"action\":\"$ACTION\"}"
+    echo "{\"status\":\"error\",\"error\":\"$ERROR_MSG\",\"package\":\"$PACKAGE_NAME\",\"local_version\":null,\"remote_version\":null,\"has_update\":false,\"tap_repo\":\"$TAP_REPO\"}"
     exit 2
 fi
 
@@ -373,11 +355,28 @@ fi
 
 # 判断是否有更新
 HAS_UPDATE=false
-UPDATE_NEEDED=false
+UPDATE_ACTION="noneed"  # noneed:无需更新 confirm:确认更新 cancel:取消更新
 if [ -n "$LOCAL_VERSION" ] && [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
     HAS_UPDATE=true
-    UPDATE_NEEDED=true
     log_key "⚠️ 发现新版本: $LOCAL_VERSION -> $REMOTE_VERSION"
+    
+    # 让用户确认是否更新
+    while true; do
+        read -r -p "是否确认更新? (yes/no): " confirm_update
+        case "$confirm_update" in
+            yes|y)
+                UPDATE_ACTION="confirm"
+                break
+                ;;
+            no|n)
+                UPDATE_ACTION="cancel"
+                break
+                ;;
+            *)
+                echo "请输入 yes/y 或 no/n"
+                ;;
+        esac
+    done
 elif [ -n "$LOCAL_VERSION" ]; then
     log_key "✅ 已是最新版本: $LOCAL_VERSION"
 else
@@ -386,7 +385,7 @@ fi
 
 # 根据操作类型执行不同逻辑
 UPDATE_SUCCESS=false
-if [ "$ACTION" = "update" ] && [ "$UPDATE_NEEDED" = true ]; then
+if [ "$UPDATE_ACTION" = "confirm" ]; then
     log_key "开始执行更新操作..."
     if do_update "$TAP_REPO" "$PACKAGE_NAME"; then
         UPDATE_SUCCESS=true
@@ -401,34 +400,28 @@ if [ "$ACTION" = "update" ] && [ "$UPDATE_NEEDED" = true ]; then
     else
         log_error "❌ 更新失败"
     fi
-elif [ "$ACTION" = "update" ] && [ "$UPDATE_NEEDED" = false ]; then
-    log_key "已是最新版本，无需更新"
+elif [ "$UPDATE_ACTION" = "cancel" ]; then
+    log_key "已取消更新"
+else
+    log_key "无需更新"
 fi
 
 # 输出 JSON
-if [ "$ACTION" = "update" ]; then
-    if [ "$UPDATE_NEEDED" = true ] && [ "$UPDATE_SUCCESS" = true ]; then
-        STATUS="updated"
-        EXIT_CODE=0
-    elif [ "$UPDATE_NEEDED" = true ] && [ "$UPDATE_SUCCESS" = false ]; then
-        STATUS="error"
-        EXIT_CODE=2
-    elif [ "$UPDATE_NEEDED" = false ]; then
-        STATUS="up-to-date"
-        EXIT_CODE=0
-    else
-        STATUS="error"
-        EXIT_CODE=2
-    fi
+if [ "$UPDATE_ACTION" = "confirm" ] && [ "$UPDATE_SUCCESS" = true ]; then
+    STATUS="updated"
+    EXIT_CODE=0
+elif [ "$UPDATE_ACTION" = "confirm" ] && [ "$UPDATE_SUCCESS" = false ]; then
+    STATUS="error"
+    EXIT_CODE=2
+elif [ "$UPDATE_ACTION" = "cancel" ]; then
+    STATUS="cancelled"
+    EXIT_CODE=0
+elif [ "$UPDATE_ACTION" = "noneed" ]; then
+    STATUS="up-to-date"
+    EXIT_CODE=0
 else
-    # check 操作
-    if [ "$HAS_UPDATE" = true ]; then
-        STATUS="update-available"
-        EXIT_CODE=1
-    else
-        STATUS="up-to-date"
-        EXIT_CODE=0
-    fi
+    STATUS="error"
+    EXIT_CODE=2
 fi
 
 # 转义 JSON 中的特殊字符

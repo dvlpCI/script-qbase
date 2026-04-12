@@ -21,6 +21,11 @@ BOLD='\033[1m'
 UNDERLINE='\033[4m'
 RESET='\033[0m'
 
+# 获取脚本自身目录（用于后续其他命令）
+CurrentDIR_Script_Absolute="$(cd "$(dirname "$0")" && pwd)"
+# 获取项目根目录（脚本所在目录）
+project_homedir_abspath="${CurrentDIR_Script_Absolute}"
+
 # -package 的测试，详见 qbase_example_quickCmd.sh
 if [ "$1" == "-package" ]; then
     packageArg=$2 # 去除第一个参数之前，先保留下来
@@ -165,6 +170,7 @@ fi
 
 CurrentScript_absolute_path=$(realpath "$0")
 # echo "$0 🆚 ${CurrentScript_absolute_path}"
+
 if [ "$0" == "${CurrentScript_absolute_path}" ]; then
 # if [ "${isTestingScript}" == true ]; then   # 如果是测试脚本中
     qbase_latest_version="local_qbase"
@@ -343,11 +349,14 @@ show_usage() {
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     printf "%-20s %s\n" "Commands:" ""
     printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ custom" "执行自定义的命令菜单（若不存在会引导添加）"
+    printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ check-version" "检查/更新 qbase 的远程版本"
     printf "\n"
     printf "%-20s %s\n" "Options:" ""
     printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-verbose" "Show more debugging information"
     printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "--help" "Show help banner of specified command"
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-quick" "执行快捷命令（如 qbase -quick xxx）"
     printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-quick-eg" "查看可使用的快捷命令"
+    printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-path" "获取脚本路径（如 qbase -path xxx）"
     printf "${INDENT}${BLUE}%-20s ${NC}%s\n" "-path-eg" "查看可使用的脚本，需要密码"
     # printf "%-20s %s\n" "Arguments:" ""
     # printf "%-20s %s\n" "file" "Input file path"
@@ -366,6 +375,15 @@ if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
 
 elif [ "${firstArg}" == "custom" ]; then
     sh $qbase_homedir_abspath/qbase_custom.sh
+
+elif [ "${firstArg}" == "check-version" ]; then
+    # 拼接 package_remote_version.sh 脚本的绝对路径
+    package_remote_version_script="${project_homedir_abspath}/package/package_remote_version.sh"
+    if [ ! -f "${package_remote_version_script}" ]; then
+        echo "${RED}Error: 未找到 ${package_remote_version_script}${NC}"
+        exit 1
+    fi
+    sh "${package_remote_version_script}" -p qbase
 
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     passwordStrings=("qian" "chaoqian" "lichaoqian")

@@ -41,8 +41,33 @@ brew upgrade qbase
 答案见：[https://dvlproad.github.io/代码管理/库管理/homebrew](https://dvlproad.github.io/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86/%E5%BA%93%E7%AE%A1%E7%90%86/homebrew)
 
 
+## 三、命令用法
 
-## 二、功能模块
+| 命令 | 说明 |
+|------|------|
+| `qbase -path` | 获取脚本路径 |
+| `qbase -quick` | 执行快捷命令 |
+| `qbase -path-eg` | 查看脚本路径菜单（需密码） |
+| `qbase -quick-eg` | 查看快捷命令菜单 |
+| `qbase custom` | 打印自定义命令菜单，并在选择后进行脚本操作 |
+| `qbase check-version` | 对 qbase 软件包进行检查更新 |
+| `qbase --help` | 帮助 |
+
+> 查看脚本路径需要密码：`qian`、`chaoqian` 或 `lichaoqian`
+
+所有脚本调用方式统一为：
+
+```bash
+qbase -quick 脚本关键字 [具名参数/参数...]
+```
+
+## 四、相关文档
+
+| 文档 | 说明 |
+|------|------|
+| [menu/qbrew_menu.md](./menu/qbrew_menu.md) | qbrew_menu.sh 菜单脚本的详细逻辑说明 |
+
+## 五、功能模块
 
 ### 基础工具
 
@@ -85,44 +110,12 @@ brew upgrade qbase
 
 ## Shell 结果要点
 
-### 1、结果
+
+### 日志
 
 ```shell
-// printf "%s" 会保留\n等
-printf "%s" "${responseJsonString}"
-```
-
-
-### 2、日志
-
-```shell
-# 使用>&2将echo输出重定向到标准错误，作为日志
-
-function debug_log() {
-	echo "$1" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
-}
-
-
-
 # 2>/dev/null 只将标准错误输出重定向到 /dev/null，保留标准输出。
 # >/dev/null 2>&1 将标准输出和标准错误输出都重定向到 /dev/null，即全部丢弃。
-```
-
-```
-为了避免jq在处理json文件中的内容有\的问题时候，请使用
-$(printf "%s" "$categoryData" | jq "length") 而不是 $(echo "$categoryData" | jq "length")
-
-示例：
-catalogCount=$(printf "%s" "$categoryData" | jq "length")
-# echo "catalogCount=${catalogCount}"
-for ((i = 0; i < ${catalogCount}; i++)); do
-	iCatalogMap=$(printf "%s" "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
-	if [ $? != 0 ] || [ -z "${iCatalogMap}" ]; then
-		echo "❌${RED}Error1:执行命令jq出错了，常见错误：您的内容文件中，有斜杠，但使用jq时候却没使用printf \"%s\"，而是使用echo。解决方法1：去掉斜杠；解决方法2：一个斜杠，应该用四个斜杠标识；更好的解决方法：使用printf \"%s\"。请检查>>>>>>>${NC}\n ${iCatalogMap} ${RED}\n<<<<<<<<<<<<<请检查以上内容。${NC} "
-		# echo "cat \"$qbrew_json_file_path\" | jq \".${qbrew_categoryType}\" | jq -r \".[${i}]\" | jq -r \".values\""
-		exit 1
-	fi
-done
 ```
 
 
