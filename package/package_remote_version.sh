@@ -4,7 +4,7 @@
 # @Author: dvlproad dvlproad@163.com
 # @Date: 2023-04-12 22:15:22
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2026-04-13 02:34:20
+ # @LastEditTime: 2026-04-13 16:31:34
 # @FilePath: package/check_version.sh
 # @Description: 对指定的 Homebrew 软件包进行远程检查更新
 # @Note: 检查更新原理见 [https://dvlproad.github.io/代码管理/库管理/homebrew](https://dvlproad.github.io/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86/%E5%BA%93%E7%AE%A1%E7%90%86/homebrew)
@@ -84,17 +84,13 @@ else
     NC=''
 fi
 
-# 初始化变量
-PACKAGE_NAME=""
-LOG_FILE=""
+# --------------------- 日志函数（终端） ---------------------
+# 日志相关的初始变量
 VERBOSE=false
-TIMER_PID=""
+LOG_FILE=""
 
-# Ctrl+C 中断处理
-trap 'cleanup_timer; exit 130' INT
-
-# 日志函数
-log() {
+# 日志函数（私有）
+_log() {
     local level="$1"
     shift
     local message="$*"
@@ -102,69 +98,41 @@ log() {
     
     # 写入日志文件（所有级别，不带颜色）
     if [ -n "$LOG_FILE" ]; then
-        echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
+        printf "[%s] [%s] %s\n" "$timestamp" "$level" "$message" >> "$LOG_FILE"
     fi
     
-    # 终端输出（ERROR/WARN/KEY 级别有默认颜色，消息内部可再用其他颜色高亮特定内容）
+    # 终端输出（ERROR/WARN/KEY 级别有默认颜色，INFO 无默认颜色。消息内部可再用其他颜色高亮特定内容）
     case "$level" in
         ERROR)
-            # ERROR 红色，消息内部可用 ${BLUE} 等高亮
-            echo "${RED}[$timestamp] [$level] $message${NC}" >&2
+            printf "${RED}[%s] [%s] %s${NC}\n" "$timestamp" "$level" "$message" >&2
             ;;
         WARN)
-            # WARN 黄色
-            echo "${YELLOW}[$timestamp] [$level] $message${NC}" >&2
+            printf "${YELLOW}[%s] [%s] %s${NC}\n" "$timestamp" "$level" "$message" >&2
             ;;
         KEY)
-            # KEY 绿色
-            echo "${GREEN}[$timestamp] [$level] $message${NC}" >&2
+            printf "${GREEN}[%s] [%s] %s${NC}\n" "$timestamp" "$level" "$message" >&2
             ;;
         INFO)
-            # INFO 只在 verbose 模式下显示，无默认颜色
+            # INFO 只在 verbose 模式下显示
             if [ "$VERBOSE" = true ]; then
-                echo "[$timestamp] [$level] $message" >&2
+                printf "[%s] [%s] %s\n" "$timestamp" "$level" "$message" >&2
             fi
             ;;
     esac
 }
 
-# 错误日志函数（总是输出）
-log_error() {
-    local message="$1"
-    log "ERROR" "$message"
-}
+log_error() { _log "ERROR" "$1"; }
+log_warn() { _log "WARN" "$1"; }
+log_info() { _log "INFO" "$1"; }
+log_key() { _log "KEY" "$1"; }
 
-# 警告日志函数（总是输出）
-log_warn() {
-    local message="$1"
-    log "WARN" "$message"
-}
+# --------------------- 耗时操作计时函数 ---------------------
+# 耗时操作计时的初始变量
+TIMER_PID=""
 
-# 信息日志函数（根据 verbose 决定）
-log_info() {
-    local message="$1"
-    log "INFO" "$message"
-}
+# Ctrl+C 中断处理
+trap 'cleanup_timer; exit 130' INT
 
-# 关键日志函数（总是显示）
-log_key() {
-    local message="$1"
-    log "KEY" "$message"
-}
-
-# 日志轮转函数
-rotate_log() {
-    if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ]; then
-        local MAX_LOG_SIZE=10485760  # 10MB
-        local LOG_SIZE=$(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null)
-        if [ -n "$LOG_SIZE" ] && [ "$LOG_SIZE" -gt $MAX_LOG_SIZE ]; then
-            mv "$LOG_FILE" "${LOG_FILE}.old" 2>/dev/null
-            log_info "日志文件已轮转（超过 10MB）"
-        fi
-    fi
-}
-
-# 耗时操作计时函数
 # 用法: start_timer "提示信息"; <执行命令>; stop_timer
 start_timer() {
     TIMER_MSG="${1:-执行中}"
@@ -193,6 +161,12 @@ cleanup_timer() {
     fi
 }
 
+
+# --------------------- main 相关 ---------------------
+# ---------- 1、初始化变量 ----------
+PACKAGE_NAME=""
+
+# ---------- 2、核心命令 ----------
 # 执行更新命令
 do_update() {
     local tap_repo="$1"
@@ -209,6 +183,7 @@ do_update() {
     return $?
 }
 
+# ---------- 3.1、具名参数的解析、判断等 ----------
 # 解析具名参数
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -252,33 +227,22 @@ log_error "使用 '$(basename "$0") --help' 查看帮助"
 exit 2
 fi
 
-# 检查必需参数 -p
-if [ -z "$PACKAGE_NAME" ]; then
-log_error "错误: 缺少必需参数 -p/--package"
-log_error "使用 '$(basename "$0") --help' 查看帮助"
-exit 2
-fi
-
-# 初始化日志目录
+# 检查可选参数 -l
 if [ -n "$LOG_FILE" ]; then
     LOG_DIR=$(dirname "$LOG_FILE")
-    if [ ! -d "$LOG_DIR" ] && [ "$LOG_DIR" != "." ]; then
-        mkdir -p "$LOG_DIR" 2>/dev/null
-        if [ $? -ne 0 ]; then
-            log_warn "警告: 无法创建日志目录 $LOG_DIR，日志将只输出到终端"
-            LOG_FILE=""
-        fi
-    fi
-    
-    if [ -n "$LOG_FILE" ]; then
-        rotate_log
-        log_info "========== 脚本开始执行 =========="
-        log_info "软件包: $PACKAGE_NAME"
-        log_info "参数: $*"
-        log_info "日志文件: $LOG_FILE"
+    if [ ! -d "$LOG_DIR" ]; then
+        log_error "错误: 日志目录不存在: $LOG_DIR"
+        log_error "使用 '$(basename "$0") --help' 查看帮助"
+        exit 2
     fi
 fi
 
+log_info "========== 脚本开始执行 =========="
+log_info "软件包: $PACKAGE_NAME"
+log_info "参数: $*"
+log_info "日志文件: $LOG_FILE"
+
+# ---------- 3.2、业务逻辑 ----------
 log_key "开始检查软件包版本: $PACKAGE_NAME"
 
 # 获取软件包信息
