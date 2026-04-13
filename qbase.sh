@@ -369,7 +369,7 @@ show_usage() {
 
 # 如果是获取版本号
 versionCmdStrings=("--version" "-version" "-v" "version")
-helpCmdStrings=("--help" "-help" "help")
+helpCmdStrings=("--help" "-help" "-h" "help")
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
 
@@ -377,13 +377,22 @@ elif [ "${firstArg}" == "custom" ]; then
     sh $qbase_homedir_abspath/qbase_custom.sh
 
 elif [ "${firstArg}" == "check-version" ]; then
+    # 提示用户输入要检查的包名
+    printf "请输入要检查/更新的包名（如 qbase、qtool）: "
+    read packageName
+    if [ -z "${packageName}" ]; then
+        echo "${RED}Error: 包名不能为空${NC}"
+        exit 1
+    fi
+    printf "\n"
+
     # 拼接 package_remote_version.sh 脚本的绝对路径
-    package_remote_version_script="${project_homedir_abspath}/package/package_remote_version.sh"
+    package_remote_version_script="${qbase_homedir_abspath}/package/package_remote_version.sh"
     if [ ! -f "${package_remote_version_script}" ]; then
         echo "${RED}Error: 未找到 ${package_remote_version_script}${NC}"
         exit 1
     fi
-    sh "${package_remote_version_script}" -p qbase
+    sh "${package_remote_version_script}" -p "${packageName}"
 
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     passwordStrings=("qian" "chaoqian" "lichaoqian")
@@ -414,7 +423,7 @@ elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 # elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
-elif [ "${firstArg}" == "--help" ] || [ "${firstArg}" == "-help" ] || [ "${firstArg}" == "help" ]; then
+elif [ "${firstArg}" == "--help" ] || [ "${firstArg}" == "-help" ] ||[ "${firstArg}" == "-h" ] || [ "${firstArg}" == "help" ]; then
 # elif echo "${helpCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then # 判断结果有误
     show_usage
 else
