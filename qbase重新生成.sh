@@ -22,7 +22,11 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_HomeDir_Absolute=${CurrentDIR_Script_Absolute}
 
 
-# 检查 realpath 命令是否安装，未安装则提示用什么命令在终端进行安装
+# 检查当前机器架构
+ARCH=$(uname -m)
+echo "当前机器架构: $ARCH"
+
+# 检查 shc 命令是否安装
 if ! command -v shc &> /dev/null; then
     echo "${RED}温馨提示：您当前的系统中未安装 shc 命令，正在为您自动安装，如安装失败，请使用《${BLUE} brew install shc ${RED}》命令在终端进行安装。${NC}"
     brew install shc
@@ -41,5 +45,11 @@ fi
 rm -rf ${qbase_HomeDir_Absolute}/qbase.sh.x.c
 # 重命名
 mv ${qbase_HomeDir_Absolute}/qbase.sh.x ${qbase_HomeDir_Absolute}/qbase
+
+# 检查生成的二进制文件是否可执行
+if [ ! -x "${qbase_HomeDir_Absolute}/qbase" ]; then
+    echo "${RED}Error：生成的 qbase 文件不可执行${NC}"
+    exit 1
+fi
 
 echo "${GREEN}Success：把shell脚本转换为一个可执行的二进制文件成功。${NC}"
