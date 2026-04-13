@@ -378,12 +378,19 @@ elif [ "${firstArg}" == "custom" ]; then
 
 elif [ "${firstArg}" == "check-version" ]; then
     # 提示用户输入要检查的包名
-    printf "请输入要检查/更新的包名（如 qbase、qtool）: "
-    read packageName
-    if [ -z "${packageName}" ]; then
-        echo "${RED}Error: 包名不能为空${NC}"
-        exit 1
-    fi
+    while true; do
+        printf "请输入要检查/更新的包名（如 qbase、qtool）【退出quit/q】）: "
+        read packageName
+        if [ -z "${packageName}" ]; then
+            echo "${RED}Error: 包名不能为空，请重新输入${NC}"
+            continue
+        fi
+        if [ "${packageName}" == "quit" ] || [ "${packageName}" == "q" ]; then
+            echo "已退出"
+            exit 0
+        fi
+        break
+    done
     printf "\n"
 
     # 拼接 package_remote_version.sh 脚本的绝对路径

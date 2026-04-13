@@ -3,6 +3,12 @@
 
 
 
+## 若要发布新版本
+
+请使用 [script-to-qbase/SKILL.md](https://github.com/dvlproad/AI-qskills/blob/main/script-to-qbase/SKILL.md)
+
+
+
 ## 一、安装、删除与更新
 
 ### 1、安装、删除
