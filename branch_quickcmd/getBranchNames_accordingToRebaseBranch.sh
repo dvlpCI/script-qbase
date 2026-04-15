@@ -2,8 +2,8 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-07 15:45:48
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-15 21:36:44
 # @Description: 根据 rebase 分支，获取当前分支所含的所有分支名
 ###
 
@@ -70,8 +70,14 @@ while [ "$#" -gt 0 ]; do
             REBASE_BRANCH=$(get_argument "$1" "$2") || handle_error "$1"
             shift 2 # 知识点：这里不能和 REBASE_BRANCH 同一行，否则会出如果执行脚本脚本卡住
             ;;
+        # 注意：-addValue 参数值允许为负数（如 -100000），不能使用通用的 get_argument 函数
+        # 因为 get_argument 会把以 - 开头的值误判为新选项，导致解析失败
         -addValue|--add-value) 
-            add_value=$(get_argument "$1" "$2") || handle_error "$1" 
+            if [ -z "$2" ]; then
+                echo "${RED}Error: Argument for $1 is missing${NC}"
+                handle_error "$1"
+            fi
+            add_value="$2"
             shift 2;;
         -onlyName|--only-name) 
             ONLY_NAME=$(get_argument "$1" "$2") || handle_error "$1"

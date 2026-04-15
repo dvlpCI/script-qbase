@@ -30,10 +30,11 @@ CategoryFun_HomeDir_Absolute=${Example_HomeDir_Absolute%/*} # 使用 %/* 方法�
 qbase_getBranchNames_accordingToRebaseBranch_scriptPath="${CategoryFun_HomeDir_Absolute}/getBranchNames_accordingToRebaseBranch.sh"
 
 
-REBASE_BRANCH="master"
+REBASE_BRANCH="main"
 add_value="1"
 ONLY_NAME="false"
-resultBranchResponseJsonString=$(sh ${qbase_getBranchNames_accordingToRebaseBranch_scriptPath} -rebaseBranch "${REBASE_BRANCH}" -addValue "${add_value}" -addType "${add_type}" -onlyName "${ONLY_NAME}")
+echo "${YELLOW}正在执行测试命令(获取当前分支【在rebase指定分支后】的所有分支名)：《 sh ${qbase_getBranchNames_accordingToRebaseBranch_scriptPath} -rebaseBranch \"${REBASE_BRANCH}\" -addValue \"${add_value}\" -onlyName \"${ONLY_NAME}\" ${YELLOW}》${NC}"
+resultBranchResponseJsonString=$(sh ${qbase_getBranchNames_accordingToRebaseBranch_scriptPath} -rebaseBranch "${REBASE_BRANCH}" -addValue "${add_value}" -onlyName "${ONLY_NAME}")
 if [ $? != 0 ]; then
     echo "${resultBranchResponseJsonString}"
     exit 1
