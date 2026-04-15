@@ -37,8 +37,10 @@ get_branch_all_detail_info_script_path="${qbase_homedir_abspath}/branchMaps_20_i
 
 
 Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/example20_get_branch_all_detail_info.json"
-TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_result.json"
-
+TEST_DATA_RESULT_TEXT_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_text.json"
+TEST_DATA_RESULT_MARKDOWN_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_markdown.json"
+chmod +rw "${TEST_DATA_RESULT_TEXT_FILE_PATH}" # 增加读写权限
+chmod +rw "${TEST_DATA_RESULT_MARKDOWN_FILE_PATH}" # 增加读写权限
 
 # echo "正在引入方法文件(brances_info_log_common.sh)：《source ${qbase_homedir_abspath}/brances_info/brances_info_log/brances_info_log_common.sh -commonFunHomeDir \"${qbase_homedir_abspath}\" --branch-info-json-file \"${Develop_Branchs_FILE_PATH}\"》"
 # source ${qbase_homedir_abspath}/brances_info/brances_info_log/brances_info_log_common.sh -commonFunHomeDir "${qbase_homedir_abspath}" --branch-info-json-file "${Develop_Branchs_FILE_PATH}"
@@ -48,6 +50,10 @@ TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/test_data_save_re
 
 function test_getAllBranchLogArray_andCategoryThem() {
     echo "----------------------------------------------------------------------------3上层方法：按分类获取所有分支信息的整合字符串"
+    
+    shouldMarkdown=$1 # "false"
+    
+    TEST_DATA_RESULT_FILE_PATH=$2
     echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
 
     showBranchLogFlag='true'
@@ -57,7 +63,7 @@ function test_getAllBranchLogArray_andCategoryThem() {
     shouldShowSpendHours=true
     showBranchTable='false' # 通知也暂时都不显示
     showCategoryName='true' # 通知时候显示
-    shouldMarkdown='false'
+    # shouldMarkdown='false'
     
     RESULT_BRANCH_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.branch"
     RESULT_CATEGORY_ARRAY_SALE_BY_KEY="branch_info_result.Notification.current.category"
@@ -79,4 +85,11 @@ function test_getAllBranchLogArray_andCategoryThem() {
 
 
 
-test_getAllBranchLogArray_andCategoryThem
+echo "\n\n"
+log_title "3.获取所有分支信息, text 形式"
+test_getAllBranchLogArray_andCategoryThem "false" "${TEST_DATA_RESULT_TEXT_FILE_PATH}"
+
+
+echo "\n\n"
+log_title "4.获取所有分支信息, markdown 形式(发送到企业微信、钉钉等地方有用，可以显示颜色)"
+test_getAllBranchLogArray_andCategoryThem "true" "${TEST_DATA_RESULT_MARKDOWN_FILE_PATH}"

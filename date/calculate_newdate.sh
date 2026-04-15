@@ -4,22 +4,20 @@
  # @Date: 2023-06-07 16:03:56
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-11-15 14:56:35
- # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
- # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
+ # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间加减指定秒数)
+ # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1"
 ### 
 
 
 # 默认参数值
 old_date=""
 add_value=0
-add_type=""
 
 # 在Mac上，请将
-# arguments="--old-date 2023-11-15 13:52:23 --add-value 10 --add-type second"
+# arguments="--old-date 2023-11-15 13:52:23 --add-value 10
 # 拆分成一个数组，所得的结果要求是
 # 元素1：--old-date 2023-11-15 13:52:23
 # 元素2：-add-value 10
-# 元素3：--add-type second
 # 你也可以使用正则等任何有效的方法，要求是结果必须准确。
 
 # 解析命令行参数
@@ -28,7 +26,6 @@ add_type=""
 #         case "$1" in
 #         --old-date) old_date="$2" shift 2;;
 #         --add-value) add_value="$2" shift 2;;
-#         --add-type) add_type="$2" shift 2;;
 #         *) echo "未知选项: $1" exit 1;;
 #         esac
 #     done
@@ -104,7 +101,6 @@ do
     case "$1" in
         -old-date|--old-date) old_date="$2" shift 2;;
         -add-value|--add-value) add_value="$2" shift 2;;
-        -add-type|--add-type) add_type="$2" shift 2;;
         --) break ;;
         *) break ;;
     esac

@@ -72,6 +72,7 @@ qbase -quick 脚本关键字 [具名参数/参数...]
 | 文档 | 说明 |
 |------|------|
 | [menu/qbrew_menu.md](./menu/qbrew_menu.md) | qbrew_menu.sh 菜单脚本的详细逻辑说明 |
+| [branch.md](./branch.md) | 分支管理功能详解（筛选、获取、检查、展示） |
 
 ## 五、功能模块
 

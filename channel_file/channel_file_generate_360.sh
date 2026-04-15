@@ -75,7 +75,7 @@ if [ -n "${argsJsonString}" ]; then
   # 🚗📢:使用下面的方法会丢失空元素，详情可看 foundation/string2array_example.sh 进行错误示例的查看
   # argArray=($(sh $qbase_homedir_abspath/foundation/json2array.sh "${argsJsonString}"))
   # 所以，直接使用源码来处理
-  echo "🏃🏻‍♀️🏃🏻‍♀️🏃🏻‍♀️ 正在处理 argsJsonString = ${argsJsonString}"
+  echo "🏃🏃🏃 正在处理 argsJsonString = ${argsJsonString}"
   argArray=()
   count=$(printf "%s" "$argsJsonString" | jq -r '.|length')
   if [ $? != 0 ]; then

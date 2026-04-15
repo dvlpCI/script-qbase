@@ -5,7 +5,6 @@
  # @LastEditors: dvlproad dvlproad@163.com
  # @LastEditTime: 2023-11-12 22:21:17
  # @Description: 日期的相关计算方法--用来获取新时间(通过旧时间的加减)
- # @使用示例: sh ./date/calculate_newdate.sh --old-date $old_date --add-value "1" --add-type "second"
 ### 
 
 # 定义颜色常量

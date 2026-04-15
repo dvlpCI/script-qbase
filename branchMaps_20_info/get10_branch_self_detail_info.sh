@@ -120,7 +120,7 @@ function getSingleBranchLog_flag() {
         fi
         branchLogFlag+="】"  #结束标记
     elif [ "${TEST_STATE}" == 'coding' ]; then
-        branchLogFlag="🏃🏻‍♀️"
+        branchLogFlag="🏃"
     else
         branchLogFlag="🖍"
     fi

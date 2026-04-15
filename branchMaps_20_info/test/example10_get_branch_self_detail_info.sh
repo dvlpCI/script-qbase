@@ -34,8 +34,10 @@ source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFi
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
 Develop_Branch_FILE_PATH="${Example_HomeDir_Absolute}/data/example10_get_branch_self_detail_info.json"
-TEST_DATA_RESULT_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result.json"
-chmod +rw "${TEST_DATA_RESULT_FILE_PATH}" # 增加读写权限
+TEST_DATA_RESULT_TEXT_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_text.json"
+TEST_DATA_RESULT_MARKDOWN_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_markdown.json"
+chmod +rw "${TEST_DATA_RESULT_TEXT_FILE_PATH}" # 增加读写权限
+chmod +rw "${TEST_DATA_RESULT_MARKDOWN_FILE_PATH}" # 增加读写权限
 
 
 JsonUpdateFun_script_file_Absolute="${qbase_homedir_abspath}/value_update_in_file/update_json_file.sh"
@@ -58,9 +60,10 @@ branchName=$(echo ${iBranchMap} | jq -r ".name") # -r 去除字符串引号
 
 
 function test_getSingleBranchLog() {
-    echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
-
     shouldMarkdown=$1 # "false"
+    
+    TEST_DATA_RESULT_FILE_PATH=$2
+    echo "{}" > ${TEST_DATA_RESULT_FILE_PATH} #清空文件内容,但清空成{}
     
     showBranchLogFlag='true'
     showBranchName='true'
@@ -129,9 +132,9 @@ echo "${BLUE}${des_info_string}${NC}"
 
 echo "\n\n"
 log_title "3.获取单个分支信息, text 形式"
-test_getSingleBranchLog "false"
+test_getSingleBranchLog "false" "${TEST_DATA_RESULT_TEXT_FILE_PATH}"
 
 
 echo "\n\n"
-log_title "4.获取单个分支信息, text 形式"
-test_getSingleBranchLog "true"
+log_title "4.获取单个分支信息, markdown 形式(发送到企业微信、钉钉等地方有用，可以显示颜色)"
+test_getSingleBranchLog "true" "${TEST_DATA_RESULT_MARKDOWN_FILE_PATH}"

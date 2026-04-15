@@ -25,8 +25,7 @@ show_usage() {
     printf "%-30s %s\n" "-v|--verbose" "Enable verbose mode"
     printf "%-30s %s\n" "-h|--help" "Display this help and exit"
     printf "%-30s %s\n" "-rebaseBranch|--rebase-branch" "必填：要reabase的分支名"
-    printf "%-30s %s\n" "-addValue|--add-value" "可选；要增加的时间值"
-    printf "%-30s %s\n" "-addType|--add-type" "可选；时间增加的类型"
+    printf "%-30s %s\n" "-addValue|--add-value" "可选；要增减的时间秒数(支持正负值)"
     printf "%-30s %s\n" "-onlyName|--only-name" "可选；名字是否只取最后部分，不为true时候为全名"
     # printf "%-20s %s\n" "Arguments:" ""
     # printf "%-20s %s\n" "file" "Input file path"
@@ -73,9 +72,6 @@ while [ "$#" -gt 0 ]; do
             ;;
         -addValue|--add-value) 
             add_value=$(get_argument "$1" "$2") || handle_error "$1" 
-            shift 2;;
-        -addType|--add-type) 
-            add_type=$(get_argument "$1" "$2") || handle_error "$1" 
             shift 2;;
         -onlyName|--only-name) 
             ONLY_NAME=$(get_argument "$1" "$2") || handle_error "$1"
@@ -193,7 +189,6 @@ function optimizeBranchNames() {
 #     case "$1" in
 #         -rebaseBranch|--rebase-branch) REBASE_BRANCH=$2; shift 2;;
 #         -addValue|--add-value) add_value="$2" shift 2;;
-#         -addType|--add-type) add_type="$2" shift 2;;
 #         -onlyName|--only-name) ONLY_NAME=$2; shift 2;; # 名字是否只取最后部分，不为true时候为全名
 #         --) break ;;
 #         *) break ;;

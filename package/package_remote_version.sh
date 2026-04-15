@@ -237,6 +237,7 @@ if [ -n "$LOG_FILE" ]; then
     fi
 fi
 
+# 输出参数
 log_info "========== 脚本开始执行 =========="
 log_info "软件包: $PACKAGE_NAME"
 log_info "参数: $*"
