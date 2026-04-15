@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-23 00:54:34
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-24 03:38:37
+ # @LastEditTime: 2026-04-16 03:34:18
  # @FilePath: get_filePath_mapping_branchName_from_dir.sh
  # @Description: 获取所有远程的分支信息(每个分支从它自己的分支里提取)
 ### 
@@ -26,10 +26,10 @@ qbase_get_all_json_file_content_inDir_scriptPath=${qbase_homedir_abspath}/git_co
 while [ -n "$1" ]
 do
     case "$1" in
-        -requestBranchNames|--request-branch-names) requestBranchNames=$2 shift 2;;
+        -requestBranchNames|--request-branch-names) requestBranchNames=$2; shift 2;;
         -access-token|--access-token) access_token=$2; shift 2;;
         -oneOfDirUrl|--one-of-dir-url) ONE_OF_DIRECTORY_URL=$2; shift 2;;
-        -dirUrlBranchName|--dir-url-branch-name) DIRECTORY_URL_BranchName=$2 shift 2;;
+        -dirUrlBranchName|--dir-url-branch-name) DIRECTORY_URL_BranchName=$2; shift 2;;
         --) break ;;
         *) break ;;
     esac
@@ -47,7 +47,7 @@ function get_all_json_file_content_inDir_mapping_branchName() {
         case "$1" in
             -dirUrl|--dir-url) DIRECTORY_URL=$2; shift 2;;
             -access-token|--access-token) access_token=$2; shift 2;;
-            -inBranchName|--in-branch-name) inBranchName=$2 shift 2;;
+            -inBranchName|--in-branch-name) inBranchName=$2; shift 2;;
             --) break ;;
             *) break ;;
         esac
@@ -64,7 +64,16 @@ function get_all_json_file_content_inDir_mapping_branchName() {
     # fi
     
     allFileContent_JsonStrings=$(sh $qbase_get_all_json_file_content_inDir_scriptPath -dirUrl "${DIRECTORY_URL}" -access-token "${access_token}" -inBranchName "${inBranchName}")
-    if [ $? != 0 ] || [ "${allFileContent_JsonStrings}" == "[]" ]; then
+    script_exit_code=$?
+    # if [ $script_exit_code != 0 ]; then
+    #     echo "${allFileContent_JsonStrings}" >&2
+    #     return 1
+    # fi
+    # if [ "${allFileContent_JsonStrings}" == "[]" ]; then
+    #     echo "目录 ${DIRECTORY_URL} 中没有找到任何 JSON 文件" >&2
+    #     return 1
+    # fi
+    if [ $script_exit_code != 0 ] || [ "${allFileContent_JsonStrings}" == "[]" ]; then
         # echo "${allFileContent_JsonStrings}" #此时此值是错误原因
         # return 1
         allFileContent_JsonStrings=$(echo "$allFileContent_JsonStrings" | sed 's/"//g' | tr -d '\n') # 去除所有双引号，避免放到JSON中的时候出错
@@ -224,13 +233,19 @@ done
 allBranchJsonStrings+="]"
 allBranchJsonErrorMessage+="]"
 
-# echo ""
-# echo "${YELLOW}获取所有远程的分支信息(每个分支从它自己的分支里提取)分支总结:${NC}"
-# if [ "${allBranchJsonErrorMessage}" != "[]" ]; then
-#     echo "${RED}其中失败的分支及其信息如下:${NC}"
+echo "" >&2
+echo "${YELLOW}获取所有远程的分支信息(每个分支从它自己的分支里提取)分支总结:${NC}" >&2
+if [ "${allBranchJsonErrorMessage}" != "[]" ]; then
+    echo "${RED}❌其中失败的分支及其信息如下:${NC}" >&2
 #     echo "${allBranchJsonErrorMessage}" | jq "."
+    echo "${allBranchJsonErrorMessage}" | jq "." 2>/dev/null >&2 || echo "${allBranchJsonErrorMessage}" >&2
 #     # exit 1
-# fi
+fi
+
+if [ "${allBranchJsonStrings}" == "[]" ]; then
+    echo "${RED}❌没有获取到任何分支信息，请检查上面错误信息${NC}" >&2
+    exit 1
+fi
 
 # echo "${GREEN}成功的分支及其信息如下:${NC}"
 # printf "%s" "${allBranchJsonStrings}" | jq "."

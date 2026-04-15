@@ -120,8 +120,8 @@ function testGithub {
     # github token 获取方式:进入 https://github.com/settings/tokens 创建（个人设置 -- 底部的Developer Settings -- 配置repo来支持repo中的数据读权限)
     access_token="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"
     
-    ONE_OF_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/test/test1/branchMaps_10_resouce_get/example/featureBrances"
-    DIRECTORY_URL_BranchName="test/test1"
+    ONE_OF_DIRECTORY_URL="https://github.com/dvlpCI/script-qbase/tree/main/branchMaps_10_resouce_get/example/featureBrances"
+    DIRECTORY_URL_BranchName="main"
     example_remote_branchs_json_filePath=${example_remote_branchs_json_github_filePath}
 }
 
@@ -164,7 +164,7 @@ function testGitlab {
 
 
 function dealFound() {
-    echo "${YELLOW}正在执行测试名(获取所有json):《${BLUE} sh \"$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath\" -requestBranchNames \"${requestBranchNames}\" -access-token \"${access_token}\" -oneOfDirUrl \"${ONE_OF_DIRECTORY_URL}\" -dirUrlBranchName \"${DIRECTORY_URL_BranchName}\" ${YELLOW}》${NC}"
+    echo "${YELLOW}正在执行测试名(获取所有json):《${BLUE} sh \"$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath\" -requestBranchNames \"${requestBranchNames//$'\n'/ }\" -access-token \"${access_token}\" -oneOfDirUrl \"${ONE_OF_DIRECTORY_URL}\" -dirUrlBranchName \"${DIRECTORY_URL_BranchName}\" ${YELLOW}》${NC}"
     # sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}"
     # return
     allBranchJsonStrings=$(sh "$qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath" -requestBranchNames "${requestBranchNames}" -access-token "${access_token}" -oneOfDirUrl "${ONE_OF_DIRECTORY_URL}" -dirUrlBranchName "${DIRECTORY_URL_BranchName}")
@@ -203,6 +203,9 @@ function test_getAllBranchLogArray_andCategoryThem() {
 
     TEST_ROBOT_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=925776da-1ff4-417a-922a-d5ced384050e"
 
+    echo "${YELLOW}正在执行测试命令(测试整理所有分支信息并发送通知)...《${BLUE} sh $qbase_getBranchMapsInfoAndNotifiction_scriptPath -branchMapsInJsonF \"${branchMapsInJsonFile}\" -branchMapsInKey \"${branchMapsInKey}\" \
+    -showCategoryName \"${showCategoryName}\" -showFlag \"${showBranchLogFlag}\" -showName \"${showBranchName}\" -showTime \"${showBranchTimeLog}\" -showAt \"${showBranchAtLog}\" -showTable \"${showBranchTable}\" -shouldMD \"${shouldMarkdown}\"\
+    -robot \"${TEST_ROBOT_URL}\" ${YELLOW}》${NC}"
     sh $qbase_getBranchMapsInfoAndNotifiction_scriptPath -branchMapsInJsonF "${branchMapsInJsonFile}" -branchMapsInKey "${branchMapsInKey}" \
     -showCategoryName "${showCategoryName}" -showFlag "${showBranchLogFlag}" -showName "${showBranchName}" -showTime "${showBranchTimeLog}" -showAt "${showBranchAtLog}" -showTable "${showBranchTable}" -shouldMD "${shouldMarkdown}"\
     -robot "${TEST_ROBOT_URL}"

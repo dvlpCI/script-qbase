@@ -271,6 +271,76 @@ echo "$result" | jq '.'
 
 ---
 
+### 2.3 get_allBranchJson_inBranchNames_byJsonDir - 从远程仓库获取分支信息
+
+从 GitHub/Gitee/GitLab 获取指定分支的 JSON 信息文件。
+
+**参数说明：**
+
+| 参数 | 说明 |
+|------|------|
+| `-requestBranchNames` | 要获取的分支名列表（空格分隔） |
+| `-access-token` | 访问令牌（GitHub/GitLab 需要） |
+| `-oneOfDirUrl` | 包含分支目录的 URL |
+| `-dirUrlBranchName` | 目录所在的分支名 |
+
+**调用关系：**
+
+```
+get_allBranchJson_inBranchNames_byJsonDir.sh
+    ├── get_only_branch_from_recods.sh         ← 提取分支名
+    ├── select_branch_byNames.sh               ← 筛选分支
+    └── getBranchMapsInfoAndNotifiction.sh     ← 整理并发送通知
+```
+
+**使用流程：**
+
+```bash
+# 1. 获取本地分支列表
+git branch -r | grep -v HEAD | sed 's/origin\///'
+
+# 2. 筛选符合条件的分支
+branchNames=$(sh select_branch_byNames.sh \
+  -branchNames "origin/feature/a origin/feature/b" \
+  -ignoreBranchNameOrRules "unuse/* test/*" \
+  -lastCommit-startDate "2024-01-01")
+
+# 3. 从远程获取分支信息
+allBranchJsonStrings=$(sh get_allBranchJson_inBranchNames_byJsonDir.sh \
+  -requestBranchNames "${branchNames//$'\n'/ }" \
+  -access-token "ghp_xxx" \
+  -oneOfDirUrl "https://github.com/user/repo/tree/main/branchInfos" \
+  -dirUrlBranchName "main")
+```
+
+**输出效果：**
+
+```json
+{
+  "branchJsons": [
+    {
+      "name": "feature/user_login",
+      "type": "feature",
+      "create_time": "2024.03.01",
+      "submit_test_time": "2024.03.10",
+      "outlines": [
+        { "title": "登录模块开发", "weekSpend": [16, 24] }
+      ]
+    }
+  ]
+}
+```
+
+**支持的平台：**
+
+| 平台 | 需要 Token | API |
+|------|-----------|-----|
+| GitHub | 是 | `api.github.com` |
+| Gitee | 否 | `gitee.com/api` |
+| GitLab | 是 | `gitlab.com/api` |
+
+---
+
 ## 三、分支信息检查
 
 ### 3.1 branchMapFile_checkMap - 检查分支信息完整性

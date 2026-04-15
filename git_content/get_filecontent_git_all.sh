@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-22 23:35:57
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-23 14:17:01
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-16 04:04:50
  # @FilePath: get_filecontent_git_all.sh
  # @Description: 获取网络文件的内容-git
 ### 
@@ -50,55 +50,72 @@ if [[ ! $FILE_URL == http* ]]; then
     exit 1
 fi
 
-if [[ $FILE_URL == http* ]]; then
-    if [ -z "$curBranchName" ]; then
-        echo "请求git的网络文件内容的时候 -curBranchName 参数值不能为空，否则等下无法从路径中获取到文件的相对路径。"
-        exit 1
-    fi
+if [ -z "$curBranchName" ]; then
+    echo "请求git的网络文件内容的时候 -curBranchName 参数值不能为空，否则等下无法从路径中获取到文件的相对路径。"
+    exit 1
 fi
 
-# echo "access_token=${access_token}"
-# 没传令牌时候：如果成功即成功；如果失败，则提示可能需要传入 -access-token 令牌参数。
-if [ -z "${access_token}" ]; then
-    debug_log "${YELLOW}正在执行命令(不需要token，直接获取网络地址对应的内容):《${BLUE} curl -s \"$FILE_URL\" ${YELLOW}》${NC}"
-    FileContent=$(curl -s "$FILE_URL")
-    if [ $? != 0 ]; then
-        echo "Error❌: 无法获取文件列表。您可能需要添加 -access-token 身份验证令牌参数才能查看此地址内容。详细的错误信息如下:\n${FileContent}"
-        exit 1
-    fi
-    exit 0
-fi
-
-function getFileContent_github() {
-    # 有传令牌时候：如果成功即成功；如果失败，则根据错误提示，指明错误原因
-    debug_log "${YELLOW}正在执行命令(使用token，获取网络地址对应的内容):《${BLUE} curl -s --header \"Private-Token: $access_token\" \"$FILE_URL\" ${YELLOW}》${NC}"
-    FileContent=$(curl -s --header "Private-Token: $access_token" "$FILE_URL")
-    if [ $? != 0 ]; then
-        echo "Error❌: 无法获取文件列表。请检查您的身份验证令牌 ${access_token} 是否正确。"
-        exit 1
-    fi
-    # echo "===============FileContent=${FileContent}"
-
-    # 检查字符串是否包含指定字符串变量
-    errorFlagString="users/sign_in"
-    if [[ $FileContent == *"$errorFlagString"* ]]; then
-        echo "Error❌: 获取网络地址内容失败。执行的命令为 《 curl -s --header \"Private-Token: $access_token\" \"$FILE_URL\"》。得到的值为 $FileContent"
-        # echo "所获得的错误内容如下:\n${FileContent}"
-        exit 1
+function curl_with_auth() {
+    local header_type=$1
+    local header_value=""
+    
+    case "$header_type" in
+        bearer)
+            header_value="Authorization: Bearer $access_token"
+            ;;
+        private_token)
+            header_value="Private-Token: $access_token"
+            ;;
+        none)
+            ;;
+        *)
+            echo "Error❌: 不支持的认证类型: $header_type"
+            exit 1
+            ;;
+    esac
+    
+    if [ -n "$header_value" ]; then
+        curl -s -H "$header_value" "$FILE_URL"
+    else
+        curl -s "$FILE_URL"
     fi
 }
 
-function getFileContent_gitee() {
-    getFileContent_github
+function check_error() {
+    local content=$1
+    local platform=$2
+    
+    if [ $? != 0 ]; then
+        echo "Error❌: 无法获取文件内容，请检查网络连接"
+        exit 1
+    fi
+    
+    if [[ $content == *"Bad credentials"* ]]; then
+        echo "Error❌: ${platform} Token 无效或已过期，请检查: https://github.com/settings/tokens (GitHub) 或 https://gitee.com/profile/personal_access_tokens (Gitee)"
+        exit 1
+    fi
+    
+    if [[ $content == *"Not Found"* ]]; then
+        echo "Error❌: 文件不存在或没有访问权限"
+        exit 1
+    fi
+    
+    if [[ $content == *"login"* ]] && [[ $content == *"password"* ]]; then
+        echo "Error❌: 获取文件内容失败，可能需要登录"
+        exit 1
+    fi
 }
-
-
 
 if [[ "${FILE_URL}" == *"https://raw.githubusercontent.com"* ]]; then
-    getFileContent_github
+    curl_with_auth "none"
 
 elif [[ "${FILE_URL}" == *"https://gitee"* ]]; then   # https://gitee.com/profile/personal_access_tokens/
-    getFileContent_gitee
+    FileContent=$(curl_with_auth "private_token")
+    check_error "$FileContent" "Gitee"
+
+elif [[ "${FILE_URL}" == *"https://github.com"* ]]; then
+    FileContent=$(curl_with_auth "bearer")
+    check_error "$FileContent" "GitHub"
 
 elif [[ "${FILE_URL}" == *"https://gitlab"* ]]; then
     debug_log "正在读取gitlab文件内容:《 sh $qbase_get_filecontent_gitlab_scriptPath -fileUrl \"${FILE_URL}\" -access-token \"${access_token}\" -curBranchName \"${curBranchName}\" 》"
