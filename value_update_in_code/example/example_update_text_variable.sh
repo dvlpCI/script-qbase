@@ -64,3 +64,38 @@ result113=$(sh ${update_text_variable_scriptPath} -willUpdateText "${WillUpdateT
 logString "${result113}"
 
 
+echo "            --------           "
+function updateText_test3() {
+    logTitle "3.直接使用原始命令"
+    # WillUpdateText="origin/main origin/dev_in_pgyer origin/feature/network_time origin/test/test1 origin/test3"
+    WillUpdateText=$(
+cat << 'EOF'
+origin/main
+origin/dev_in_pgyer
+origin/feature/network_time
+origin/test/test1
+origin/test3
+EOF
+)
+    echo "原始值:"
+    echo "$WillUpdateText"
+
+    echo "-------------3.1.①直接使用原始命令，直接输出(替换所有)"
+    # logString ${WillUpdateText//\\n/\\\\n}
+
+    echo ">>>>>>>>>>>>>3.1.1"
+    echo ${WillUpdateText//\\n/\\\\n}   # ✅
+    echo ">>>>>>>>>>>>>3.1.2"
+    echo "${WillUpdateText//\\n/\\\\n}" # ❌ 换行了
+    echo ">>>>>>>>>>>>>3.1.3"
+    echo ${WillUpdateText//$'\n'/\\\\n} # ✅ \n
+    echo ${WillUpdateText//$'\n'/ }     # ✅ 空格
+    echo ">>>>>>>>>>>>>3.1.4"
+    echo "${WillUpdateText//$'\n'/\\\\n}"   # ✅ \n
+    echo "${WillUpdateText//$'\n'/ }"       # ✅ 空格
+
+    # echo "-------------1.1.②直接使用原始命令，赋值变量后输出(替换所有)"
+    # result112=${WillUpdateText//\\n/\\\\n}
+    # logString "${result112}"
+}
+updateText_test3
