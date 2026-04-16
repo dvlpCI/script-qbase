@@ -49,7 +49,7 @@ get_argument() {
 # 定义错误处理函数
 handle_error() {
     local option="$1"
-    echo "${RED}Error:您指定了以下参数，却漏了为其复制，请检查${YELLOW} ${option} ${RED}${NC}"
+    echo "${RED}Error: 您为参数 ${YELLOW}${option}${RED} 指定了值，但该值不符合要求或为空，请检查是否在 ${option} 后提供了正确的值${NC}"
     exit 1
 }
 
@@ -80,7 +80,10 @@ while [ "$#" -gt 0 ]; do
             add_value="$2"
             shift 2;;
         -onlyName|--only-name) 
-            ONLY_NAME=$(get_argument "$1" "$2") || handle_error "$1"
+            ONLY_NAME=$(get_argument "$1" "$2")
+            if [ $? != 0 ]; then
+                ONLY_NAME=false
+            fi
             shift 2;;
         --) # 结束解析具名参数
             shift
