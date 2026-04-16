@@ -7,7 +7,8 @@
                 {
                     "des": "获取当前分支【在rebase指定分支后】的所有分支名",
                     "key": "getBranchNamesAccordingToRebaseBranch",
-                    "rel_path": "./branch_quickcmd/getBranchNames_accordingToRebaseBranch.sh"
+                    "rel_path": "./branch_quickcmd/getBranchNames_accordingToRebaseBranch.sh",
+                    "example": "qbase -quick getBranchNamesAccordingToRebaseBranch -rebaseBranch \"master\" --add-value 1 --only-name true"
                 },
                 {
                     "des": "获取所有指定分支名的branchMap组成branchMaps输出到指定文件中(1添加前，可增加检查每个branchMap在指定环境下的属性缺失，2如果添加成功可设置是否删除已获取的文件)，如有缺失输出缺失错误",
@@ -18,7 +19,8 @@
                 {
                     "des": "获取指定文件中的所有分支信息，并进行整理及整理后发送通知",
                     "key": "getBranchMapsInfoAndNotifiction",
-                    "rel_path": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh"
+                    "rel_path": "./branch_quickcmd/getBranchMapsInfoAndNotifiction.sh",
+                    "example": "qbase -quick getBranchMapsInfoAndNotifiction -branchMapsInJsonF xxx/v1.7.2.json -branchMapsInKey online_branches -showCategoryName true -showFlag true -showName true -showTime none -showAt true -shouldMD true -robot https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx"
                 }
             ]
         }
@@ -31,7 +33,8 @@
                 {
                     "des": "输出 qbrew 库中 qbase.json 、 qtool.json 的菜单，并可选择查看哪项的使用示例",
                     "key": "qbrew_menu",
-                    "rel_path": "./menu/qbrew_menu.sh"
+                    "rel_path": "./menu/qbrew_menu.sh",
+                    "example": "qbase -quick qbrew_menu -file qbase.json -categoryType support_script_path -execChoosed true"
                 },
                 {
                     "des": "获取 package 的指定 key 的脚本文件路径",
@@ -114,12 +117,14 @@
                 {
                     "des": "环境变量文件的操作(生效环境变量文件、打开环境变量文件)",
                     "key": "env_var_effective_or_open",
-                    "rel_path": "./env_variables/env_var_effective_or_open.sh"
+                    "rel_path": "./env_variables/env_var_effective_or_open.sh",
+                    "example": "qbase -quick env_var_effective_or_open open"
                 },
                 {
                     "key": "env_var_add_or_update",
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
-                    "rel_path": "./env_variables/env_var_add_or_update.sh"
+                    "rel_path": "./env_variables/env_var_add_or_update.sh",
+                    "example": "qbase -quick env_var_add_or_update -envVariableKey TEST_KEY -envVariableValue test_value"
                 }
             ]
         },
@@ -130,12 +135,14 @@
                 {
                     "key": "get_package_util",
                     "des": "脚本包的信息获取(版本号、根目录信息)",
-                    "rel_path": "./package/get_package_info.sh"
+                    "rel_path": "./package/get_package_info.sh",
+                    "example": "qbase -quick get_package_util -package qbase -param version"
                 },
                 {
                     "key": "install_package",
                     "des": "检查安装环境，且未安装时候需要进行安装",
-                    "rel_path": "./package/install_package.sh"
+                    "rel_path": "./package/install_package.sh",
+                    "example": "qbase -quick install_package jq"
                 },
                 {
                     "key": "package_remote_version",
@@ -158,17 +165,20 @@
                 {
                     "des": "对 project.pbxproj 更新版本号、build号、app展示名",
                     "key": "update_ios_pbxproj",
-                    "rel_path": "./value_create/update_ios_pbxproj.sh"
+                    "rel_path": "./value_create/update_ios_pbxproj.sh",
+                    "example": "qbase -quick update_ios_pbxproj -pbxproj xxx/Beyond.xcodeproj/project.pbxproj -ver 1.7.3 -bid 24010809 -appNameOld Beyond -appNameNew Beyond开发版"
                 },
                 {
                     "des": "对指定文件中匹配的指定字符串的所有行,从匹配到的位置开始将该行替换成新的字符串",
                     "key": "update_line_that_match_text",
-                    "rel_path": "./value_create/update_line_that_match_text.sh"
+                    "rel_path": "./value_create/update_line_that_match_text.sh",
+                    "example": "qbase -quick update_line_that_match_text -file xxx/yy.dart -matchString \"static var networkType = PackageNetworkType.\" -newString \"static var networkType = PackageNetworkType.test1\""
                 },
                 {
                     "des": "更新指定文件里指定的ios项目及其环境（版本号、build号、app展示名、代码环境）",
                     "key": "update_ios_app_info",
-                    "rel_path": "./value_create/update_ios_app_info.sh"
+                    "rel_path": "./value_create/update_ios_app_info.sh",
+                    "example": "qbase -quick update_ios_app_info -app xxx/yyy.json"
                 }
             ]
         },
@@ -179,17 +189,20 @@
                 {
                     "key": "sedtext",
                     "des": "任意文件中的值的更新，根据值的位置",
-                    "rel_path": "./value_update_in_file/sed_text.sh"
+                    "rel_path": "./value_update_in_file/sed_text.sh",
+                    "example": "qbase -quick sedtext -f /path/to/file -r \"old_text\" -t \"new_text\""
                 },
                 {
                     "key": "update_json_file_singleString",
                     "des": "json文件中的值的更新，根据指定key的位置",
-                    "rel_path": "./value_update_in_file/update_json_file_singleString.sh"
+                    "rel_path": "./value_update_in_file/update_json_file_singleString.sh",
+                    "example": "qbase -quick update_json_file_singleString -jsonF xxx/app_info.json -k \"package_message\" -v \"新的更新说明\""
                 },
                 {
                     "key": "py_update_json_file",
                     "des": "json文件中的值的更新，使用python实现",
-                    "rel_path": "./value_update_in_file/update_json_file.py"
+                    "rel_path": "./value_update_in_file/update_json_file.py",
+                    "example": "qbase -quick py_update_json_file -jsonF xxx/app_info.json -k \"target.nested_key\" -v \"new_value\" -change-type add"
                 }
             ]
         },
