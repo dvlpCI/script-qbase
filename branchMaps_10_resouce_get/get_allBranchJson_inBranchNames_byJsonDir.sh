@@ -4,7 +4,7 @@
  # @Date: 2023-11-23 00:54:34
  # @LastEditors: dvlproad dvlproad@163.com
  # @LastEditTime: 2026-04-16 03:34:18
- # @FilePath: get_filePath_mapping_branchName_from_dir.sh
+ # @FilePath: get_allBranchJson_inBranchNames_byJsonDir.sh
  # @Description: 获取所有远程的分支信息(每个分支从它自己的分支里提取)
 ### 
 
