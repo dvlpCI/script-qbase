@@ -3,7 +3,7 @@
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-02-25 02:04:22
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-26 00:37:30
+ # @LastEditTime: 2026-04-16 19:33:25
  # @FilePath: /AutoPackage-CommitInfo/bulidScriptCommon/brances_info/brances_info_log/test/tssh_branch_detail_info_result.sh
  # @Description: 测试分支本身的详情信息
 ### 
@@ -36,7 +36,7 @@ echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}
 get20_branchMapsInfo_byHisJsonFile_script_path="${qbase_homedir_abspath}/branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh"
 
 
-Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/example20_get_branch_all_detail_info.json"
+Develop_Branchs_FILE_PATH="${CurrentDIR_Script_Absolute}/data/example20_get_branchMapsInfo_byHisJsonFile.json"
 TEST_DATA_RESULT_TEXT_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_text.json"
 TEST_DATA_RESULT_MARKDOWN_FILE_PATH="${Example_HomeDir_Absolute}/data/test_data_save_result_markdown.json"
 chmod +rw "${TEST_DATA_RESULT_TEXT_FILE_PATH}" # 增加读写权限

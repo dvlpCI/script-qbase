@@ -423,7 +423,7 @@ branchMaps_20_info/
 └── test/                                          # 测试用例
     ├── example10_get_branch_self_detail_info.sh
     ├── example11_get_category_all_detail_info.sh
-    ├── example20_get_branch_all_detail_info.sh
+    ├── example20_get_branchMapsInfo_byHisJsonFile.sh
     └── data/
 ```
 
@@ -505,7 +505,7 @@ get20_branchMapsInfo_byHisJsonFile.sh 的输出结构
 }
 ```
 
-**多分支测试数据** (`test/data/example20_get_branch_all_detail_info.json`)：
+**多分支测试数据** (`test/data/example20_get_branchMapsInfo_byHisJsonFile.json`)：
 
 包含 6 个分支，涵盖不同 type 和不同测试状态：
 
@@ -538,7 +538,7 @@ get20_branchMapsInfo_byHisJsonFile.sh 的输出结构
 | `-resultCategoryKey` | 分类结果保存 key |
 | `-resultFullKey` | 完整字符串保存 key |
 
-**测试用例：** `test/example20_get_branch_all_detail_info.sh`
+**测试用例：** `test/example20_get_branchMapsInfo_byHisJsonFile.sh`
 
 **效果（输出到 JSON 文件）：**
 
@@ -812,11 +812,110 @@ branch_quickcmd/
 
 ### 5.2 调用关系
 
+#### 5.2.1 调用关系图
+
 ```
-getBranchMapsInfoAndNotifiction.sh    ← 调用
-    └── branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh
+getBranchMapsInfoAndNotifiction.sh              ← 主入口：整合信息并发送通知
+    ├── branchMaps_20_info/
+    │   └── get20_branchMapsInfo_byHisJsonFile.sh   ← 整理分支信息
+    │       ├── get10_branch_self_detail_info.sh      ← 获取单个分支信息
+    │       │   └── get10_branch_self_detail_info_outline.sh  ← outlines 描述
+    │       │       └── get10_branch_self_detail_info_outline_spend.sh  ← 耗时
+    │       └── get11_category_all_detail_info.sh     ← 分类整理
+    ├── notification/
+    │   └── notification2wechat.sh              ← 错误通知
+    └── notification/
+        └── notification_strings_to_wechat.sh    ← 成功通知
 
 getBranchNames_accordingToRebaseBranch.sh    ← 独立，不调用其他脚本
+```
+
+#### 5.2.2 调用关系示例
+
+以主入口 `getBranchMapsInfoAndNotifiction.sh` 为例，说明其执行流程：
+
+```
+getBranchMapsInfoAndNotifiction.sh 的执行流程
+│
+├── 1. 读取分支信息 JSON 文件
+│   └── 输入: branchMapsInJsonF 指定文件
+│
+├── 2. 调用 get20_branchMapsInfo_byHisJsonFile.sh 整理信息
+│   ├── get10_branch_self_detail_info.sh      ← 生成单条分支信息
+│   │   ├── 状态标记：🏃/❓/👌🏻/✅
+│   │   ├── 分支名
+│   │   ├── 时间线
+│   │   ├── @人员
+│   │   └── outlines 描述
+│   │       ├── get10_branch_self_detail_info_outline.sh
+│   │       │   ├── 编号：①
+│   │       │   ├── 标题
+│   │       │   ├── 链接
+│   │       │   └── 耗时
+│   │       │       └── get10_branch_self_detail_info_outline_spend.sh
+│   │       │
+│   │       └── 输出示例："①功能点一[4h]\n②功能点二[12h]"
+│   │
+│   └── get11_category_all_detail_info.sh    ← 分类整理
+│       ├── 按 type 分组 (hotfix/feature/optimize/other)
+│       ├── 添加分类标题
+│       └── 输出示例：
+│           "=======feature=======\n{get10 生成的分支信息}\n..."
+│
+├── 3. 结果写入原 JSON 文件
+│   └── 保存到 branch_info_result.Notification.current 路径下
+│       ├── branch: 单个分支信息数组
+│       ├── category: 分类后的信息
+│       └── full: 完整字符串
+│
+├── 4. 发送通知
+│   ├── 成功时 → notification_strings_to_wechat.sh
+│   │   └── 输出 Markdown/Text 格式的分支信息
+│   │
+│   └── 失败时 → notification2wechat.sh
+│       └── 输出错误信息
+│
+└── 最终输出效果（JSON 文件内容）：
+    {
+      "branch_info_result": {
+        "Notification": {
+          "current": {
+            "branch": [
+              "🏃dev_login_err:[02.09开发中]@test1\n①功能点一[4h]"
+            ],
+            "category": {
+              "feature": ["✅dev_ui:[02.17已合入]@qian\n①UI改版[8h]"],
+              "hotfix": ["🏃dev_err:[02.09开发中]@test1\n①功能点一[4h]"]
+            },
+            "full": {
+              "full": ">>>>>>>>您当前打包的分支信息如下(v1.7.2)>>>>>>>>>\n=======feature=======\n✅dev_ui:[02.17已合入]@qian\n①UI改版[8h]\n..."
+            }
+          }
+        }
+      }
+    }
+```
+
+#### 5.2.3 通知发送流程
+
+```
+getBranchMapsInfoAndNotifiction.sh
+│
+├─ 成功路径
+│   └─ sh notification_strings_to_wechat.sh
+│       ├─ headerText: ">>>>>>>>您当前打包的分支信息如下(xxx)>>>>>>>>>\n"
+│       ├─ contentJsonF: 原 JSON 文件
+│       ├─ contentJsonKey: branch_info_result.Notification.current.full_slice
+│       ├─ robot: 企业微信机器人 URL
+│       ├─ at: @ 人员列表
+│       └─ msgtype: markdown/text
+│
+└─ 失败路径
+    └─ sh notification2wechat.sh
+        ├─ robot: 企业微信机器人 URL
+        ├─ content: 错误信息
+        ├─ at: @ 人员列表
+        └─ msgtype: markdown/text
 ```
 
 ### 5.3 脚本说明
