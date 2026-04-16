@@ -1053,7 +1053,7 @@ qbase -quick getBranchMapsInfoAndNotifiction \
 ```bash
 qbase -quick getBranchNamesAccordingToRebaseBranch \
   -rebaseBranch "master" \
-  --add-rel_path 1 \
+  --add-value 1 \
   -onlyName true \
   --verbose
 ```

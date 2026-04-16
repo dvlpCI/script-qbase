@@ -224,7 +224,7 @@
                 {
                     "key": "calculate_newdate",
                     "des": "日期的相关计算方法--用来获取新时间(通过旧时间的加减)",
-                    "example": "sh ./date/calculate_newdate.sh --old-date $old_date --add-rel_path \"1\"",
+                    "example": "sh ./date/calculate_newdate.sh --old-date $old_date --add-value \"1\"",
                     "rel_path": "./date/calculate_newdate.sh"
                 }
             ]
