@@ -874,6 +874,31 @@ getBranchNames_accordingToRebaseBranch.sh    ← 独立，不调用其他脚本
 
 以主入口 `getBranchMapsInfoAndNotifiction.sh` 为例，说明其执行流程：
 
+##### 1. 数据来源说明
+
+`getBranchMapsInfoAndNotifiction.sh` 的两个关键参数 `-branchMapsInJsonF` 和 `-branchMapsInKey` 通常来源于 [四、分支信息展示 的 调用关系示例 的数据来源](#四、分支信息展示 的 调用关系示例 的数据来源) `get20_branchMapsInfo_byHisJsonFile.sh` 的输出：
+
+```
+数据流转关系：
+get20_branchMapsInfo_byHisJsonFile.sh (整理分支信息)
+    │
+    │  输出: 格式化后的分支信息字符串
+    │
+    ▼
+存储到 JSON 文件 (getBranchMapsInfoAndNotifiction 内部)
+    │
+    │  文件示例: v1.7.2.json
+    │  内容: { "branch_info_result": { "Notification": { "current": { "full": {...} } } } }
+    │
+    ▼
+getBranchMapsInfoAndNotifiction.sh (读取并发送通知)
+    │
+    ├── -branchMapsInJsonF = v1.7.2.json      ← 数据源文件
+    └── -branchMapsInKey = branch_info_result.Notification.current.full      ← 数据在文件中的 key
+```
+
+##### 2. 输出结构说明
+
 ```
 getBranchMapsInfoAndNotifiction.sh 的执行流程
 │
@@ -936,21 +961,21 @@ getBranchMapsInfoAndNotifiction.sh 的执行流程
     }
 ```
 
+##### 3. 输出用途说明
 
+`getBranchMapsInfoAndNotifiction.sh` 的输出主要用于以下场景：
+
+| 用途 | 说明 | 示例 |
+|------|------|------|
+| **发送通知** | 发送到企业微信/钉钉机器人 | 企业微信/钉钉群 |
 
 ```
-
-{
-      "category": {
-        "feature": ["✅dev_ui_revision:[02.17已合入预生产]@qian@qian\n①首页UI改版[8h]"],
-        "hotfix": ["🏃dev_login_err:[02.09开发中]@producter1@test1\n①功能点一[4h]\n②功能点二[12h]"],
-        "optimize": [...],
-        "other": []
-      }
-    }
+getBranchMapsInfoAndNotifiction 输出 → 企业微信/钉钉通知
 ```
 
+##### 4. 完整示例参考
 
+`branch_quickcmd/example/example_getBranchMapsInfoAndNotifiction.sh`
 
 #### 5.2.3 通知发送流程
 
