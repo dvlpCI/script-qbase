@@ -1,0 +1,15 @@
+{
+  "name": "test/branchInfo2",
+  "type": "test",
+  "create_time": "2026.04.16",
+  "submit_test_time": "2026.04.16",
+  "tester": {
+    "name": "测试员2"
+  },
+  "outlines": [
+    {
+      "title": "分支信息测试项2",
+      "weekSpend": [4, 4]
+    }
+  ]
+}
