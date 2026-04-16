@@ -41,7 +41,7 @@ if [ $? != 0 ]; then
 fi
 resultBranchNames=$(printf "%s" "${resultBranchResponseJsonString}" | jq -r '.mergerRecords')
 if [ -z "${resultBranchNames}" ]; then
-    echo "${RED}您当前目录($PWD)下的项目，没有新的提交记录，更不用说分支了，请检查确保cd到正确目录，或者提交了代码。${NC}"
+    echo "${RED}您在当前目录($PWD)下的项目，进行获取当前分支【在rebase指定分支后】的所有分支名的结果为：无。而且它连新的提交记录都没有，更不用说分支了，请检查确保cd到正确目录，或者提交了代码。${CYAN}你可以使用《 test-branch-info 这个skill 通过输入${GREEN} 测试分支信息的获取:项目路径 ${CYAN}来快速模拟多分支和提交》${NC}"
     exit 1
 fi
 echo "${GREEN}恭喜：获取当前分支【在rebase指定分支后】的所有分支名的结果如下：${BLUE} $resultBranchNames ${GREEN}。${NC}"

@@ -2,8 +2,8 @@
 ###
  # @Author: dvlproad dvlproad@163.com
  # @Date: 2023-11-22 23:42:34
- # @LastEditors: dvlproad
- # @LastEditTime: 2023-11-23 10:13:28
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-16 15:35:36
  # @FilePath: get_fileUrls_inDir_local.sh
  # @Description: 获取目录下的所有文件路径--local
 ### 
@@ -45,7 +45,7 @@ if [[ $DIRECTORY_URL =~ ^~.* ]]; then
 fi
 #获取featureBrances文件夹下的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 中
 if [ ! -d "${DIRECTORY_URL}" ]; then
-    echo "Error❌:您的 -dirUrl 指向的'map是从哪个文件夹路径获取'的参数值 ${DIRECTORY_URL} 不存在，请检查！"
+    echo "Error❌:您的 -dirUrl(告诉脚本分支信息.json是从哪个文件夹路径获取)的参数值 ${DIRECTORY_URL} 不存在，请修改该路径为正确地址！"
     exit 1
 fi
 

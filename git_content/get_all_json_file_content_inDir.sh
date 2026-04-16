@@ -77,6 +77,11 @@ function getContentIfJson() {
             return 1
         fi
     else
+        # 本地的话，需要判断文件是否存在
+        # if [ ! -f "$branchFileAbsolutePathOrUrl" ]; then
+        #     echo "您的 ${branchFileAbsolutePathOrUrl} 文件不存在！"
+        #     return 1
+        # fi
         FileContent=$(cat "$branchFileAbsolutePathOrUrl")
     fi
     # 检查文件内容是否符合JSON规范
@@ -99,7 +104,7 @@ function get_fileUrls_inDir_local() {
     fi
     #获取featureBrances文件夹下的所有分支json组成数组，添加到 ${BranchMapAddToJsonFile} 的 ${BranchMapAddToKey} 中
     if [ ! -d "${DIRECTORY_URL}" ]; then
-        echo "Error❌:您的 -dirUrl 指向的'map是从哪个文件夹路径获取'的参数值 ${DIRECTORY_URL} 不存在，请检查！"
+        echo "Error❌:您的 -dirUrl(告诉脚本分支信息.json是从哪个文件夹路径获取)的参数值 ${DIRECTORY_URL} 不存在，请修改该路径为正确地址！"
         return 1
     fi
 

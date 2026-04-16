@@ -200,6 +200,7 @@ do
         getBranchJsonStringsErrorMessage=${iBranchJsonStrings}  # 此时 iBranchJsonStrings 是错误信息字符串
     else
         if ! jq -e . <<< "$iBranchJsonStrings" >/dev/null 2>&1; then
+            # 注意这里发现有个别失败了的时候，不要跳出循环，因为是多个分支，一个失败就跳出了，那其他分支的信息就获取不到了
             getBranchJsonStringsErrorMessage="❌ get_all_json_file_content_inDir_mapping_branchName 失败，返回的结果不是json。其内容如下:$iBranchJsonStrings"
         fi
     fi

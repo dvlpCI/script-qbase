@@ -791,3 +791,111 @@ cat /path/to/output.json | jq '.category'
 **原因：** `create_time` 必须是 `YYYY.MM.DD` 或 `MM.DD` 格式
 
 **解决：** 修改 JSON 文件中的时间格式
+
+---
+
+## 五、快速命令 (branch_quickcmd)
+
+独立快捷命令脚本集。
+
+### 5.1 目录结构
+
+```
+branch_quickcmd/
+├── getBranchMapsInfoAndNotifiction.sh           # 发送分支信息通知
+├── getBranchNames_accordingToRebaseBranch.sh    # 根据 rebase 分支获取分支名
+└── example/                                    # 示例
+    ├── example_getBranchMapsInfoAndNotifiction.sh
+    ├── example_getBranchNames_accordingToRebaseBranch.sh
+    └── data/
+```
+
+### 5.2 调用关系
+
+```
+getBranchMapsInfoAndNotifiction.sh    ← 调用
+    └── branchMaps_20_info/get20_branchMapsInfo_byHisJsonFile.sh
+
+getBranchNames_accordingToRebaseBranch.sh    ← 独立，不调用其他脚本
+```
+
+### 5.3 脚本说明
+
+#### 5.3.1 getBranchMapsInfoAndNotifiction.sh - 发送分支信息通知
+
+**功能：** 读取分支信息 JSON，整理后发送到企业微信/钉钉
+
+**参数：**
+
+| 参数 | 说明 |
+|------|------|
+| `-branchMapsInJsonF` | 分支信息 JSON 文件路径 |
+| `-branchMapsInKey` | 分支数组在文件中的 key |
+| `-showCategoryName` | 是否显示分类名 |
+| `-showFlag` | 是否显示状态标记 |
+| `-showName` | 是否显示分支名 |
+| `-showTime` | 时间显示方式（all/only_last/none） |
+| `-showAt` | 是否显示 @ 人员 |
+| `-shouldMD` | 是否使用 Markdown 格式 |
+| `-robot` | 机器人 URL |
+| `-at` | @ 的人员列表 |
+
+**使用示例：**
+
+```bash
+qbase -quick getBranchMapsInfoAndNotifiction \
+  -branchMapsInJsonF /path/to/v1.7.2.json \
+  -branchMapsInKey online_branches \
+  -showCategoryName true \
+  -showFlag true \
+  -showName true \
+  -showTime none \
+  -showAt true \
+  -shouldMD true \
+  -robot https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx \
+  -at ["lichaoqian"]
+```
+
+#### 5.3.2 getBranchNames_accordingToRebaseBranch.sh - 获取分支名
+
+**功能：** 根据 rebase 分支获取当前分支所含的所有分支名
+
+**参数：**
+
+| 参数 | 说明 |
+|------|------|
+| `-rebaseBranch` | 必填：要 rebase 的分支名 |
+| `-addValue` | 可选：增减的时间秒数（支持正负值） |
+| `-onlyName` | 可选：是否只取最后部分（不为 true 时为全名） |
+
+**使用示例：**
+
+```bash
+qbase -quick getBranchNamesAccordingToRebaseBranch \
+  -rebaseBranch "master" \
+  --add-rel_path 1 \
+  -onlyName true \
+  --verbose
+```
+
+### 5.4 测试数据
+
+**输入文件** (`example/example_input_getBranchMapsInfoAndNotifiction.json`)：
+
+```json
+{
+  "actions": [
+    { "id": "-quick", "fixedValue": "getBranchMapsInfoAndNotifiction" },
+    { "id": "-branchMapsInJsonF" },
+    { "id": "-branchMapsInKey", "fixedValue": "online_branches" },
+    { "id": "-showCategoryName", "fixedValue": true },
+    { "id": "-showFlag", "fixedValue": true },
+    { "id": "-showName", "fixedValue": true },
+    { "id": "-showTime", "fixedValue": "none" },
+    { "id": "-showAt", "fixedValue": true },
+    { "id": "-shouldMD", "fixedValue": true },
+    { "id": "-robot", "fixedValue": "https://qyapi.weixin.qq.com/..." },
+    { "id": "-at", "fixedValue": "[\"lichaoqian\"]" }
+  ]
+}
+```

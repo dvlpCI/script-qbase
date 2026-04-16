@@ -81,15 +81,7 @@ if [ $? != 0 ]; then
 fi
 # 检查是否超过API请求限制
 if [[ $fileList == *"Bad credentials"* ]]; then
-    echo "获取git目录下的所有文件路径的凭证无效，请检查您的token值 ${access_token} 是否正确。或者进入git查看token是否已过期或者被删除(github请进入: https://github.com/settings/tokens ) 。详细的错误信息为:${fileList} ."
-    echo "❌ GitHub Token 无效，请检查:"
-    echo "   1. Token 是否过期或已删除"
-    echo "   2. 创建新 Token: https://github.com/settings/tokens"
-    echo "   3. 创建步骤: Fine-grained tokens → Generate new token"
-    echo "      - Repository access: 选择你的仓库"
-    echo "      - Permissions: Contents → Read and write"
-    echo ""
-    echo "详细错误: ${fileList}"
+    echo "获取git目录下的所有文件路径的凭证无效，请检查您的token值 ${access_token} 是否正确。或者进入git查看token是否已过期或者被删除(github请进入: https://github.com/settings/tokens 附：创建新Token步骤①: Fine-grained tokens → Generate new token ② Repository access: 选择你的仓库 ③ Permissions: Contents → Read and write ④→ Save → Generate token) 。详细的错误信息为:${fileList} ."
     exit 1
 elif [[ $fileList == *"API rate limit exceeded"* ]]; then
     echo "超过API请求限制。请稍后再试。${fileList}"

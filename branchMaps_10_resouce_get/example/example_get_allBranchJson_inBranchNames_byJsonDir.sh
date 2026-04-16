@@ -28,6 +28,7 @@ qbase_select_branch_byNames_scriptPath=${qbase_homedir_abspath}/branch/select_br
 qbase_get_allBranchJson_inBranchNames_byJsonDir_scriptPath=${CategoryFun_HomeDir_Absolute}/get_allBranchJson_inBranchNames_byJsonDir.sh
 qbase_getBranchMapsInfoAndNotifiction_scriptPath=${qbase_homedir_abspath}/branch_quickcmd/getBranchMapsInfoAndNotifiction.sh
 
+example_remote_branchs_json_local_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_local.json
 example_remote_branchs_json_github_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_github.json
 example_remote_branchs_json_gitee_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_gitee.json
 example_remote_branchs_json_gitlab_filePath=${Example_HomeDir_Absolute}/example_remote_branchs_json_gitlab.json
@@ -107,6 +108,26 @@ function getRequestBranchNames() {
 }
 
 
+
+function testLocal {
+    log_title "0.local"
+    # 获取要请求的分支列表
+    ignoreBranchNameOrRules="unuse/* origin/unuse/* test/* origin/test/*"
+    create_start_date=""        # 若有值，创建时间早于该值不显示
+    lastCommit_start_date=""    # 若有值，最后修改时间早于该值不显示(即该时间值之后没有提交的不显示)
+    # requestBranchNames=$(getRequestBranchNames)
+    requestBranchNames="dev/demo test/test1"
+    # requestBranchNames="dev_in_pgyer test/branchInfo1 test/branchInfo2 test/branchInfo1"
+    echo "您当前项目${BLUE} ${PWD} ${NC}获取信息的远程分支名分别是${BLUE} ${requestBranchNames} ${NC}"
+    # exit
+    
+    access_token=""
+    
+    ONE_OF_DIRECTORY_URL="~/Project/CQCI/script-qbase/branchMaps_10_resouce_get/example/featureBrances"
+    DIRECTORY_URL_BranchName="main"
+    example_remote_branchs_json_filePath=${example_remote_branchs_json_local_filePath}
+}
+
 function testGithub {
     log_title "1.github"
     # 获取要请求的分支列表
@@ -182,6 +203,7 @@ function dealFound() {
         "branchJsons": '${allBranchJsonStrings}'
     }
     '
+    # echo "{}" > ${example_remote_branchs_json_filePath} #清空文件内容,但清空成{}
     printf "%s" "$lastJson" > ${example_remote_branchs_json_filePath}
     open "${example_remote_branchs_json_filePath}"
 
@@ -215,7 +237,8 @@ function test_getAllBranchLogArray_andCategoryThem() {
     echo "${YELLOW}更多详情请可点击查看文件:${BLUE} ${example_remote_branchs_json_filePath}${NC}"
 }
 
-
-testGithub && dealFound
+testLocal && dealFound
+# testGithub && dealFound
 # testGitee && dealFound
 # testGitlab && dealFound
+echo "\n${RED}更多测试(local/github/gitee/gitlab)请进入本测试脚本查看运行${NC}"
