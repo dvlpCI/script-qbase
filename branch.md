@@ -39,6 +39,65 @@ branch/                              ← 分支操作（筛选、记录、时间
 
 ---
 
+
+
+## 前言：分支信息结构
+
+### 1 分支 JSON 结构
+
+```json
+{
+  "name": "feature/user_login",
+  "type": "feature",
+  "create_time": "2024.03.01",
+  "submit_test_time": "2024.03.10",
+  "pass_test_time": "2024.03.15",
+  "merger_pre_time": "2024.03.18",
+  "tester": {
+    "name": "zhangsan"
+  },
+  "answer": {
+    "name": "lisi"
+  },
+  "outlines": [
+    {
+      "title": "登录模块开发",
+      "weekSpend": [16, 24, 16, 8]
+    }
+  ]
+}
+```
+
+### 2 字段说明
+
+| 字段                   | 类型   | 必填         | 说明                                |
+| ---------------------- | ------ | ------------ | ----------------------------------- |
+| `name`                 | string | 是           | 分支名                              |
+| `type`                 | string | 是           | 类型：hotfix/feature/optimize/other |
+| `create_time`          | string | 是           | 创建时间（格式：YYYY.MM.DD）        |
+| `submit_test_time`     | string | 测试阶段必填 | 提测时间                            |
+| `pass_test_time`       | string | 预生产前必填 | 测试通过时间                        |
+| `merger_pre_time`      | string | 发布前必填   | 合入预生产时间                      |
+| `tester`               | object | 提测时必填   | 测试人员信息                        |
+| `tester.name`          | string | 是           | 测试人员姓名                        |
+| `answer`               | object | 否           | 答疑者信息                          |
+| `outlines`             | array  | 否           | 工作事项列表                        |
+| `outlines[].title`     | string | 是           | 事项标题                            |
+| `outlines[].weekSpend` | array  | 周报必填     | 各周耗时（小时）                    |
+
+### 3 type 类型说明
+
+| 类型       | 说明     | 场景                 |
+| ---------- | -------- | -------------------- |
+| `hotfix`   | 热修复   | 线上紧急问题修复     |
+| `feature`  | 需求功能 | 产品新功能开发       |
+| `optimize` | 技术优化 | 性能优化、重构等     |
+| `other`    | 其他     | 不属于以上类型的分支 |
+
+---
+
+## 
+
 ## 一、分支筛选与记录
 
 ### 1.1 select_branch_byNames - 按条件筛选分支
@@ -179,13 +238,120 @@ last_date=$(sh rebasebranch_last_commit_date.sh -rebaseBranch "develop")
 
 ---
 
-## 二、分支信息获取
+## 二、分支信息获取 (branchMaps_10_resouce_get)
 
-### 2.1 addBranchMaps_toJsonFile - 添加分支信息到文件
+### 2.1 目录结构
 
-将分支信息从指定目录读取并添加到目标 JSON 文件。
+```
+branchMaps_10_resouce_get/
+├── addBranchMaps_toJsonFile.sh              # 主入口：添加分支信息到文件
+├── get_filePath_mapping_branchName_from_dir.sh # 根据分支名查找信息文件
+├── get_allBranchJson_inBranchNames_byJsonDir.sh # 主入口：从远程获取分支信息
+├── git_content/                            # 远程文件获取子模块
+│   ├── get_all_json_file_content_inDir.sh   # 获取目录下 JSON 文件内容
+│   ├── get_fileUrls_inDir_github.sh         # 获取 GitHub 目录文件列表
+│   ├── get_fileUrls_inDir_gitee.sh          # 获取 Gitee 目录文件列表
+│   ├── get_fileUrls_inDir_gitlab.sh         # 获取 GitLab 目录文件列表
+│   ├── get_filecontent_gitlab.sh           # 获取 GitLab 文件内容
+│   └── get_filecontent_git_all.sh          # 获取 GitHub/Gitee 文件内容
+└── example/                                # 示例
+    └── data/
+```
 
-**参数说明：**
+### 2.2 调用关系
+
+#### 2.2.1 调用关系图
+
+```
+addBranchMaps_toJsonFile.sh                       ← 主入口：本地分支信息添加
+    └── branchMaps_11_resouce_check/
+        └── branchMapFile_checkMap.sh             ← 检查分支信息完整性
+
+get_allBranchJson_inBranchNames_byJsonDir.sh     ← 主入口：远程分支信息获取
+    └── git_content/
+        └── get_all_json_file_content_inDir.sh    ← 获取目录下 JSON 文件内容
+            ├── get_fileUrls_inDir_github.sh      ← GitHub 目录列表
+            ├── get_fileUrls_inDir_gitee.sh       ← Gitee 目录列表
+            ├── get_fileUrls_inDir_gitlab.sh      ← GitLab 目录列表
+            ├── get_filecontent_gitlab.sh         ← GitLab 文件内容
+            └── get_filecontent_git_all.sh        ← GitHub/Gitee 文件内容
+
+get_filePath_mapping_branchName_from_dir.sh       ← 独立：根据分支名查找文件
+```
+
+#### 2.2.2 调用关系示例
+
+以主入口 `get_allBranchJson_inBranchNames_byJsonDir.sh` 为例，说明其执行流程：
+
+```
+get_allBranchJson_inBranchNames_byJsonDir.sh 的执行流程
+│
+├── 1. 接收参数
+│   ├── requestBranchNames: feature/user_login feature/payment
+│   ├── access-token: ghp_xxx
+│   ├── oneOfDirUrl: https://github.com/user/repo/tree/main/branchInfos
+│   └── dirUrlBranchName: main
+│
+├── 2. 遍历每个分支名
+│   └── 对每个分支调用 get_all_json_file_content_inDir.sh
+│
+├── 3. 调用 get_all_json_file_content_inDir.sh
+│   │
+│   ├── 3.1 根据 URL 类型选择平台
+│   │   ├── GitHub → get_fileUrls_inDir_github.sh
+│   │   ├── Gitee  → get_fileUrls_inDir_gitee.sh
+│   │   └── GitLab → get_fileUrls_inDir_gitlab.sh
+│   │
+│   ├── 3.2 获取目录下所有文件路径
+│   │   └── 输出: ["/path/file1.json", "/path/file2.json"]
+│   │
+│   ├── 3.3 遍历文件获取内容
+│   │   └── 对每个文件调用 getContentIfJson
+│   │
+│   └── 3.4 获取文件内容
+│       ├── GitHub/Gitee → get_filecontent_git_all.sh
+│       ├── GitLab      → get_filecontent_gitlab.sh
+│       └── 本地文件    → cat 命令
+│
+├── 4. 组合结果
+│   └── 将所有分支的 JSON 内容组合成数组
+│
+└── 最终输出示例：
+    [
+      {
+        "name": "feature/user_login",
+        "type": "feature",
+        "create_time": "2024.03.01",
+        "submit_test_time": "2024.03.10",
+        "outlines": [
+          { "title": "登录模块开发", "weekSpend": [16, 24] }
+        ],
+        "fileUrl": "https://raw.githubusercontent.com/..."
+      },
+      {
+        "name": "feature/payment",
+        "type": "feature",
+        ...
+      }
+    ]
+```
+
+### 2.3 支持的平台
+
+| 平台 | 目录列表获取 | 文件内容获取 | 需要 Token |
+|------|-------------|-------------|-----------|
+| GitHub | `get_fileUrls_inDir_github.sh` | `get_filecontent_git_all.sh` | 是 |
+| Gitee | `get_fileUrls_inDir_gitee.sh` | `get_filecontent_git_all.sh` | 否 |
+| GitLab | `get_fileUrls_inDir_gitlab.sh` | `get_filecontent_gitlab.sh` | 是 |
+| 本地 | `get_fileUrls_inDir_local` (函数) | `cat` 命令 | 否 |
+
+---
+
+### 2.4 主入口 - addBranchMaps_toJsonFile.sh
+
+**功能：** 从本地目录读取分支信息 JSON 文件并添加到目标文件
+
+**参数：**
 
 | 参数 | 说明 |
 |------|------|
@@ -197,27 +363,7 @@ last_date=$(sh rebasebranch_last_commit_date.sh -rebaseBranch "develop")
 | `-ignoreCheckBranchNames` | 忽略检查的分支名 |
 | `-shouldDeleteHasCatchRequestBranchFile` | 成功后是否删除源文件 |
 
-**示例：**
-
-```bash
-# 基本用法：从目录获取分支信息并添加到文件
-sh addBranchMaps_toJsonFile.sh \
-  -branchMapsFromDir "/path/to/branchInfos" \
-  -branchMapsAddToJsonF "/path/to/output.json" \
-  -branchMapsAddToKey "branch_maps" \
-  -requestBranchNamesString "feature/user_login feature/payment"
-
-# 启用属性检查（test1 环境）
-sh addBranchMaps_toJsonFile.sh \
-  -branchMapsFromDir "/path/to/branchInfos" \
-  -branchMapsAddToJsonF "/path/to/output.json" \
-  -branchMapsAddToKey "branch_maps" \
-  -requestBranchNamesString "feature/user_login feature/payment" \
-  -checkPropertyInNetwork "test1" \
-  -ignoreCheckBranchNames "master develop"
-```
-
-**输出效果：**
+**效果：**
 
 ```
 正在执行命令(获取json内容)《sh ... 》
@@ -229,30 +375,57 @@ sh addBranchMaps_toJsonFile.sh \
 
 ---
 
-### 2.2 get_filePath_mapping_branchName_from_dir - 根据分支名查找信息文件
+### 2.5 主入口 - get_allBranchJson_inBranchNames_byJsonDir.sh
 
-在指定目录中查找分支名对应的 JSON 信息文件。
+**功能：** 从 GitHub/Gitee/GitLab 远程获取分支的 JSON 信息文件
 
-**参数说明：**
+**数据来源：** 从远程仓库的分支目录中读取 JSON 文件
+
+**输出用途：** 其输出通常作为 `get20_branchMapsInfo_byHisJsonFile.sh` 见（[四、分支信息展示 的 调用关系示例 的数据来源](#四、分支信息展示 的 调用关系示例 的数据来源)）的数据源，用于展示和发送通知。
+
+```
+get_allBranchJson_inBranchNames_byJsonDir.sh 输出 → 存储到 JSON 文件 → get20_branchMapsInfo_byHisJsonFile.sh 读取展示
+```
+
+**参数：**
+
+| 参数 | 说明 |
+|------|------|
+| `-requestBranchNames` | 要获取的分支名列表（空格分隔） |
+| `-access-token` | 访问令牌（GitHub/GitLab 需要） |
+| `-oneOfDirUrl` | 包含分支目录的 URL |
+| `-dirUrlBranchName` | 目录所在的分支名 |
+
+**效果：**
+
+```json
+[
+  {
+    "name": "feature/user_login",
+    "type": "feature",
+    "create_time": "2024.03.01",
+    "submit_test_time": "2024.03.10",
+    "outlines": [
+      { "title": "登录模块开发", "weekSpend": [16, 24] }
+    ]
+  }
+]
+```
+
+---
+
+### 2.6 根据分支名查找 - get_filePath_mapping_branchName_from_dir.sh
+
+**功能：** 在指定目录中查找分支名对应的 JSON 信息文件
+
+**参数：**
 
 | 参数 | 说明 |
 |------|------|
 | `-branchMapsFromDir` | 分支信息文件所在目录 |
 | `-requestBranchName` | 要查找的分支名 |
 
-**示例：**
-
-```bash
-# 查找单个分支的信息
-result=$(sh get_filePath_mapping_branchName_from_dir.sh \
-  -branchMapsFromDir "/path/to/branchInfos" \
-  -requestBranchName "feature/user_login")
-
-# 查看结果
-echo "$result" | jq '.'
-```
-
-**输出效果：**
+**效果：**
 
 ```json
 [
@@ -262,82 +435,10 @@ echo "$result" | jq '.'
     "type": "feature",
     "create_time": "2024.03.01",
     "submit_test_time": "2024.03.10",
-    "tester": {
-      "name": "wangwu"
-    }
+    "tester": { "name": "wangwu" }
   }
 ]
 ```
-
----
-
-### 2.3 get_allBranchJson_inBranchNames_byJsonDir - 从远程仓库获取分支信息
-
-从 GitHub/Gitee/GitLab 获取指定分支的 JSON 信息文件。
-
-**参数说明：**
-
-| 参数 | 说明 |
-|------|------|
-| `-requestBranchNames` | 要获取的分支名列表（空格分隔） |
-| `-access-token` | 访问令牌（GitHub/GitLab 需要） |
-| `-oneOfDirUrl` | 包含分支目录的 URL |
-| `-dirUrlBranchName` | 目录所在的分支名 |
-
-**调用关系：**
-
-```
-get_allBranchJson_inBranchNames_byJsonDir.sh
-    ├── get_only_branch_from_recods.sh         ← 提取分支名
-    ├── select_branch_byNames.sh               ← 筛选分支
-    └── getBranchMapsInfoAndNotifiction.sh     ← 整理并发送通知
-```
-
-**使用流程：**
-
-```bash
-# 1. 获取本地分支列表
-git branch -r | grep -v HEAD | sed 's/origin\///'
-
-# 2. 筛选符合条件的分支
-branchNames=$(sh select_branch_byNames.sh \
-  -branchNames "origin/feature/a origin/feature/b" \
-  -ignoreBranchNameOrRules "unuse/* test/*" \
-  -lastCommit-startDate "2024-01-01")
-
-# 3. 从远程获取分支信息
-allBranchJsonStrings=$(sh get_allBranchJson_inBranchNames_byJsonDir.sh \
-  -requestBranchNames "${branchNames//$'\n'/ }" \
-  -access-token "ghp_xxx" \
-  -oneOfDirUrl "https://github.com/user/repo/tree/main/branchInfos" \
-  -dirUrlBranchName "main")
-```
-
-**输出效果：**
-
-```json
-{
-  "branchJsons": [
-    {
-      "name": "feature/user_login",
-      "type": "feature",
-      "create_time": "2024.03.01",
-      "submit_test_time": "2024.03.10",
-      "outlines": [
-        { "title": "登录模块开发", "weekSpend": [16, 24] }
-      ]
-    }
-  ]
-}
-```
-
-**支持的平台：**
-
-| 平台 | 需要 Token | API |
-|------|-----------|-----|
-| GitHub | 是 | `api.github.com` |
-| Gitee | 否 | `gitee.com/api` |
-| GitLab | 是 | `gitlab.com/api` |
 
 ---
 
@@ -427,6 +528,8 @@ branchMaps_20_info/
     └── data/
 ```
 
+<a name="四、分支信息展示"></a>
+
 ### 4.2 调用关系
 
 #### 4.2.1 调用关系图
@@ -442,6 +545,34 @@ get20_branchMapsInfo_byHisJsonFile.sh    ← 主入口
 #### 4.2.2 调用关系示例
 
 以主入口 `get20` 为例，说明其输出是如何由各子模块组合而成的：
+
+<a name="四、分支信息展示 的 调用关系示例 的数据来源"></a>
+
+##### 1. 数据来源说明
+
+`get20_branchMapsInfo_byHisJsonFile.sh` 的两个关键参数 `-branchMapsInJsonF` 和 `-branchMapsInKey` 通常来源于 [2.5 主入口](#2.5-主入口---get_allBranchJson_inBranchNames_byJsonDir.sh) `get_allBranchJson_inBranchNames_byJsonDir.sh` 的输出：
+
+```
+数据流转关系：
+get_allBranchJson_inBranchNames_byJsonDir.sh (获取远程分支信息)
+    │
+    │  输出: JSON 数组
+    │  示例: [{ "name": "feature/user_login", ... }, { "name": "feature/payment", ... }]
+    │
+    ▼
+存储到 JSON 文件 (通过其他脚本或手动)
+    │
+    │  文件示例: v1.7.2.json
+    │  内容: { "branchJsons": [{ "name": "feature/user_login", ... }, ...] }
+    │
+    ▼
+get20_branchMapsInfo_byHisJsonFile.sh (读取并展示)
+    │
+    ├── -branchMapsInJsonF = v1.7.2.json      ← 数据源文件
+    └── -branchMapsInKey = branchJsons         ← 数据在文件中的 key（对应数组）
+```
+
+##### 2. 输出结构说明
 
 ```
 get20_branchMapsInfo_byHisJsonFile.sh 的输出结构
@@ -481,6 +612,43 @@ get20_branchMapsInfo_byHisJsonFile.sh 的输出结构
         "other": []
       }
     }
+```
+
+##### 3. 输出用途说明
+
+`get20_branchMapsInfo_byHisJsonFile.sh` 的输出主要用于以下场景：
+
+| 用途 | 说明 | 示例 |
+|------|------|------|
+| **发送通知** | 发送到企业微信/钉钉机器人 | `getBranchMapsInfoAndNotifiction.sh` |
+| **生成周报** | 整理分支进度信息 | 定时任务调用 |
+| **状态展示** | 在 CI/CD 流程中展示分支状态 | 打包完成后输出 |
+
+```
+get20 输出 → 格式化分支信息字符串 → 通知/周报/展示
+```
+
+##### 4. 完整示例参考
+
+见 [`branchMaps_10_resouce_get/example/example_get_allBranchJson_inBranchNames_byJsonDir.sh`](branchMaps_10_resouce_get/example/example_get_allBranchJson_inBranchNames_byJsonDir.sh)
+
+```bash
+# 示例中的关键代码
+# 1. 获取远程分支信息并存储
+allBranchJsonStrings=$(sh get_allBranchJson_inBranchNames_byJsonDir.sh ...)
+lastJson='{
+    "branchJsons": '"${allBranchJsonStrings}"'
+}'
+printf "%s" "$lastJson" > ${example_remote_branchs_json_filePath}
+
+# 2. 读取并展示分支信息
+branchMapsInJsonFile=${example_remote_branchs_json_filePath}
+branchMapsInKey="branchJsons"
+
+sh getBranchMapsInfoAndNotifiction.sh \
+    -branchMapsInJsonF "${branchMapsInJsonFile}" \
+    -branchMapsInKey "${branchMapsInKey}" \
+    ...
 ```
 
 ### 4.3 测试数据说明
@@ -666,134 +834,6 @@ Flutter升级3.3.9
 
 ---
 
-## 五、分支信息结构
-
-### 5.1 分支 JSON 结构
-
-```json
-{
-  "name": "feature/user_login",
-  "type": "feature",
-  "create_time": "2024.03.01",
-  "submit_test_time": "2024.03.10",
-  "pass_test_time": "2024.03.15",
-  "merger_pre_time": "2024.03.18",
-  "tester": {
-    "name": "zhangsan"
-  },
-  "answer": {
-    "name": "lisi"
-  },
-  "outlines": [
-    {
-      "title": "登录模块开发",
-      "weekSpend": [16, 24, 16, 8]
-    }
-  ]
-}
-```
-
-### 5.2 字段说明
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `name` | string | 是 | 分支名 |
-| `type` | string | 是 | 类型：hotfix/feature/optimize/other |
-| `create_time` | string | 是 | 创建时间（格式：YYYY.MM.DD） |
-| `submit_test_time` | string | 测试阶段必填 | 提测时间 |
-| `pass_test_time` | string | 预生产前必填 | 测试通过时间 |
-| `merger_pre_time` | string | 发布前必填 | 合入预生产时间 |
-| `tester` | object | 提测时必填 | 测试人员信息 |
-| `tester.name` | string | 是 | 测试人员姓名 |
-| `answer` | object | 否 | 答疑者信息 |
-| `outlines` | array | 否 | 工作事项列表 |
-| `outlines[].title` | string | 是 | 事项标题 |
-| `outlines[].weekSpend` | array | 周报必填 | 各周耗时（小时） |
-
-### 5.3 type 类型说明
-
-| 类型 | 说明 | 场景 |
-|------|------|------|
-| `hotfix` | 热修复 | 线上紧急问题修复 |
-| `feature` | 需求功能 | 产品新功能开发 |
-| `optimize` | 技术优化 | 性能优化、重构等 |
-| `other` | 其他 | 不属于以上类型的分支 |
-
----
-
-## 六、典型工作流
-
-### 6.1 提测流程
-
-```bash
-# 1. 确保分支信息文件存在
-# /path/to/branchInfos/feature_user_login.json
-
-# 2. 检查信息完整性（test1 环境）
-sh branchMapFile_checkMap.sh \
-  -checkBranchMap "$(cat /path/to/branchInfos/feature_user_login.json)" \
-  -pn "test1"
-
-# 3. 添加到汇总文件
-sh addBranchMaps_toJsonFile.sh \
-  -branchMapsFromDir "/path/to/branchInfos" \
-  -branchMapsAddToJsonF "/path/to/branchMaps.json" \
-  -branchMapsAddToKey "branch_maps" \
-  -requestBranchNamesString "feature/user_login" \
-  -checkPropertyInNetwork "test1"
-
-# 4. 生成展示信息
-sh get10_branch_self_detail_info.sh \
-  -iBranchMap "$(cat /path/to/branchInfos/feature_user_login.json)" \
-  -showFlag "true" \
-  -showName "true" \
-  -showTime "all" \
-  -showAt "true"
-```
-
-### 6.2 周报生成流程
-
-```bash
-# 1. 批量生成各分支信息
-sh get20_branchMapsInfo_byHisJsonFile.sh \
-  -branchMapsInJsonF "/path/to/branchMaps.json" \
-  -branchMapsInKey ".branch_maps" \
-  -showFlag "true" \
-  -showName "true" \
-  -showTime "only_last" \
-  -shouldMD "true" \
-  -resultSaveToJsonF "/path/to/output.json" \
-  -resultBranchKey "branches" \
-  -resultCategoryKey "category"
-
-# 2. 查看分类后的信息
-cat /path/to/output.json | jq '.category'
-```
-
----
-
-## 七、常见问题
-
-### Q1: 提示 "获取分支创建的时间失败"
-
-**原因：** 本地不存在该分支
-
-**解决：** 使用远程分支名（带 `origin/` 前缀）或先执行 `git fetch`
-
-### Q2: 提示 "缺失提测时间 submit_test_time"
-
-**原因：** 分支 JSON 中缺少 `submit_test_time` 字段
-
-**解决：** 在对应的 JSON 文件中添加 `submit_test_time` 字段
-
-### Q3: 时间格式不正确
-
-**原因：** `create_time` 必须是 `YYYY.MM.DD` 或 `MM.DD` 格式
-
-**解决：** 修改 JSON 文件中的时间格式
-
----
-
 ## 五、快速命令 (branch_quickcmd)
 
 独立快捷命令脚本集。
@@ -896,6 +936,22 @@ getBranchMapsInfoAndNotifiction.sh 的执行流程
     }
 ```
 
+
+
+```
+
+{
+      "category": {
+        "feature": ["✅dev_ui_revision:[02.17已合入预生产]@qian@qian\n①首页UI改版[8h]"],
+        "hotfix": ["🏃dev_login_err:[02.09开发中]@producter1@test1\n①功能点一[4h]\n②功能点二[12h]"],
+        "optimize": [...],
+        "other": []
+      }
+    }
+```
+
+
+
 #### 5.2.3 通知发送流程
 
 ```
@@ -926,18 +982,18 @@ getBranchMapsInfoAndNotifiction.sh
 
 **参数：**
 
-| 参数 | 说明 |
-|------|------|
-| `-branchMapsInJsonF` | 分支信息 JSON 文件路径 |
-| `-branchMapsInKey` | 分支数组在文件中的 key |
-| `-showCategoryName` | 是否显示分类名 |
-| `-showFlag` | 是否显示状态标记 |
-| `-showName` | 是否显示分支名 |
-| `-showTime` | 时间显示方式（all/only_last/none） |
-| `-showAt` | 是否显示 @ 人员 |
-| `-shouldMD` | 是否使用 Markdown 格式 |
-| `-robot` | 机器人 URL |
-| `-at` | @ 的人员列表 |
+| 参数                 | 说明                               |
+| -------------------- | ---------------------------------- |
+| `-branchMapsInJsonF` | 分支信息 JSON 文件路径             |
+| `-branchMapsInKey`   | 分支数组在文件中的 key             |
+| `-showCategoryName`  | 是否显示分类名                     |
+| `-showFlag`          | 是否显示状态标记                   |
+| `-showName`          | 是否显示分支名                     |
+| `-showTime`          | 时间显示方式（all/only_last/none） |
+| `-showAt`            | 是否显示 @ 人员                    |
+| `-shouldMD`          | 是否使用 Markdown 格式             |
+| `-robot`             | 机器人 URL                         |
+| `-at`                | @ 的人员列表                       |
 
 **使用示例：**
 
@@ -961,11 +1017,11 @@ qbase -quick getBranchMapsInfoAndNotifiction \
 
 **参数：**
 
-| 参数 | 说明 |
-|------|------|
-| `-rebaseBranch` | 必填：要 rebase 的分支名 |
-| `-addValue` | 可选：增减的时间秒数（支持正负值） |
-| `-onlyName` | 可选：是否只取最后部分（不为 true 时为全名） |
+| 参数            | 说明                                         |
+| --------------- | -------------------------------------------- |
+| `-rebaseBranch` | 必填：要 rebase 的分支名                     |
+| `-addValue`     | 可选：增减的时间秒数（支持正负值）           |
+| `-onlyName`     | 可选：是否只取最后部分（不为 true 时为全名） |
 
 **使用示例：**
 
@@ -998,3 +1054,81 @@ qbase -quick getBranchNamesAccordingToRebaseBranch \
   ]
 }
 ```
+
+
+
+
+
+## 六、典型工作流
+
+### 6.1 提测流程
+
+```bash
+# 1. 确保分支信息文件存在
+# /path/to/branchInfos/feature_user_login.json
+
+# 2. 检查信息完整性（test1 环境）
+sh branchMapFile_checkMap.sh \
+  -checkBranchMap "$(cat /path/to/branchInfos/feature_user_login.json)" \
+  -pn "test1"
+
+# 3. 添加到汇总文件
+sh addBranchMaps_toJsonFile.sh \
+  -branchMapsFromDir "/path/to/branchInfos" \
+  -branchMapsAddToJsonF "/path/to/branchMaps.json" \
+  -branchMapsAddToKey "branch_maps" \
+  -requestBranchNamesString "feature/user_login" \
+  -checkPropertyInNetwork "test1"
+
+# 4. 生成展示信息
+sh get10_branch_self_detail_info.sh \
+  -iBranchMap "$(cat /path/to/branchInfos/feature_user_login.json)" \
+  -showFlag "true" \
+  -showName "true" \
+  -showTime "all" \
+  -showAt "true"
+```
+
+### 6.2 周报生成流程
+
+```bash
+# 1. 批量生成各分支信息
+sh get20_branchMapsInfo_byHisJsonFile.sh \
+  -branchMapsInJsonF "/path/to/branchMaps.json" \
+  -branchMapsInKey ".branch_maps" \
+  -showFlag "true" \
+  -showName "true" \
+  -showTime "only_last" \
+  -shouldMD "true" \
+  -resultSaveToJsonF "/path/to/output.json" \
+  -resultBranchKey "branches" \
+  -resultCategoryKey "category"
+
+# 2. 查看分类后的信息
+cat /path/to/output.json | jq '.category'
+```
+
+---
+
+## 七、常见问题
+
+### Q1: 提示 "获取分支创建的时间失败"
+
+**原因：** 本地不存在该分支
+
+**解决：** 使用远程分支名（带 `origin/` 前缀）或先执行 `git fetch`
+
+### Q2: 提示 "缺失提测时间 submit_test_time"
+
+**原因：** 分支 JSON 中缺少 `submit_test_time` 字段
+
+**解决：** 在对应的 JSON 文件中添加 `submit_test_time` 字段
+
+### Q3: 时间格式不正确
+
+**原因：** `create_time` 必须是 `YYYY.MM.DD` 或 `MM.DD` 格式
+
+**解决：** 修改 JSON 文件中的时间格式
+
+---
+
