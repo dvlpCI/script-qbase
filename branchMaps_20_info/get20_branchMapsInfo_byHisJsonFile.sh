@@ -283,10 +283,10 @@ cat ${RESULT_SALE_TO_JSON_FILE_PATH} | jq ".${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}
 
 
 # 进一步进行对上诉所得的 category 整理
-get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
+get11_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
 showCategoryName="true"
-debug_log "${YELLOW}正在执行(获取分类的所有信息)《 ${BLUE}sh ${get_category_all_detail_info_script_path} -categoryJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" ${YELLOW}》${NC}"
-ALL_CATEGORY_BRANCH_STRING=$(sh ${get_category_all_detail_info_script_path} -categoryJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}")
+debug_log "${YELLOW}正在执行(获取分类的所有信息)《 ${BLUE}sh ${get11_category_all_detail_info_script_path} -categoryJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${RESULT_SALE_TO_JSON_FILE_PATH}\" ${YELLOW}》${NC}"
+ALL_CATEGORY_BRANCH_STRING=$(sh ${get11_category_all_detail_info_script_path} -categoryJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${RESULT_SALE_TO_JSON_FILE_PATH}")
 if [ $? != 0 ]; then
     echo "${RED}${ALL_CATEGORY_BRANCH_STRING}${NC}" # 此时值为错误信息
     exit 1

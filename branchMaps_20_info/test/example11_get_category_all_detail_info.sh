@@ -36,7 +36,7 @@ source $qbase_function_log_msg_script_path # 为了使用 logResultValueToJsonFi
 echo "${YELLOW}引入文件： ${BLUE}${qbase_function_log_msg_script_path}${NC}"
 
 
-get_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
+get11_category_all_detail_info_script_path="${CommonFun_HomeDir_Absolute}/branchMaps_20_info/get11_category_all_detail_info.sh"
 
 
 TEST_DATA_RESULT_FILE_PATH="${CurrentDIR_Script_Absolute}/data/example11_get_category_all_detail_info.json"
@@ -83,8 +83,8 @@ function test_getCategoryBranchsLog() {
 
     echo "----------------------------------------3.4 getAllCategoryBranchLog"
     showCategoryName="true"
-    echo "${YELLOW}正在执行《 ${BLUE}sh ${get_category_all_detail_info_script_path} -categoryJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" ${YELLOW}》${NC}"
-    ALL_CATEGORY_BRANCH_STRING=$(sh ${get_category_all_detail_info_script_path} -categoryJsonF "${TEST_DATA_RESULT_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}")
+    echo "${YELLOW}正在执行《 ${BLUE}sh ${get11_category_all_detail_info_script_path} -categoryJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" -categoryArrayKey \"${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}\" -showCategoryName \"${showCategoryName}\" -resultFullKey \"${RESULT_FULL_STRING_SALE_BY_KEY}\" -resultFullSaveToJsonF \"${TEST_DATA_RESULT_FILE_PATH}\" ${YELLOW}》${NC}"
+    ALL_CATEGORY_BRANCH_STRING=$(sh ${get11_category_all_detail_info_script_path} -categoryJsonF "${TEST_DATA_RESULT_FILE_PATH}" -categoryArrayKey "${RESULT_CATEGORY_ARRAY_SALE_BY_KEY}" -showCategoryName "${showCategoryName}" -resultFullKey "${RESULT_FULL_STRING_SALE_BY_KEY}" -resultFullSaveToJsonF "${TEST_DATA_RESULT_FILE_PATH}")
     if [ $? != 0 ]; then
         echo "${RED}${ALL_CATEGORY_BRANCH_STRING}${NC}" # 此时值为错误信息
         return 1
