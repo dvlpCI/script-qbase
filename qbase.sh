@@ -2,7 +2,7 @@
 ###
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
- # @LastEditors: dvlproad
+ # @LastEditors: dvlproad dvlproad@163.com
  # @LastEditTime: 2024-12-07 20:54:07
 # @Description: qbase 不是所要执行的直接脚本，所以不要使用颜色
 # @注意：修改本文件后，记得重新生成 qbase 二进制文件
@@ -369,14 +369,49 @@ show_usage() {
 
 # 如果是获取版本号
 versionCmdStrings=("--version" "-version" "-v" "version")
-helpCmdStrings=("--help" "-help" "-h" "help")
+
+# 判断第一个参数是不是 help 参数
+shouldShowHelp=false
+case "${firstArg}" in
+    --help|-help|-h|help)
+        shouldShowHelp=true
+        exit 0  # 这行会退出脚本！
+        ;;
+esac
+# 判断去除第一个参数后，剩余的参数是不是 help 参数
+contains_help_in_allArgsExceptFirstArg=false
+for arg in $allArgsExceptFirstArg; do
+    case $arg in
+        --help|-help|-h|help)
+            contains_help_in_allArgsExceptFirstArg=true
+            break
+            ;;
+    esac
+done
+
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
+
+elif [ "$shouldShowHelp" = true ]; then
+    show_usage
 
 elif [ "${firstArg}" == "custom" ]; then
     sh $qbase_homedir_abspath/qbase_custom.sh
 
 elif [ "${firstArg}" == "check-version" ]; then
+    # 拼接 package_remote_version.sh 脚本的绝对路径
+    package_remote_version_script="${qbase_homedir_abspath}/package/package_remote_version.sh"
+    if [ ! -f "${package_remote_version_script}" ]; then
+        echo "${RED}Error: 未找到 ${package_remote_version_script} ${NC}"
+        exit 1
+    fi
+
+    # 先判断是不是 help ，如果不是才执行后面的操作
+    if [ "$contains_help_in_allArgsExceptFirstArg" = true ]; then
+        sh "${package_remote_version_script}" -h
+        exit 0
+    fi
+
     # 提示用户输入要检查的包名
     while true; do
         printf "请输入要检查/更新的包名（如 qbase、qtool）【退出quit/q】）: "
@@ -393,12 +428,7 @@ elif [ "${firstArg}" == "check-version" ]; then
     done
     printf "\n"
 
-    # 拼接 package_remote_version.sh 脚本的绝对路径
-    package_remote_version_script="${qbase_homedir_abspath}/package/package_remote_version.sh"
-    if [ ! -f "${package_remote_version_script}" ]; then
-        echo "${RED}Error: 未找到 ${package_remote_version_script}${NC}"
-        exit 1
-    fi
+    # echo "正在执行命令...《 sh $package_remote_version_script -p \"${packageName}\" 》"
     sh "${package_remote_version_script}" -p "${packageName}"
 
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
@@ -429,10 +459,7 @@ elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     fi
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
-# elif echo "${helpCmdStrings[@]}" | grep -wq "$firstArg" &>/dev/null; then
-elif [ "${firstArg}" == "--help" ] || [ "${firstArg}" == "-help" ] ||[ "${firstArg}" == "-h" ] || [ "${firstArg}" == "help" ]; then
-# elif echo "${helpCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then # 判断结果有误
-    show_usage
+
 else
     echo "${qbase_latest_version}"
 fi
