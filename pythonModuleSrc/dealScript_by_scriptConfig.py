@@ -2,7 +2,7 @@
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-12 22:15:22
 LastEditors: dvlproad dvlproad@163.com
-LastEditTime: 2026-04-18 04:16:52
+LastEditTime: 2026-04-18 05:42:27
 FilePath: dealScript_by_scriptConfig.py
 Description: 根据配置文件，执行指定的脚本及其配置参数
 '''
@@ -381,15 +381,22 @@ def __getInputParamMapFromFile(operateHomeMap):
 
 
 import sys
-# Check if command line arguments are provided
-if len(sys.argv) == 0:
-    print(f"{RED}请传递描述想要执行的脚本的信息配置文件")
-    exit(1)
-# print(f"传递进来的参数如下:")
-# for i, arg in enumerate(sys.argv[1:], start=1):
-#     print(f"参数{i}: {arg}")
+# 当文件既可被导入、又能直接运行时必须 if __name__ == "__main__":
+# - 当你用 python3 dealScript_by_scriptConfig.py xxx.json 运行时，__name__ 是 "__main__"，会执行
+# - 当你在其他文件中 import 时，__name__ 是模块名 "dealScript_by_scriptConfig"，不会执行
+# - 所以这是安全的，不会影响现有的调用方式
+if __name__ == "__main__":
+    # Check if command line arguments are provided
+    # - sys.argv[0] 是脚本本身名称
+    # - sys.argv[1] 是第一个参数
+    # - len(sys.argv) < 2 表示没有传参数
+    if len(sys.argv) < 2:
+        print(f"{RED}请传递描述想要执行的脚本的信息配置文件")
+        exit(1)
+    # print(f"传递进来的参数如下:")
+    # for i, arg in enumerate(sys.argv[1:], start=1):
+    #     print(f"参数{i}: {arg}")
 
-
-resultCode=dealScriptByScriptConfig(sys.argv[1])
-if resultCode==False:
-    exit(1)
+    resultCode=dealScriptByScriptConfig(sys.argv[1])
+    if resultCode==False:
+        exit(1)

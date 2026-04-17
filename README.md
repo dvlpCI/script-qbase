@@ -131,6 +131,10 @@ qbase -quick 脚本关键字 [具名参数/参数...]
 
 ## 版本记录
 
+### 2026-04-18
+
+- 让 python3 dealScript_by_scriptConfig.py 既可被导入、又能直接运行时必须 `if __name__ == "__main__":`
+
 ### 0.8.0 (2026-04-11)
 
 增加 package_remote_version.sh（检查/更新 Homebrew 包版本）
