@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2026-04-15 21:36:44
+ # @LastEditTime: 2026-04-17 21:43:34
 # @Description: 根据 rebase 分支，获取当前分支所含的所有分支名
 ###
 
@@ -31,6 +31,72 @@ show_usage() {
     # printf "%-20s %s\n" "file" "Input file path"
     # printf "%-20s %s\n" "output" "Output file path"
     printf "${NC}"
+}
+
+# --------------------- 具名参数值的解析和获取函数 ---------------------
+# 获取具名参数的值（不允许以 - 开头）
+# 用法：get_named_arg_value "$1" "$2" "参数名"
+# 返回值：0=成功，1=参数缺失，2=参数为空，3=参数以-开头
+# 输出：成功时输出参数值，失败时输出具体原因（不含 Error: 前缀）
+get_named_arg_value() {
+    local opt="$1"
+    local val="$2"
+    local arg_name="${3:-参数值}"
+    
+    # 条件1：没有第2个参数
+    if [ $# -lt 2 ]; then
+        printf "%s 缺少 %s" "$opt" "$arg_name"
+        return 1
+    fi
+    
+    # 条件2：第2个参数为空字符串
+    if [ -z "$val" ]; then
+        printf "%s 的 %s 为空字符串" "$opt" "$arg_name"
+        return 2
+    fi
+    
+    # 条件3：第2个参数以 - 开头（是选项）
+    if [[ "$val" =~ ^- ]]; then
+        printf "%s 的 %s 不能以 '-' 开头: %s" "$opt" "$arg_name" "$val"
+        return 3
+    fi
+    
+    # 正常情况：输出值，返回0
+    printf "%s" "$val"
+    return 0
+}
+
+# 获取具名参数的值（允许以 - 开头）
+# 用法：get_named_arg_dashValue "$1" "$2" "参数名"
+# 返回值：0=成功，1=参数缺失，2=参数为空
+# 输出：成功时输出参数值，失败时输出具体原因（不含 Error: 前缀）
+get_named_arg_dashValue() {
+    local opt="$1"
+    local val="$2"
+    local arg_name="${3:-参数值}"
+    
+    # 条件1：没有第2个参数
+    if [ $# -lt 2 ]; then
+        printf "%s 缺少 %s" "$opt" "$arg_name"
+        return 1
+    fi
+    
+    # 条件2：第2个参数为空字符串
+    if [ -z "$val" ]; then
+        printf "%s 的 %s 为空字符串" "$opt" "$arg_name"
+        return 2
+    fi
+    
+    # 正常情况：输出值，返回0
+    printf "%s" "$val"
+    return 0
+}
+
+# 定义错误处理函数
+handle_named_arg_error() {
+    local option="$1"
+    echo "${RED}Error: 您为参数${YELLOW} ${option} ${RED}指定了值，但该值不符合要求或为空，请检查是否在 ${option} 后提供了正确的值${NC}"
+    exit 1
 }
 
 # 获取参数值的函数
@@ -67,24 +133,24 @@ while [ "$#" -gt 0 ]; do
             ;;
         -rebaseBranch|--rebase-branch)
             # 知识点：如果 get_argument "$1" "$2" 返回失败（非零退出码），那么 handle_error "$1" 会被执行。
-            REBASE_BRANCH=$(get_argument "$1" "$2") || handle_error "$1"
+            REBASE_BRANCH=$(get_named_arg_value "$1" "$2") || handle_named_arg_error "$1"
             shift 2 # 知识点：这里不能和 REBASE_BRANCH 同一行，否则会出如果执行脚本脚本卡住
             ;;
         # 注意：-addValue 参数值允许为负数（如 -100000），不能使用通用的 get_argument 函数
         # 因为 get_argument 会把以 - 开头的值误判为新选项，导致解析失败
         -addValue|--add-value) 
-            if [ -z "$2" ]; then
-                echo "${RED}Error: Argument for $1 is missing${NC}"
-                handle_error "$1"
-            fi
-            add_value="$2"
+            add_value=$(get_named_arg_dashValue "$1" "$2") || handle_named_arg_error "$1"
             shift 2;;
         -onlyName|--only-name) 
-            ONLY_NAME=$(get_argument "$1" "$2")
-            if [ $? != 0 ]; then
-                ONLY_NAME=false
+            VALUE=$(get_named_arg_value "$1" "$2")
+            if [ $? -eq 0 ] && [ "$VALUE" = "true" ]; then
+                ONLY_NAME="true"
+                shift 2
+            else
+                ONLY_NAME="false"
+                shift
             fi
-            shift 2;;
+            ;;
         --) # 结束解析具名参数
             shift
             break

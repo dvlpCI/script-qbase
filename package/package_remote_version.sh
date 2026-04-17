@@ -5,7 +5,7 @@
 # @Date: 2023-04-12 22:15:22
  # @LastEditors: dvlproad dvlproad@163.com
  # @LastEditTime: 2026-04-13 16:31:34
-# @FilePath: package/check_version.sh
+# @FilePath: package/package_remote_version.sh
 # @Description: 对指定的 Homebrew 软件包进行远程检查更新
 # @Note: 检查更新原理见 [https://dvlproad.github.io/代码管理/库管理/homebrew](https://dvlproad.github.io/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86/%E5%BA%93%E7%AE%A1%E7%90%86/homebrew)
 ###

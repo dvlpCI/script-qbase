@@ -1,4 +1,12 @@
 #!/bin/bash
+###
+ # @Author: dvlproad dvlproad@163.com
+ # @Date: 2023-11-15 21:11:32
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-17 23:46:46
+ # @FilePath: checkInputArgsValid.sh
+ # @Description: 检查输入参数的有效性
+### 
 
 # 判断字符串 -a a -b b -c -d ，如果字符串是以-开头，则其下个字符串不能以-开头
 inputArgArray=($@)
