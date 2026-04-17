@@ -1,8 +1,8 @@
 '''
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-16 00:10:18
-LastEditors: dvlproad
-LastEditTime: 2023-11-07 11:42:18
+LastEditors: dvlproad dvlproad@163.com
+LastEditTime: 2026-04-18 04:17:58
 FilePath: base_util.py
 Description: 打开文件、执行脚本
 '''
@@ -27,6 +27,15 @@ def openFile(file_path):
        
         
 def callScriptCommond(command, sript_file_absPath, verbose=False):
+    # -------- 检查 sript_file_absPath --------- 
+    # 展开路径中的 ~ 为用户 home 目录
+    if sript_file_absPath.startswith('~'):
+        sript_file_absPath = os.path.expanduser(sript_file_absPath)
+    # 检查文件是否存在
+    if sript_file_absPath is None:
+        print(f"{RED}错误: 找不到文件: {sript_file_absPath}{NC}")
+        return False
+    
     # try:
     #     subprocess.check_call(command)
     # except subprocess.CalledProcessError as e:
@@ -57,6 +66,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         print(f"{BLUE}您正在执行的命令字符串为:《{YELLOW} {escaped_command} {BLUE}》{NC}")
 
 
+    # print(f"{GREEN}==========注意11. 为避免安全风险，未使用 shell=True 时，传递给 command 的脚本文件路径不能是相对路径，必须是绝对路径{NC}")
     # 调用 subprocess.run() 函数执行 shell 命令
     try:
         # 尝试执行脚本
@@ -64,6 +74,7 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         # capture_output=True 参数可以捕获命令的标准输出和标准错误输出。
         # text=True 参数可以将输出解码为字符串。如果省略 capture_output=True 参数，则无法在 except 块中访问命令的输出
         result = subprocess.run(command) # 为了避免执行过程中，有键盘输入的需求，所以不使用 capture_output 属性
+        # print(f"{GREEN}==========注意12. 为避免安全风险，未使用 shell=True 时，传递给 command 的脚本文件路径不能是相对路径，必须是绝对路径{NC}")
     except PermissionError:
         print(f"{CYAN}没有执行权限，正为你添加执行权限并重试{NC}")
         os.chmod(sript_file_absPath, 0o755)

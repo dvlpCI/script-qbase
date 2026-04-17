@@ -1,8 +1,8 @@
 '''
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-12 22:15:22
-LastEditors: dvlproad
-LastEditTime: 2023-10-10 17:34:33
+LastEditors: dvlproad dvlproad@163.com
+LastEditTime: 2026-04-18 04:16:52
 FilePath: dealScript_by_scriptConfig.py
 Description: 根据配置文件，执行指定的脚本及其配置参数
 '''
@@ -62,6 +62,15 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
     # 3、使用获得的脚本文件和参数，执行脚本命令
     # 调用脚本
     _, file_ext = os.path.splitext(action_script_file_absPath)
+    # print(f"--------------33{action_script_file_absPath}")  
+    # 注意: 为避免安全风险，未使用 shell=True 时，传递给 command 的脚本文件路径不能是相对路径，必须是绝对路径，即不能是~/开头，必须展开路径中的 ~ 为用户 home 目录，且不能等到 callScriptCommond 方法里再判断就太晚了
+    if action_script_file_absPath.startswith('~'):
+        action_script_file_absPath = os.path.expanduser(action_script_file_absPath)
+    # 检查文件是否存在
+    if action_script_file_absPath is None:
+        print(f"{RED}错误: 找不到文件: {action_script_file_absPath}{NC}")
+        return False
+    # print(f"--------------44{action_script_file_absPath}") 
     if file_ext == '.sh':
         command = ["sh", action_script_file_absPath]
     else:
@@ -87,18 +96,30 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
     else:
         return True
     
+import shutil
+def is_command(cmd):
+    """判断是否是系统命令（在 PATH 中可找到）"""
+    return shutil.which(cmd) is not None
+
 # 1、从 fileData 中获取展示可选择的操作，并进行选择输出
 def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
     if 'action_sript_bin' in data:
         action_sript_bin=data['action_sript_bin']
+        
+        # 判断是否是系统命令（在 PATH 中可找到）
         # print(f"这是本地命令{action_sript_bin}")
         # check_command(action_sript_bin) # TODO不正确
+        if not is_command(action_sript_bin):
+            print(f"{RED}发生错误:您的{BLUE} action_sript_bin = {action_sript_bin} {RED}不是系统命令，如果您是要用文件路径路径请使改用字段 {BLUE} action_sript_file_absPath [脚本的绝对路径] {RED}或{BLUE} action_sript_file_rel_this_dir [脚本相对这个目录的相对路径] {RED}。所以，请打开检查您的 {YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_bin {RED}属性值{BLUE} {action_sript_bin} {RED}是否正确。{NC}")
+            openFile(pack_input_params_file_path)
+            
         return action_sript_bin
     
     
     if 'action_sript_file_absPath' in data:
         action_script_file_absPath=data['action_sript_file_absPath']
-        action_script_file_absPath = os.path.abspath(os.path.expanduser(action_script_file_absPath))    # 将 ~ 转换为完整路径
+        action_script_file_absPath = os.path.expanduser(action_script_file_absPath)   # 将 ~ 转换为完整路径
+        action_script_file_absPath = os.path.abspath(action_script_file_absPath)
         if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
             print(f"{RED}发生错误:脚本文件不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_absPath {RED}属性值{BLUE} {action_script_file_absPath} {RED}是否正确。{NC}")
             openFile(pack_input_params_file_path)
