@@ -32,13 +32,13 @@
         },
         {
             "id": "-branchMapsInJsonF",
-            "des": "分支map数组所在的json文件路径",
+            "des": "分支map数组所在的json文件路径(可以使用 qtool 的 getBranchMapsAccordingToRebaseBranch.sh 获取到。附：该脚本可能频繁修改，所以没放到 qbase 中)",
             "actionType": "custom",
             "resultForParam": "-branchMapsInJsonF"
         },
         {
             "id": "-branchMapsInKey",
-            "des": "分支map数组在json文件的哪个字段",
+            "des": "分支map数组在json文件的哪个字段(可以使用 qtool 的 getBranchMapsAccordingToRebaseBranch.sh 获取到。附：该脚本可能频繁修改，所以没放到 qbase 中)",
             "actionType": "fixed",
             "resultForParam": "-branchMapsInKey",
             "fixedType": "fixed-value",

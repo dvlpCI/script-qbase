@@ -2,10 +2,11 @@
 ###
  # @Author: dvlproad
  # @Date: 2023-11-27 09:49:03
- # @LastEditors: dvlproad
- # @LastEditTime: 2024-12-07 17:23:10
+ # @LastEditors: dvlproad dvlproad@163.com
+ # @LastEditTime: 2026-04-19 04:46:29
  # @FilePath: getBranchMapsInfoAndNotifiction.sh
- # @Description: 
+ # @Description: 处理整理好的分支数组，得到一个长字符串，可用于发送消息通知
+ # @Note: 数据源 -branchMapsInJsonF 和 -branchMapsInKey (可以使用 qtool 的 getBranchMapsAccordingToRebaseBranch.sh 获取到。附：该脚本可能频繁修改，所以没放到 qbase 中)
 ### 
 
 # 定义颜色常量
@@ -25,8 +26,8 @@ show_usage() {
     printf "%-20s %s\n" "Options:" ""
     printf "%-50s %s\n" "-v|--verbose" "Enable verbose mode"
     printf "%-50s %s\n" "-h|--help" "Display this help and exit"
-    printf "%-50s %s\n" "-branchMapsInJsonF|--branchMaps-json-file-path" "必填：要计算的branchMaps所在的json文件"
-    printf "%-50s %s\n" "-branchMapsInKey|--branchMaps-key" "要计算的branchMaps在json文件中的哪个字段"
+    printf "%-50s %s\n" "-branchMapsInJsonF|--branchMaps-json-file-path" "必填：要计算的branchMaps所在的json文件（(可以使用 qtool 的 getBranchMapsAccordingToRebaseBranch.sh 获取到。附：该脚本可能频繁修改，所以没放到 qbase 中)）"
+    printf "%-50s %s\n" "-branchMapsInKey|--branchMaps-key" "要计算的branchMaps在json文件中的哪个字段（(可以使用 qtool 的 getBranchMapsAccordingToRebaseBranch.sh 获取到。附：该脚本可能频繁修改，所以没放到 qbase 中)）"
     printf "%-50s %s\n" "-showCategoryName|--show-category-name" "Display this help and exit"
     printf "%-50s %s\n" "-showFlag|--show-branchLog-Flag" "Display this help and exit"
     printf "%-50s %s\n" "-showName|--show-branchName" "Display this help and exit"
