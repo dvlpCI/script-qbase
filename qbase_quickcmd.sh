@@ -3,7 +3,7 @@
 # @Author: dvlproad
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad dvlproad@163.com
- # @LastEditTime: 2023-11-16 02:16:08
+ # @LastEditTime: 2026-04-19 01:54:51
 # @Description:
 ###
 
@@ -74,6 +74,14 @@ fi
 function _verbose_log() {
     if [ "$verbose" == true ]; then
         echo "$1"
+    fi
+}
+
+function qian_log() {
+    # 只有定义 --qian 的时候才打印这个log
+    if [ "$DEFINE_QIAN" = true ]; then
+        echo "$1" >&2   # 使用 echo 信息里的颜色才能正常显示出来
+        # printf "%s\n" "$1" >&2
     fi
 }
 
@@ -168,7 +176,7 @@ fi
 _verbose_log "✅ $packagePathKey 的参数分别如下:${argsString}"
 
 specified_value=${packagePathKey}
-_verbose_log "${YELLOW}正在执行命令(获取脚本的相对路径):《${BLUE} sh $qbase_package_path_and_cmd_menu_scriptPath -file \"${qpackageJsonF}\" -key \"${specified_value}\" ${YELLOW}》${NC}"
+qian_log "${YELLOW}正在执行命令(获取脚本的相对路径):《${BLUE} sh $qbase_package_path_and_cmd_menu_scriptPath -file \"${qpackageJsonF}\" -key \"${specified_value}\" ${YELLOW}》${NC}"
 # sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -key "${specified_value}" && exit 1 # 测试脚本就退出脚本
 relpath=$(sh $qbase_package_path_and_cmd_menu_scriptPath -file "${qpackageJsonF}" -key "${specified_value}")
 if [ $? != 0 ]; then
@@ -179,13 +187,18 @@ relpath="${relpath//.\//}"  # 去掉开头的 "./"
 quickCmd_script_path="$qpackage_homedir_abspath/$relpath"
 if [ $? != 0 ] || [ ! -f "$quickCmd_script_path" ]; then
     echo "抱歉：暂不支持 ${packagePathAction} 对 ${packagePathKey} 的快捷命令，请检查。"
-    #echo "${RED}提示${YELLOW}（仅供个人调试时候打开）${RED}：暂不支持的原因为：${BLUE} ${quickCmd_script_path} ${RED}文件不存在，请检查 qbase.json 文件中的路径配置是否正确。${NC}"
+    qian_log "${RED}暂不支持的原因为：拼接 ${qpackage_homedir_abspath} 和 $relpath 得到的${BLUE} ${quickCmd_script_path} ${RED}不是文件路径或者文件不存在，请检查 qbase.json 文件中的路径配置是否正确。${NC}" >&2
     exit 1
 fi
 
 if [ "${packagePathAction}" == "execCmd" ]; then
-    _verbose_log "正在执行参数快捷命令:《 sh ${quickCmd_script_path} ${argsString} 》"
-    sh ${quickCmd_script_path} ${argsString}
+    if [[ "${quickCmd_script_path}" == *.py ]]; then
+        qian_log "正在执行参数快捷命令:《 python3 ${quickCmd_script_path} ${argsString} 》"
+        python3 ${quickCmd_script_path} ${argsString}
+    else
+        qian_log "正在执行参数快捷命令:《 sh ${quickCmd_script_path} ${argsString} 》"
+        sh ${quickCmd_script_path} ${argsString}
+    fi
 else
     echo "$quickCmd_script_path"
 fi

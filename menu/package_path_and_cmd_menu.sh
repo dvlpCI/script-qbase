@@ -25,6 +25,14 @@ function debug_log() {
     fi
 }
 
+function qian_log() {
+    # 只有定义 --qian 的时候才打印这个log
+    if [ "$DEFINE_QIAN" = true ]; then
+        echo "$1" >&2   # 使用 echo 信息里的颜色才能正常显示出来
+        # printf "%s\n" "$1" >&2
+    fi
+}
+
 
 # shell 参数具名化
 while [ -n "$1" ]
@@ -62,7 +70,7 @@ if [ -z "${specified_value}" ]; then
     echo "${RED}Error:在 ${qpackageName} 库支持的命令如下，请指定你要获取的 key ,请检查。${BLUE}\n ${map} ${NC}"
     exit 1 
 fi
-debug_log "${YELLOW}1.从 ${qpackageName} 库的 quickCmd 和 support_script_path 中查找 key 为 $specified_value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
+qian_log "${YELLOW}1.从 ${qpackageName} 库的 quickCmd 和 support_script_path 中查找 key 为 $specified_value 的结果是:${BLUE} ${map} ${YELLOW}。${NC}"
 if [ -z "${map}" ] || [ "${map}" == "null" ]; then
     echo "${RED}Error:在 ${qpackageName} 库的 quickCmd 和 support_script_path 的 values 下都没有 key 为${BLUE} $specified_value ${RED}的map,请检查。 ${NC}"
     exit 1

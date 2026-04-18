@@ -133,7 +133,8 @@ qbase -quick 脚本关键字 [具名参数/参数...]
 
 ### 2026-04-18
 
-- 让 python3 dealScript_by_scriptConfig.py 既可被导入、又能直接运行时必须 `if __name__ == "__main__":`
+- 让 `python3 dealScript_by_scriptConfig.py` 既可被导入、又能直接运行时必须 `if __name__ == "__main__":`
+- `qbase_quickcmd.sh` 增加对 python 脚本的执行
 
 ### 0.8.0 (2026-04-11)
 

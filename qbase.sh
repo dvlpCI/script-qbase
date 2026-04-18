@@ -88,6 +88,14 @@ function _verbose_log() {
     fi
 }
 
+function qian_log() {
+    # 只有定义 --qian 的时候才打印这个log
+    if [ "$DEFINE_QIAN" = true ]; then
+        echo "$1" >&2   # 使用 echo 信息里的颜色才能正常显示出来
+        # printf "%s\n" "$1" >&2
+    fi
+}
+
 # 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
 # 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
 # 特别注意：这是qbase。所以无法(强烈不建议)使用 get_package_info.sh 文件，因为qbase.sh处理成qbase二进制文件后，其会被存放到任意路径。就不是相对qbase.sh的路径了。
@@ -445,7 +453,7 @@ elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData \"${categoryData}\" -relPath-baseDirPath \"${qpackage_homedir_abspath}\" 》"
     # sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData "${categoryData}" -relPath-baseDirPath "${qpackage_homedir_abspath}"
 elif [ "${firstArg}" == "-path" ]; then
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
+    qian_log "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 
 elif [ "${firstArg}" == "-quick-eg" ]; then     # 查看快捷命令
