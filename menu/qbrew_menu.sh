@@ -305,7 +305,7 @@ show_usage_for_choose() {
 
             if [ "${exec_demo_option}" == yes ] || [ "${exec_demo_option}" == "YES" ]; then
                 # echo "${CYAN}======================正在使用${BLUE} ${qbase_execScript_by_configJsonFile_scriptPath} ${CYAN}执行${BLUE} ${input_params_from_file_path} ${CYAN}======================${NC}"
-                resultCode=$(python3 $qbase_execScript_by_configJsonFile_scriptPath $input_params_from_file_path >&2)
+                resultCode=$(python3 $qbase_execScript_by_configJsonFile_scriptPath -script-config-file $input_params_from_file_path >&2)
                 # 获取input_params_from_file_path 这个json文件中 action_sript_file_rel_this_dir 的值
                 # 如果刚刚执行的脚本是 qbrew_menu.sh 等，则因为该脚本有自己的菜单输出，所以我们在其结束时，额外自己补充上本页面的菜单。
                 # if [[ "$resultCode" -eq 109 ]]; then    # 如果所执行的脚本有列表，则在退出后，重新展示本菜单

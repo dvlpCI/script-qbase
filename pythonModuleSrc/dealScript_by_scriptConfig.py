@@ -28,7 +28,59 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
 
+import argparse
+import sys
 
+def print_custom_help():
+    print(f"print_custom_help()")
+    
+def parse_arguments():
+    # 先手动检查 help
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print_custom_help()
+        sys.exit(0)
+    
+    # 禁用自动 help，避免冲突
+    parser = argparse.ArgumentParser(description='你的程序描述', add_help=False)
+    
+    parser.add_argument('--verbose', '-v', 
+                       action='store_true',
+                       help='显示详细信息')
+    
+    parser.add_argument('--qian', 
+                       action='store_true',
+                       help='开启打印调试log模式')
+    
+    parser.add_argument('--qbase-local-path', '-qbase-local-path', 
+                   type=str,  # 指定类型为字符串
+                   default=None,  # 默认值为 None
+                   help='依赖的子库 qbase 使用指定的路径，用来顺便测试子库')
+    
+    parser.add_argument('--script-config-file', '-script-config-file', 
+                   type=str,  # 指定类型为字符串
+                   default=None,  # 默认值为 None
+                   help='描述【要执行的脚本的配置文件】')
+    
+    args = parser.parse_args()
+    return args
+
+#### ------ qian_log_func() ------ ####
+import inspect
+# 声明全局变量
+DEFINE_QIAN = None
+def qian_log_func(msg):
+    """只有定义 --qian 的时候才打印这个log(带函数名)"""
+    global DEFINE_QIAN
+    if DEFINE_QIAN:  # 只有当用户传了 --qian 相关参数时才打印
+        func_name = inspect.currentframe().f_back.f_code.co_name
+        print(f"{PURPLE}>>>>>>>>>>>>【{func_name}】{msg} {NC}", file=sys.stderr)
+        
+def qian_log(msg):
+    """只有定义 --qian 的时候才打印这个log"""
+    global DEFINE_QIAN
+    if DEFINE_QIAN:  # 只有当用户传了 --qian 相关参数时才打印
+        print(msg, file=sys.stderr)
+        
 def dealScriptByScriptConfig(pack_input_params_file_path):
     if not os.path.exists(pack_input_params_file_path):
         print(f"{RED}您的参数文件(内含脚本及脚本的参数)不存在，请检查{YELLOW} {pack_input_params_file_path} {NC}")
@@ -89,7 +141,7 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
             value = scriptParamMap["resultValue"]
             command += [value]
        
-    # print(f"{PURPLE}>>>>>>>>>>>>>温馨提示：接下来您将根据传入的脚本文件{BLUE} {pack_input_params_file_path} {PURPLE}里的参数及该参数的固定或者输入值组合成的命令进行其生成的结果命令字符串执行。参数为：{BLUE} {command} {PURPLE}。<<<<<<<<<<<<<<{NC}")  
+    qian_log(f"{PURPLE}>>>>>>>>>>>>>温馨提示：接下来您将根据传入的脚本文件{BLUE} {pack_input_params_file_path} {PURPLE}里的参数及该参数的固定或者输入值组合成的命令进行其生成的结果命令字符串执行。参数为：{BLUE} {command} {PURPLE}。<<<<<<<<<<<<<<{NC}")  
     resultCode=callScriptCommond(command, action_script_file_absPath, verbose=True)
     if resultCode==False:
         return False
@@ -145,6 +197,7 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
 
 # 1、从 fileData 中获取展示可选择的操作，并进行选择输出
 def chooseFullActionMapByInputFromData(data, pack_input_params_file_path):
+    qian_log_func(f"")
     if 'actions_envs_values' not in data:
         print(f"{RED}发生错误:{pack_input_params_file_path} 文件中不存在'actions_envs_values'键，请检查{NC}")
         openFile(pack_input_params_file_path)
@@ -186,6 +239,7 @@ def chooseFullActionMapByInputFromData(data, pack_input_params_file_path):
 
 # 2、根据所选择的操作的所需的所有参数，遍历获取每个【参数】的内容
 def getScriptChangeParamsFromFileData(data, chooseEnvMap, pack_input_params_file_path):
+    qian_log_func(f"")
     # 2、针对选择的环境，执行所需的操作
     env_action_ids=chooseEnvMap['env_action_ids']
     # print(f"所选择操作所需要的所有参数为:{YELLOW}{env_action_ids}的用户{NC}")
@@ -224,6 +278,8 @@ def getActionById(actions, actionId, pack_input_params_file_path):
     return person
 
 def _getScriptParamFromFileDataByOperate(data, operate, pack_input_params_file_path):
+    qian_log_func(f"{operate}")
+    
     operateHomeMap=getActionById(data['actions'],operate,pack_input_params_file_path)
     if operateHomeMap == None:
         return None
@@ -247,6 +303,8 @@ def _getScriptParamFromFileDataByOperate(data, operate, pack_input_params_file_p
 
 # ①从 jsonFile 中获取脚本的指定固定参数
 def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
+    qian_log_func(f"")
+    
     # 对 homeMap 进行处理
     operateDes = operateHomeMap['des']
 
@@ -286,6 +344,8 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
 
 # ②从 jsonFile 中获取脚本的指定固定参数
 def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
+    qian_log_func(f"")
+    
     operateDes = operateHomeMap['des']
 
     operateActionTypeDes="选择"
@@ -357,6 +417,8 @@ def __getChooseParamMapFromFile(operateHomeMap, pack_input_params_file_path):
 
 # ③从 jsonFile 中获取脚本的指定固定参数
 def __getInputParamMapFromFile(operateHomeMap):
+    qian_log_func(f"")
+    
     # 其他情况，提示进行"完整的"输入
     operateActionTypeDes="输入"
     operateDes = operateHomeMap['des']
@@ -382,10 +444,25 @@ def __getInputParamMapFromFile(operateHomeMap):
 
 import sys
 # 当文件既可被导入、又能直接运行时必须 if __name__ == "__main__":
-# - 当你用 python3 dealScript_by_scriptConfig.py xxx.json 运行时，__name__ 是 "__main__"，会执行
+# - 当你用 python3 dealScript_by_scriptConfig.py -script-config-file xxx.json 运行时，__name__ 是 "__main__"，会执行
 # - 当你在其他文件中 import 时，__name__ 是模块名 "dealScript_by_scriptConfig"，不会执行
 # - 所以这是安全的，不会影响现有的调用方式
 if __name__ == "__main__":
+    # 解析参数（所有参数都是可选的）
+    args = parse_arguments()
+    contains_verbose_in_allArgs = args.verbose  # 用户没传 --verbose 时是 False
+    DEFINE_QIAN = args.qian  # 用户没传 --qian 时是 False
+    QBASE_CMD = "qbase"
+    if args.qbase_local_path:
+        QBASE_CMD = args.qbase_local_path
+        print(f"{GREEN}使用本地 qbase 路径: {QBASE_CMD} {NC}")
+    
+    '''
+    # 测试输出
+    if contains_verbose_in_allArgs:
+        print("Verbose mode enabled")
+    '''
+
     # Check if command line arguments are provided
     # - sys.argv[0] 是脚本本身名称
     # - sys.argv[1] 是第一个参数
@@ -397,6 +474,8 @@ if __name__ == "__main__":
     # for i, arg in enumerate(sys.argv[1:], start=1):
     #     print(f"参数{i}: {arg}")
 
-    resultCode=dealScriptByScriptConfig(sys.argv[1])
+    # dealScriptConfigFile=sys.argv[1]
+    dealScriptConfigFile=args.script_config_file
+    resultCode=dealScriptByScriptConfig(dealScriptConfigFile)
     if resultCode==False:
         exit(1)

@@ -126,7 +126,7 @@ graph TD
 
 
 
-`python3 dealScript_by_scriptConfig.py xxx_example.json` 见下文 [演示文件的 JSON](#演示文件的 JSON)
+`python3 dealScript_by_scriptConfig.py -script-config-file xxx_example.json` 见下文 [演示文件的 JSON](#演示文件的 JSON)
 
 
 
@@ -199,7 +199,7 @@ sh qbrew_menu.sh -file xxx -categoryType yyy -execChoosed true
 
 ```bash
 # 使用 qbrew_menu_example.json 里指定的脚本及该脚本的参数值，执行该执行脚本
-python3 ${path}/pythonModuleSrc/dealScript_by_scriptConfig.py qbrew_menu_example.json
+python3 ${path}/pythonModuleSrc/dealScript_by_scriptConfig.py -script-config-file qbrew_menu_example.json
 ```
 
 #### 2.2、原理

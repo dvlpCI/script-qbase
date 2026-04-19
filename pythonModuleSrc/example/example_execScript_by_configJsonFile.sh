@@ -41,11 +41,11 @@ qbase_execScript_by_configJsonFile_script_path=${parent_dir_Absolute}/dealScript
 
 
 log_title "1.执行自己的脚本"
-echo "${YELLOW}正在执行命令(执行自己的脚本):《${BLUE} python3 ${qbase_execScript_by_configJsonFile_script_path} \"${CurrentDIR_Script_Absolute}/example_execScript_by_configJsonFile.json\" ${YELLOW}》${NC}"
-python3 ${qbase_execScript_by_configJsonFile_script_path} "${CurrentDIR_Script_Absolute}/example_execScript_by_configJsonFile.json"
+echo "${YELLOW}正在执行命令(执行自己的脚本):《${BLUE} python3 ${qbase_execScript_by_configJsonFile_script_path} -script-config-file \"${CurrentDIR_Script_Absolute}/example_execScript_by_configJsonFile.json\" ${YELLOW}》${NC}"
+python3 ${qbase_execScript_by_configJsonFile_script_path} -script-config-file "${CurrentDIR_Script_Absolute}/example_execScript_by_configJsonFile.json"
 if [ $? != 0 ]; then error_exit_script; fi
 
 log_title "2.执行命令脚本"
-echo "${YELLOW}正在执行命令(执行自己的脚本):《${BLUE} python3 ${qbase_execScript_by_configJsonFile_script_path} \"${CurrentDIR_Script_Absolute}/example_execBin_by_configJsonFile.json\" ${YELLOW}》${NC}"
-python3 ${qbase_execScript_by_configJsonFile_script_path} "${CurrentDIR_Script_Absolute}/example_execBin_by_configJsonFile.json"
+echo "${YELLOW}正在执行命令(执行自己的脚本):《${BLUE} python3 ${qbase_execScript_by_configJsonFile_script_path} -script-config-file \"${CurrentDIR_Script_Absolute}/example_execBin_by_configJsonFile.json\" ${YELLOW}》${NC}"
+python3 ${qbase_execScript_by_configJsonFile_script_path} -script-config-file "${CurrentDIR_Script_Absolute}/example_execBin_by_configJsonFile.json"
 if [ $? != 0 ]; then error_exit_script; fi

@@ -358,7 +358,7 @@
                     "des": "执行配置文件：自动根据配置文件，执行指定的脚本及其配置参数",
                     "key": "execScript_by_configJsonFile",
                     "rel_path": "./pythonModuleSrc/dealScript_by_scriptConfig.py",
-                    "example": "python3 xxx.py \"${script_json_file_path}\""
+                    "example": "python3 xxx.py -script-config-file \"${script_json_file_path}\""
                 }
             ]
         },
