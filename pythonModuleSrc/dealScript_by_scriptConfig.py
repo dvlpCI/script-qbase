@@ -115,31 +115,32 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
         return action_script_file_absPath
     
     # print(f"这不是本地命令，所以将继续寻找实际的脚本")
-    if 'action_sript_file_rel_this_dir' not in data:
-        print(f"{RED}发生错误: {pack_input_params_file_path} 文件中不存在'action_sript_file_rel_this_dir'键，请检查{NC}")
-        return False
-    action_sript_file_rel_this_dir=data['action_sript_file_rel_this_dir']
-    # 获取脚本的实际绝对路径
-    action_script_file_absPath=getAbsPathByFileRelativePath(pack_input_params_file_path, action_sript_file_rel_this_dir)
-    if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
-        print(f"{RED}发生错误:脚本文件不存在，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_rel_this_dir {RED}属性值{BLUE} {action_sript_file_rel_this_dir} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {action_script_file_absPath} {RED}不存在)。{NC}")
-        openFile(pack_input_params_file_path)
-        # print(f"{RED}=======这里报错了，应该要退出方法{NC}")
-        return False
+    if 'action_sript_file_rel_this_dir' in data:
+        action_sript_file_rel_this_dir=data['action_sript_file_rel_this_dir']
+        # 获取脚本的实际绝对路径
+        action_script_file_absPath=getAbsPathByFileRelativePath(pack_input_params_file_path, action_sript_file_rel_this_dir)
+        if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
+            print(f"{RED}发生错误:脚本文件不存在，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_rel_this_dir {RED}属性值{BLUE} {action_sript_file_rel_this_dir} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {action_script_file_absPath} {RED}不存在)。{NC}")
+            openFile(pack_input_params_file_path)
+            # print(f"{RED}=======这里报错了，应该要退出方法{NC}")
+            return False
+        return action_script_file_absPath
     
-    # 判断顺序 action_sript_bin 必须放最后且放弃判断，因为有可能它虽然是本地命令，但并不是在 PATH 中可找到的命令，如 coscmd 虽然是，但你还未安装，却又在json里使用了它，如果判断了会导致出错。
-    # if 'action_sript_bin' in data:
-    #     action_script_file_absPath=data['action_sript_bin']
+    if 'action_sript_bin' in data:
+        action_sript_bin=data['action_sript_bin']
         
-    #     # 判断是否是系统命令（在 PATH 中可找到）
-    #     # print(f"这是本地命令{action_script_file_absPath}")
-    #     # check_command(action_script_file_absPath) # TODO不正确
-    #     if not is_command(action_script_file_absPath):
-    #         print(f"{RED}发生错误:您的{BLUE} action_sript_bin = {action_script_file_absPath} {RED}要么不是系统命令，要么还未安装，如果您是要用文件路径路径请使改用字段 {BLUE} action_sript_file_absPath [脚本的绝对路径] {RED}或{BLUE} action_sript_file_rel_this_dir [脚本相对这个目录的相对路径] {RED}。所以，请打开检查您的 {YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_bin {RED}属性值{BLUE} {action_script_file_absPath} {RED}是否正确。{NC}")            
-    #         # openFile(pack_input_params_file_path)
-    #         # return False
+        # # 必须放弃对 action_sript_bin 的判断，因为有可能它虽然是本地命令，但并不是在 PATH 中可找到的命令，如 coscmd 虽然是，但你还未安装，却又在json里使用了它，如果判断了会导致出错。
+        # # 判断是否是系统命令（在 PATH 中可找到）
+        # # print(f"这是本地命令{action_sript_bin}")
+        # # check_command(action_sript_bin) # TODO不正确
+        # if not is_command(action_sript_bin):
+        #     print(f"{RED}发生错误:您的{BLUE} action_sript_bin = {action_sript_bin} {RED}要么不是系统命令，要么还未安装，如果您是要用文件路径路径请使改用字段 {BLUE} action_sript_file_absPath [脚本的绝对路径] {RED}或{BLUE} action_sript_file_rel_this_dir [脚本相对这个目录的相对路径] {RED}。所以，请打开检查您的 {YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_bin {RED}属性值{BLUE} {action_sript_bin} {RED}是否正确。{NC}")            
+        #     # openFile(pack_input_params_file_path)
+        #     # return False
+        return action_sript_bin
     
-    return action_script_file_absPath
+    print(f"{RED}发生错误: {pack_input_params_file_path} 文件中不存在 'action_sript_file_absPath' 或 'action_sript_file_rel_this_dir' 或 'action_sript_bin' 键，请检查{NC}")
+    return False
     
 
 # 1、从 fileData 中获取展示可选择的操作，并进行选择输出
