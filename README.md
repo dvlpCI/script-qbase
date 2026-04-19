@@ -131,6 +131,11 @@ qbase -quick 脚本关键字 [具名参数/参数...]
 
 ## 版本记录
 
+### 0.9.12 (2026-04-19)
+
+- 【Feature】dealScript_by_scriptConfig.py 改为使用具名参数，方便拓展
+- 【Optimize】dealScript_by_scriptConfig.py 中指向的文件如果不存在，改为会尝试帮你创建一个json文件出来
+
 ### 2026-04-18
 
 - 让 `python3 dealScript_by_scriptConfig.py` 既可被导入、又能直接运行时必须 `if __name__ == "__main__":`

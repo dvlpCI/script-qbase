@@ -316,7 +316,8 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
         elif param_type == "dir-path-rel-this-file" or param_type == "file-path-rel-this-file":
             # 如果是相对目录
             param_value = operateHomeMap['fixedValue']
-            dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value)
+            createIfNoExsit=True
+            dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value, createIfNoExsit)
 
         if dir_path == None or not os.path.exists(dir_path):
             print(f"{RED}参数指向的文件获取失败，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}")
@@ -329,6 +330,32 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
                 "resultForParam": param_key,
                 "resultValue": dir_path,
             }
+        '''
+        if not os.path.exists(dir_path):
+            param_key = operateHomeMap['resultForParam']
+            # 创建目录（如果不存在）
+            os.makedirs(os.path.dirname(dir_path), exist_ok=True)
+            print("--------------------43")
+            # 创建空JSON文件
+            try:
+                with open(dir_path, 'w') as f:
+                    json.dump({}, f)
+                print("--------------------44")
+                # 验证创建成功
+                if not os.path.exists(dir_path):
+                    print(f"Error❌: {dir_path} 文件不存在且我为你尝试创建失败，请检查权限。【若要检查根源，请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}】")
+                    # openFile(pack_input_params_file_path)
+                    return None
+                else:
+                    print(f"✅ {dir_path} 文件不存在但已为你尝试创建成功。【若不想我为你创建，请检查根源：请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}】")
+                    return {
+                        "resultForParam": param_key,
+                        "resultValue": dir_path,
+                    }
+            except Exception as e:
+                print(f"Error❌: 创建文件 {dir_path} 失败: {e}")
+                return None
+        '''
     elif param_type == "fixed-value":
         # 如果是固定值
         param_value = operateHomeMap['fixedValue']

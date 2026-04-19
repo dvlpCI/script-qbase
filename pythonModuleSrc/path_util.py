@@ -18,7 +18,7 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
 # 获取相对于指定文件的相对目录的绝对路径
-def getAbsPathByFileRelativePath(file_path, rel_path):
+def getAbsPathByFileRelativePath(file_path, rel_path, createIfNoExsit=False):
     file_dir_abspath=os.path.abspath(file_path)
     if not os.path.exists(file_dir_abspath):
         return None
@@ -26,7 +26,7 @@ def getAbsPathByFileRelativePath(file_path, rel_path):
     # 获取当前文件的所在目录
     file_parent_dir_path = os.path.dirname(file_dir_abspath)
     
-    return joinFullPath_checkExsit(file_parent_dir_path, rel_path)
+    return joinFullPath_checkExsit(file_parent_dir_path, rel_path, createIfNoExsit)
 
 
 def joinFullPath_noCheck(host_dir, rel_path):
