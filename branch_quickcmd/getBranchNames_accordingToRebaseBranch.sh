@@ -33,6 +33,14 @@ show_usage() {
     printf "${NC}"
 }
 
+# --------------------- 的 ---------------------
+# qian_log 函数
+qian_log() {
+    if [ "$DEFINE_QIAN" = true ]; then
+        echo "$1" >&2
+    fi
+}
+
 # --------------------- 具名参数值的解析和获取函数 ---------------------
 # 获取具名参数的值（不允许以 - 开头）
 # 用法：get_named_arg_value "$1" "$2" "参数名"
@@ -120,6 +128,12 @@ handle_error() {
 }
 
 
+# ==================== 默认值设置 ====================
+QBASE_CMD="qbase"  # 默认值（当用户不传这个参数时使用）
+CONTAINS_VERSION=false  # 是否是打印版本号后就结束任务
+DEFINE_QIAN=false
+CONTAINS_VERBOSE=false
+CONTAINS_HELP=false
 # 处理具名参数
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -150,6 +164,18 @@ while [ "$#" -gt 0 ]; do
                 ONLY_NAME="false"
                 shift
             fi
+            ;;
+        --qian|-qian|-lichaoqian|-chaoqian)
+            DEFINE_QIAN=true
+            shift 1
+            ;;
+        --verbose|-v)
+            CONTAINS_VERBOSE=true
+            shift 1
+            ;;
+        --help|-h)
+            CONTAINS_HELP=true
+            shift 1
             ;;
         --) # 结束解析具名参数
             shift
@@ -271,7 +297,7 @@ function optimizeBranchNames() {
 # done
 
 
-_verbose_log "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《${BLUE} sh ${qbase_rebasebranch_last_commit_date_scriptPath} -rebaseBranch \"${REBASE_BRANCH}\" ${YELLOW}》${NC}"
+qian_log "${YELLOW}正在执行命令(获取分支最后一次提交commit的时间)：《${BLUE} sh ${qbase_rebasebranch_last_commit_date_scriptPath} -rebaseBranch \"${REBASE_BRANCH}\" ${YELLOW}》${NC}"
 lastCommitDate=$(sh ${qbase_rebasebranch_last_commit_date_scriptPath} -rebaseBranch "${REBASE_BRANCH}")
 if [ $? != 0 ]; then
     echo "${lastCommitDate}" # 此时值为错误信息
