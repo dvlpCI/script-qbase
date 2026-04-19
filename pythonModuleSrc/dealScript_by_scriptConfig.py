@@ -103,19 +103,6 @@ def is_command(cmd):
 
 # 1、从 fileData 中获取展示可选择的操作，并进行选择输出
 def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
-    if 'action_sript_bin' in data:
-        action_sript_bin=data['action_sript_bin']
-        
-        # 判断是否是系统命令（在 PATH 中可找到）
-        # print(f"这是本地命令{action_sript_bin}")
-        # check_command(action_sript_bin) # TODO不正确
-        if not is_command(action_sript_bin):
-            print(f"{RED}发生错误:您的{BLUE} action_sript_bin = {action_sript_bin} {RED}不是系统命令，如果您是要用文件路径路径请使改用字段 {BLUE} action_sript_file_absPath [脚本的绝对路径] {RED}或{BLUE} action_sript_file_rel_this_dir [脚本相对这个目录的相对路径] {RED}。所以，请打开检查您的 {YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_bin {RED}属性值{BLUE} {action_sript_bin} {RED}是否正确。{NC}")
-            openFile(pack_input_params_file_path)
-            
-        return action_sript_bin
-    
-    
     if 'action_sript_file_absPath' in data:
         action_script_file_absPath=data['action_sript_file_absPath']
         action_script_file_absPath = os.path.expanduser(action_script_file_absPath)   # 将 ~ 转换为完整路径
@@ -139,6 +126,18 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
         openFile(pack_input_params_file_path)
         # print(f"{RED}=======这里报错了，应该要退出方法{NC}")
         return False
+    
+    # 判断顺序 action_sript_bin 必须放最后且放弃判断，因为有可能它虽然是本地命令，但并不是在 PATH 中可找到的命令，如 coscmd 虽然是，但你还未安装，却又在json里使用了它，如果判断了会导致出错。
+    # if 'action_sript_bin' in data:
+    #     action_script_file_absPath=data['action_sript_bin']
+        
+    #     # 判断是否是系统命令（在 PATH 中可找到）
+    #     # print(f"这是本地命令{action_script_file_absPath}")
+    #     # check_command(action_script_file_absPath) # TODO不正确
+    #     if not is_command(action_script_file_absPath):
+    #         print(f"{RED}发生错误:您的{BLUE} action_sript_bin = {action_script_file_absPath} {RED}要么不是系统命令，要么还未安装，如果您是要用文件路径路径请使改用字段 {BLUE} action_sript_file_absPath [脚本的绝对路径] {RED}或{BLUE} action_sript_file_rel_this_dir [脚本相对这个目录的相对路径] {RED}。所以，请打开检查您的 {YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_bin {RED}属性值{BLUE} {action_script_file_absPath} {RED}是否正确。{NC}")            
+    #         # openFile(pack_input_params_file_path)
+    #         # return False
     
     return action_script_file_absPath
     
