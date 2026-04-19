@@ -32,7 +32,18 @@ import argparse
 import sys
 
 def print_custom_help():
-    print(f"print_custom_help()")
+    print("""
+Usage: python3 dealScript_by_scriptConfig.py --script-config-file <配置文件路径> [其他参数]
+
+Options:
+  --script-config-file, -script-config-file <path>  描述【要执行的脚本的配置文件】
+  --verbose, -v                                  显示详细信息
+  --qian                                         开启打印调试log模式
+  --qbase-local-path <path>                      依赖的子库 qbase 使用指定的路径
+
+Example:
+  python3 dealScript_by_scriptConfig.py --script-config-file /path/to/config.json
+""")
     
 def parse_arguments():
     # 先手动检查 help
@@ -59,9 +70,14 @@ def parse_arguments():
     parser.add_argument('--script-config-file', '-script-config-file', 
                    type=str,  # 指定类型为字符串
                    default=None,  # 默认值为 None
+                   required=True,  # 必填参数
                    help='描述【要执行的脚本的配置文件】')
     
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        print_custom_help()
+        sys.exit(1)
     return args
 
 #### ------ qian_log_func() ------ ####
