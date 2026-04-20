@@ -135,6 +135,7 @@ qbase -quick 脚本关键字 [具名参数/参数...]
 
 - 【Feature】dealScript_by_scriptConfig.py 改为使用具名参数，方便拓展
 - 【Optimize】dealScript_by_scriptConfig.py 中指向的文件如果不存在，改为会尝试帮你创建一个json文件出来
+- 【Feature】在 dealScript_by_scriptConfig.py 传递 extra_command_args = QBASE_FLAG_ARGS + COMMON_FLAG_ARGS
 
 ### 2026-04-18
 

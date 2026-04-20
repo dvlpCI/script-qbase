@@ -48,28 +48,11 @@ verboseStrings=("verbose" "-verbose" "--verbose") # 输入哪些字符串算是�
 if [[ " ${verboseStrings[*]} " == *" $last_arg "* ]]; then
     # echo "verbose✅:${last_arg}"
     verbose=true
-    if [ "$second_last_arg" == "--test" ]; then
-        isTestingScript=true
-    else
-        isTestingScript=false
-    fi
 else # 最后一个元素不是 verbose
     # echo "verbose❌:${last_arg}"
     verbose=false
-    if [ "$last_arg" == "--test" ]; then
-        isTestingScript=true
-    else
-        isTestingScript=false
-    fi
 fi
 
-args=()
-if [ "${verbose}" == true ]; then
-    args+=("--verbose")
-fi
-if [ "${isTestingScript}" == true ]; then
-    args+=("--test")
-fi
 
 function _verbose_log() {
     if [ "$verbose" == true ]; then
