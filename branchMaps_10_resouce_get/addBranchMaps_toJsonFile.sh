@@ -95,6 +95,12 @@ if [ ! -d "${BranceMaps_From_Directory_PATH}" ]; then
 fi
 
 if [ ! -f "${BranchMapAddToJsonFile}" ]; then
+    if [ -d "${BranchMapAddToJsonFile}" ]; then
+        # 如果目标是目录，报错并提示用户
+        echo "Error❌: ${BranchMapAddToJsonFile} 存在，但不json文件，而是一个目录，请手动删除后再运行。"
+        exit_script
+    fi
+    
     # 创建目录（如果不存在）
     mkdir -p "$(dirname "${BranchMapAddToJsonFile}")"
     # 创建空JSON文件
