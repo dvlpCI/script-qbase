@@ -192,7 +192,8 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
     # import shlex
     # cmd_str = ' '.join(shlex.quote(arg) for arg in command)
     # qian_log(f"{GREEN}执行【要执行的脚本】的py命令是【{BLUE} {cmd_str} {GREEN}】。{NC}")
-    resultCode=callScriptCommond(command, action_script_file_absPath, verbose=True)
+    showQianLog = DEFINE_QIAN != None
+    resultCode=callScriptCommond(command, action_script_file_absPath, verbose=showQianLog)
     if resultCode==False:
         return False
     else:

@@ -97,7 +97,7 @@ fi
 if [ ! -f "${BranchMapAddToJsonFile}" ]; then
     if [ -d "${BranchMapAddToJsonFile}" ]; then
         # 如果目标是目录，报错并提示用户
-        echo "Error❌: ${BranchMapAddToJsonFile} 存在，但不json文件，而是一个目录，请手动删除后再运行。"
+        echo "Error❌: ${BranchMapAddToJsonFile} 存在，但不是json文件，而是一个目录，请手动删除后再运行。"
         exit_script
     fi
     

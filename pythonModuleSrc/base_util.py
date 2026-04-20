@@ -60,10 +60,10 @@ def callScriptCommond(command, sript_file_absPath, verbose=False):
         print(f"{RED}Error:将{BLUE} {command} {RED}数组拼接成字符串时出错，出错原因为:{BLUE} {str(e)} {RED}。{NC}")
         return False
 
-    print(f"\n{BLUE}开始执行脚本，执行过程中输出内容如下：{NC}")
+    print(f"\n{GREEN}开始执行脚本，执行过程中信息内容如下：{NC}")
     if verbose==True:
         escaped_command = cmdString.replace("(", r"\(").replace(")", r"\)")
-        print(f"{BLUE}您正在执行的命令字符串为:《{YELLOW} {escaped_command} {BLUE}》{NC}")
+        print(f"{GREEN}您正在执行的命令字符串为:《{YELLOW} {escaped_command} {GREEN}》{NC}")
 
 
     # print(f"{GREEN}==========注意11. 为避免安全风险，未使用 shell=True 时，传递给 command 的脚本文件路径不能是相对路径，必须是绝对路径{NC}")
