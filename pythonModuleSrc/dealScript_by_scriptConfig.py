@@ -2,7 +2,7 @@
 Author: dvlproad dvlproad@163.com
 Date: 2023-04-12 22:15:22
 LastEditors: dvlproad dvlproad@163.com
-LastEditTime: 2026-04-18 05:42:27
+LastEditTime: 2026-04-20 08:56:47
 FilePath: dealScript_by_scriptConfig.py
 Description: 根据配置文件，执行指定的脚本及其配置参数
 '''
@@ -80,6 +80,30 @@ def parse_arguments():
         sys.exit(1)
     return args
 
+
+# 要传递给下个脚本的参数，只允许传递不影响脚本逻辑的公共参数，不然传了后发现有些脚本只接收指定的参数会造成反而无法正常运行
+COMMON_FLAG_ARGS = []
+QBASE_FLAG_ARGS = []
+QTOOL_FLAG_ARGS = []
+def get_common_flag_args():
+    """获取公共参数"""
+    global COMMON_FLAG_ARGS
+    global QBASE_FLAG_ARGS
+    global QTOOL_FLAG_ARGS
+    
+    args = parse_arguments()
+    
+    # 只添加需要的参数
+    if args.qbase_local_path:
+        QBASE_FLAG_ARGS.extend(['--qbase-local-path', args.qbase_local_path])
+    
+    if args.qian:
+        COMMON_FLAG_ARGS.append('--qian')
+    
+    if args.verbose:
+        COMMON_FLAG_ARGS.append('--verbose')
+        
+        
 #### ------ qian_log_func() ------ ####
 import inspect
 # 声明全局变量
@@ -158,6 +182,16 @@ def dealScriptByScriptConfig(pack_input_params_file_path):
             command += [value]
        
     qian_log(f"{PURPLE}>>>>>>>>>>>>>温馨提示：接下来您将根据传入的脚本文件{BLUE} {pack_input_params_file_path} {PURPLE}里的参数及该参数的固定或者输入值组合成的命令进行其生成的结果命令字符串执行。参数为：{BLUE} {command} {PURPLE}。<<<<<<<<<<<<<<{NC}")  
+    
+    extra_command_args = QBASE_FLAG_ARGS + COMMON_FLAG_ARGS # 要传递给下个脚本的参数，只允许传递不影响脚本逻辑的公共参数，不然传了后发现有些脚本只接收指定的参数会造成反而无法正常运行
+    import shlex
+    cmd_str = ' '.join(shlex.quote(arg) for arg in extra_command_args)
+    qian_log(f"{PURPLE}>>>>>>>>>>>>>温馨提示2：额外追加公共参数【{BLUE} {cmd_str} {PURPLE}】。{NC}")
+    
+    command = command + extra_command_args # 要传递给下个脚本的参数，只允许传递不影响脚本逻辑的公共参数，不然传了后发现有些脚本只接收指定的参数会造成反而无法正常运行
+    # import shlex
+    # cmd_str = ' '.join(shlex.quote(arg) for arg in command)
+    # qian_log(f"{GREEN}执行【要执行的脚本】的py命令是【{BLUE} {cmd_str} {GREEN}】。{NC}")
     resultCode=callScriptCommond(command, action_script_file_absPath, verbose=True)
     if resultCode==False:
         return False
@@ -500,6 +534,10 @@ if __name__ == "__main__":
         QBASE_CMD = args.qbase_local_path
         print(f"{GREEN}使用本地 qbase 路径: {QBASE_CMD} {NC}")
     
+    get_common_flag_args()
+    qian_log(f"QBASE_FLAG_ARGS: {QBASE_FLAG_ARGS}")
+    qian_log(f"QTOOL_FLAG_ARGS: {QTOOL_FLAG_ARGS}")
+    qian_log(f"COMMON_FLAG_ARGS: {COMMON_FLAG_ARGS}")
     '''
     # 测试输出
     if contains_verbose_in_allArgs:
