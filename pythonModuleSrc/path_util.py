@@ -103,8 +103,12 @@ def joinFullPath_checkExsit(host_dir, rel_path, createIfNoExsit=False, is_file=N
             parent_dir = os.path.dirname(full_abspath)
             if parent_dir:
                 os.makedirs(parent_dir, exist_ok=True)
-            # 创建空文件
-            open(full_abspath, 'a').close()
+            # 如果是 .json 文件，初始化为 {}
+            if full_abspath.endswith('.json'):
+                with open(full_abspath, 'w') as f:
+                    f.write('{}')
+            else:
+                open(full_abspath, 'a').close()
             print(f"已创建文件: {full_abspath}")
         else:
             # 创建目录
