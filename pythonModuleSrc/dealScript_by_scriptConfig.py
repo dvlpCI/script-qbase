@@ -15,7 +15,7 @@ import os
 import json
 
 from base_util import openFile, callScriptCommond
-from path_util import getAbsPathByFileRelativePath
+from path_util import getAbsPathByRelativePath
 
 
 # 定义颜色常量
@@ -221,7 +221,7 @@ def getRealScriptOrCommandFromData(data, pack_input_params_file_path):
     if 'action_sript_file_rel_this_dir' in data:
         action_sript_file_rel_this_dir=data['action_sript_file_rel_this_dir']
         # 获取脚本的实际绝对路径
-        action_script_file_absPath=getAbsPathByFileRelativePath(pack_input_params_file_path, action_sript_file_rel_this_dir)
+        action_script_file_absPath=getAbsPathByRelativePath(pack_input_params_file_path, action_sript_file_rel_this_dir)
         if action_script_file_absPath == None or not os.path.isfile(action_script_file_absPath):
             print(f"{RED}发生错误:脚本文件不存在，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中的{BLUE} action_sript_file_rel_this_dir {RED}属性值{BLUE} {action_sript_file_rel_this_dir} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {action_script_file_absPath} {RED}不存在)。{NC}")
             openFile(pack_input_params_file_path)
@@ -367,8 +367,15 @@ def __getFixParamMapFromFile(operateHomeMap, pack_input_params_file_path):
         elif param_type == "dir-path-rel-this-file" or param_type == "file-path-rel-this-file":
             # 如果是相对目录
             param_value = operateHomeMap['fixedValue']
+            
             createIfNoExsit=True
-            dir_path=getAbsPathByFileRelativePath(pack_input_params_file_path, param_value, createIfNoExsit)
+            is_file = (param_type == "file-path-rel-this-file")
+            dir_path=getAbsPathByRelativePath(
+                pack_input_params_file_path,
+                param_value,
+                createIfNoExsit,
+                is_file
+            )
 
         if dir_path == None or not os.path.exists(dir_path):
             print(f"{RED}参数指向的文件获取失败，原因为计算出来的相对目录不存在。请检查您的{YELLOW} {pack_input_params_file_path} {NC}中选中的{BLUE} {json.dumps(operateHomeMap, indent=2)} {NC}里的{BLUE} fixedValue {RED}属性值{BLUE} {param_value} {RED}是否正确。（其会导致计算相对于{YELLOW} {pack_input_params_file_path} {RED}的该属性值路径{BLUE} {dir_path} {RED}不存在)。{NC}")
