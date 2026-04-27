@@ -1,0 +1,374 @@
+{
+  "branch_info_result": {
+    "Notification": {
+      "current": {
+        "branch": [
+          {
+            "name": "<font color=warning>dev_login_err</font>",
+            "outline": [
+              "<font color=warning>①登录失败错误提示</font>",
+              "<font color=warning>②登录失败错误提示2</font>"
+            ]
+          },
+          {
+            "name": "<font color=info>dev_login_err</font>",
+            "outline": [
+              "<font color=info>①修复提示语</font>"
+            ]
+          },
+          {
+            "name": "<font color=info>dev_ui_revision</font>",
+            "outline": [
+              "<font color=info>①首页UI改版</font>",
+              "<font color=info>②个人中心UI改版</font>"
+            ]
+          },
+          {
+            "name": "<font color=info>dev_js_game</font>",
+            "outline": [
+              "<font color=info>①添加打开app发布愿望单的Bridge</font>",
+              "<font color=info>②新增H5获取app版本公共信息</font>",
+              "<font color=info>③新增H5获取app设备埋点公共信息</font>"
+            ]
+          },
+          {
+            "name": "<font color=info>dev_dokit</font>",
+            "outline": [
+              "<font color=info>Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)</font>"
+            ]
+          },
+          {
+            "name": "<font color=info>dev_script_pack</font>",
+            "outline": [
+              "<font color=info>①修复开发包打包</font>",
+              "<font color=info>②添加人员信息，打包出错可@对应开发</font>",
+              "<font color=info>③打包信息添加markdown支持</font>"
+            ]
+          }
+        ],
+        "category": {
+          "hotfix": [
+            "❓【34天<font color=warning>@test1</font>】<font color=warning>dev_login_err</font>:<font color=comment>[02.09已提测]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=warning>①登录失败错误提示</font>\n<font color=warning>②登录失败错误提示2</font>",
+            "👌🏻<font color=info>dev_login_err</font>:<font color=comment>[02.09已提测][2.16已测试通过]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=info>①修复提示语</font>"
+          ],
+          "feature": [
+            "✅<font color=info>dev_ui_revision</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①首页UI改版</font>\n<font color=info>②个人中心UI改版</font>",
+            "✅<font color=info>dev_js_game</font>:<font color=comment>[02.15已提测][02.16已测试通过][02.16已合入预生产分支]</font><font color=comment>@producter2</font><font color=comment>@tester2</font>\n<font color=info>①添加打开app发布愿望单的Bridge</font>\n<font color=info>②新增H5获取app版本公共信息</font>\n<font color=info>③新增H5获取app设备埋点公共信息</font>",
+            "✅<font color=info>dev_script_pack</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①修复开发包打包</font>\n<font color=info>②添加人员信息，打包出错可@对应开发</font>\n<font color=info>③打包信息添加markdown支持</font>"
+          ],
+          "optimize": [
+            "✅<font color=info>dev_dokit</font>:<font color=comment>[12.14已提测][12.22已测试通过][12.22已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@tester3</font>\n<font color=info>Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)</font>"
+          ],
+          "other": []
+        },
+        "full": "=======hotfix=======\n1.❓【34天<font color=warning>@test1</font>】<font color=warning>dev_login_err</font>:<font color=comment>[02.09已提测]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=warning>①登录失败错误提示</font>\n<font color=warning>②登录失败错误提示2</font>\n2.👌🏻<font color=info>dev_login_err</font>:<font color=comment>[02.09已提测][2.16已测试通过]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=info>①修复提示语</font>\n=======feature=======\n3.✅<font color=info>dev_ui_revision</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①首页UI改版</font>\n<font color=info>②个人中心UI改版</font>\n4.✅<font color=info>dev_js_game</font>:<font color=comment>[02.15已提测][02.16已测试通过][02.16已合入预生产分支]</font><font color=comment>@producter2</font><font color=comment>@tester2</font>\n<font color=info>①添加打开app发布愿望单的Bridge</font>\n<font color=info>②新增H5获取app版本公共信息</font>\n<font color=info>③新增H5获取app设备埋点公共信息</font>\n5.✅<font color=info>dev_script_pack</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①修复开发包打包</font>\n<font color=info>②添加人员信息，打包出错可@对应开发</font>\n<font color=info>③打包信息添加markdown支持</font>\n=======optimize=======\n6.✅<font color=info>dev_dokit</font>:<font color=comment>[12.14已提测][12.22已测试通过][12.22已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@tester3</font>\n<font color=info>Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)</font>",
+        "full_slice": [
+          "=======hotfix=======",
+          "1.❓【34天<font color=warning>@test1</font>】<font color=warning>dev_login_err</font>:<font color=comment>[02.09已提测]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=warning>①登录失败错误提示</font>\n<font color=warning>②登录失败错误提示2</font>",
+          "2.👌🏻<font color=info>dev_login_err</font>:<font color=comment>[02.09已提测][2.16已测试通过]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=info>①修复提示语</font>",
+          "=======feature=======",
+          "3.✅<font color=info>dev_ui_revision</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①首页UI改版</font>\n<font color=info>②个人中心UI改版</font>",
+          "4.✅<font color=info>dev_js_game</font>:<font color=comment>[02.15已提测][02.16已测试通过][02.16已合入预生产分支]</font><font color=comment>@producter2</font><font color=comment>@tester2</font>\n<font color=info>①添加打开app发布愿望单的Bridge</font>\n<font color=info>②新增H5获取app版本公共信息</font>\n<font color=info>③新增H5获取app设备埋点公共信息</font>",
+          "5.✅<font color=info>dev_script_pack</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①修复开发包打包</font>\n<font color=info>②添加人员信息，打包出错可@对应开发</font>\n<font color=info>③打包信息添加markdown支持</font>",
+          "=======optimize=======",
+          "6.✅<font color=info>dev_dokit</font>:<font color=comment>[12.14已提测][12.22已测试通过][12.22已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@tester3</font>\n<font color=info>Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)</font>"
+        ]
+      },
+      "lastOnline": {
+        "branch": [
+          {
+            "name": "dev_login_err",
+            "outline": [
+              "①修复点击"
+            ]
+          },
+          {
+            "name": "dev_city_picker",
+            "outline": [
+              "城市数据存放在本地"
+            ]
+          },
+          {
+            "name": "dev_lzh_fix_web_white",
+            "outline": [
+              "①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏"
+            ]
+          },
+          {
+            "name": "dev_js_game",
+            "outline": [
+              "①修复url添加json参数未转义问题",
+              "②添加打开app发布愿望单的Bridge",
+              "③新增H5获取app版本公共信息",
+              "④新增H5获取app设备埋点公共信息"
+            ]
+          },
+          {
+            "name": "dev_location_privacy",
+            "outline": [
+              "定位初始化调整"
+            ]
+          },
+          {
+            "name": "dev_lzh_ui_fix",
+            "outline": [
+              "①下架状态优化"
+            ]
+          },
+          {
+            "name": "dev_lzh_game_scale",
+            "outline": [
+              "①debug页面新增游戏挂起"
+            ]
+          },
+          {
+            "name": "dev_script_pack",
+            "outline": [
+              "①通知增加类型区分，并可分发到不同位置",
+              "②安装包信息提前设置化，方便后面直接提取",
+              "③新增支持@人员自定义",
+              "④新增可打包任意分支"
+            ]
+          }
+        ],
+        "category": {
+          "hotfix": [
+            "[✅2.16]①修复点击",
+            "[✅02.16]城市数据存放在本地",
+            "[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+            "[✅2.16]①下架状态优化"
+          ],
+          "feature": [
+            "[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息"
+          ],
+          "optimize": [
+            "[✅2.16]①debug页面新增游戏挂起",
+            "[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支"
+          ],
+          "other": [
+            "[✅02.16]定位初始化调整"
+          ]
+        },
+        "full": "1.[✅2.16]①修复点击\n2.[✅02.16]城市数据存放在本地\n3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏\n4.[✅2.16]①下架状态优化\n5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息\n6.[✅2.16]①debug页面新增游戏挂起\n7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支\n8.[✅02.16]定位初始化调整",
+        "full_slice": [
+          "1.[✅2.16]①修复点击",
+          "2.[✅02.16]城市数据存放在本地",
+          "3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+          "4.[✅2.16]①下架状态优化",
+          "5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息",
+          "6.[✅2.16]①debug页面新增游戏挂起",
+          "7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支",
+          "8.[✅02.16]定位初始化调整"
+        ]
+      },
+      "all": {
+        "text": "<font color=warning>手写的更新内容</font>",
+        "slice": [
+          "<font color=warning>手写的更新内容</font>",
+          "=======hotfix=======",
+          "1.❓【34天<font color=warning>@test1</font>】<font color=warning>dev_login_err</font>:<font color=comment>[02.09已提测]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=warning>①登录失败错误提示</font>\n<font color=warning>②登录失败错误提示2</font>",
+          "2.👌🏻<font color=info>dev_login_err</font>:<font color=comment>[02.09已提测][2.16已测试通过]</font><font color=comment>@producter1</font><font color=comment>@test1</font>\n<font color=info>①修复提示语</font>",
+          "=======feature=======",
+          "3.✅<font color=info>dev_ui_revision</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①首页UI改版</font>\n<font color=info>②个人中心UI改版</font>",
+          "4.✅<font color=info>dev_js_game</font>:<font color=comment>[02.15已提测][02.16已测试通过][02.16已合入预生产分支]</font><font color=comment>@producter2</font><font color=comment>@tester2</font>\n<font color=info>①添加打开app发布愿望单的Bridge</font>\n<font color=info>②新增H5获取app版本公共信息</font>\n<font color=info>③新增H5获取app设备埋点公共信息</font>",
+          "5.✅<font color=info>dev_script_pack</font>:<font color=comment>[02.17已提测][02.17已测试通过][02.17已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@qian</font>\n<font color=info>①修复开发包打包</font>\n<font color=info>②添加人员信息，打包出错可@对应开发</font>\n<font color=info>③打包信息添加markdown支持</font>",
+          "=======optimize=======",
+          "6.✅<font color=info>dev_dokit</font>:<font color=comment>[12.14已提测][12.22已测试通过][12.22已合入预生产分支]</font><font color=comment>@qian</font><font color=comment>@tester3</font>\n<font color=info>Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)</font>",
+          "1.[✅2.16]①修复点击",
+          "2.[✅02.16]城市数据存放在本地",
+          "3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+          "4.[✅2.16]①下架状态优化",
+          "5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息",
+          "6.[✅2.16]①debug页面新增游戏挂起",
+          "7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支",
+          "8.[✅02.16]定位初始化调整"
+        ]
+      }
+    },
+    "Pgyer": {
+      "current": {
+        "branch": [
+          {
+            "name": "dev_login_err",
+            "outline": [
+              "①登录失败错误提示",
+              "②登录失败错误提示2"
+            ]
+          },
+          {
+            "name": "dev_login_err",
+            "outline": [
+              "①修复提示语"
+            ]
+          },
+          {
+            "name": "dev_ui_revision",
+            "outline": [
+              "①首页UI改版",
+              "②个人中心UI改版"
+            ]
+          },
+          {
+            "name": "dev_js_game",
+            "outline": [
+              "①添加打开app发布愿望单的Bridge",
+              "②新增H5获取app版本公共信息",
+              "③新增H5获取app设备埋点公共信息"
+            ]
+          },
+          {
+            "name": "dev_dokit",
+            "outline": [
+              "Flutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)"
+            ]
+          },
+          {
+            "name": "dev_script_pack",
+            "outline": [
+              "①修复开发包打包",
+              "②添加人员信息，打包出错可@对应开发",
+              "③打包信息添加markdown支持"
+            ]
+          }
+        ],
+        "category": {
+          "hotfix": [
+            "❓【34天@test1】@producter1@test1\n①登录失败错误提示\n②登录失败错误提示2",
+            "👌🏻@producter1@test1\n①修复提示语"
+          ],
+          "feature": [
+            "✅@qian@qian\n①首页UI改版\n②个人中心UI改版",
+            "✅@producter2@tester2\n①添加打开app发布愿望单的Bridge\n②新增H5获取app版本公共信息\n③新增H5获取app设备埋点公共信息",
+            "✅@qian@qian\n①修复开发包打包\n②添加人员信息，打包出错可@对应开发\n③打包信息添加markdown支持"
+          ],
+          "optimize": [
+            "✅@qian@tester3\nFlutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)"
+          ],
+          "other": []
+        },
+        "full": "=======hotfix=======\n1.❓【34天@test1】@producter1@test1\n①登录失败错误提示\n②登录失败错误提示2\n2.👌🏻@producter1@test1\n①修复提示语\n=======feature=======\n3.✅@qian@qian\n①首页UI改版\n②个人中心UI改版\n4.✅@producter2@tester2\n①添加打开app发布愿望单的Bridge\n②新增H5获取app版本公共信息\n③新增H5获取app设备埋点公共信息\n5.✅@qian@qian\n①修复开发包打包\n②添加人员信息，打包出错可@对应开发\n③打包信息添加markdown支持\n=======optimize=======\n6.✅@qian@tester3\nFlutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)",
+        "full_slice": [
+          "=======hotfix=======",
+          "1.❓【34天@test1】@producter1@test1\n①登录失败错误提示\n②登录失败错误提示2",
+          "2.👌🏻@producter1@test1\n①修复提示语",
+          "=======feature=======",
+          "3.✅@qian@qian\n①首页UI改版\n②个人中心UI改版",
+          "4.✅@producter2@tester2\n①添加打开app发布愿望单的Bridge\n②新增H5获取app版本公共信息\n③新增H5获取app设备埋点公共信息",
+          "5.✅@qian@qian\n①修复开发包打包\n②添加人员信息，打包出错可@对应开发\n③打包信息添加markdown支持",
+          "=======optimize=======",
+          "6.✅@qian@tester3\nFlutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)"
+        ]
+      },
+      "lastOnline": {
+        "branch": [
+          {
+            "name": "dev_login_err",
+            "outline": [
+              "①修复点击"
+            ]
+          },
+          {
+            "name": "dev_city_picker",
+            "outline": [
+              "城市数据存放在本地"
+            ]
+          },
+          {
+            "name": "dev_lzh_fix_web_white",
+            "outline": [
+              "①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏"
+            ]
+          },
+          {
+            "name": "dev_js_game",
+            "outline": [
+              "①修复url添加json参数未转义问题",
+              "②添加打开app发布愿望单的Bridge",
+              "③新增H5获取app版本公共信息",
+              "④新增H5获取app设备埋点公共信息"
+            ]
+          },
+          {
+            "name": "dev_location_privacy",
+            "outline": [
+              "定位初始化调整"
+            ]
+          },
+          {
+            "name": "dev_lzh_ui_fix",
+            "outline": [
+              "①下架状态优化"
+            ]
+          },
+          {
+            "name": "dev_lzh_game_scale",
+            "outline": [
+              "①debug页面新增游戏挂起"
+            ]
+          },
+          {
+            "name": "dev_script_pack",
+            "outline": [
+              "①通知增加类型区分，并可分发到不同位置",
+              "②安装包信息提前设置化，方便后面直接提取",
+              "③新增支持@人员自定义",
+              "④新增可打包任意分支"
+            ]
+          }
+        ],
+        "category": {
+          "hotfix": [
+            "[✅2.16]①修复点击",
+            "[✅02.16]城市数据存放在本地",
+            "[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+            "[✅2.16]①下架状态优化"
+          ],
+          "feature": [
+            "[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息"
+          ],
+          "optimize": [
+            "[✅2.16]①debug页面新增游戏挂起",
+            "[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支"
+          ],
+          "other": [
+            "[✅02.16]定位初始化调整"
+          ]
+        },
+        "full": "1.[✅2.16]①修复点击\n2.[✅02.16]城市数据存放在本地\n3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏\n4.[✅2.16]①下架状态优化\n5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息\n6.[✅2.16]①debug页面新增游戏挂起\n7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支\n8.[✅02.16]定位初始化调整",
+        "full_slice": [
+          "1.[✅2.16]①修复点击",
+          "2.[✅02.16]城市数据存放在本地",
+          "3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+          "4.[✅2.16]①下架状态优化",
+          "5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息",
+          "6.[✅2.16]①debug页面新增游戏挂起",
+          "7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支",
+          "8.[✅02.16]定位初始化调整"
+        ]
+      },
+      "all": {
+        "text": "手写的更新内容",
+        "slice": [
+          "手写的更新内容",
+          "=======hotfix=======",
+          "1.❓【34天@test1】@producter1@test1\n①登录失败错误提示\n②登录失败错误提示2",
+          "2.👌🏻@producter1@test1\n①修复提示语",
+          "=======feature=======",
+          "3.✅@qian@qian\n①首页UI改版\n②个人中心UI改版",
+          "4.✅@producter2@tester2\n①添加打开app发布愿望单的Bridge\n②新增H5获取app版本公共信息\n③新增H5获取app设备埋点公共信息",
+          "5.✅@qian@qian\n①修复开发包打包\n②添加人员信息，打包出错可@对应开发\n③打包信息添加markdown支持",
+          "=======optimize=======",
+          "6.✅@qian@tester3\nFlutter升级3.3.9(Button、PrimaryScrollControllerWrapper已升级)",
+          "1.[✅2.16]①修复点击",
+          "2.[✅02.16]城市数据存放在本地",
+          "3.[✅2.16]①iOS在游戏中挂起app，5分钟后打开app，刷新当前游戏",
+          "4.[✅2.16]①下架状态优化",
+          "5.[✅02.16]①修复url添加json参数未转义问题\n②添加打开app发布愿望单的Bridge\n③新增H5获取app版本公共信息\n④新增H5获取app设备埋点公共信息",
+          "6.[✅2.16]①debug页面新增游戏挂起",
+          "7.[✅02.16]①通知增加类型区分，并可分发到不同位置\n②安装包信息提前设置化，方便后面直接提取\n③新增支持@人员自定义\n④新增可打包任意分支",
+          "8.[✅02.16]定位初始化调整"
+        ]
+      }
+    }
+  }
+}

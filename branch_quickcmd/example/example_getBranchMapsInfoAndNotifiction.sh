@@ -32,4 +32,4 @@ input_params_from_file_path=${Example_HomeDir_Absolute}/example_input_getBranchM
 qbase_execScript_by_configJsonFile_scriptPath=$($qbase_homedir_abspath/qbase.sh -path execScript_by_configJsonFile)
 # qbase_execScript_by_configJsonFile_scriptPath=$(qbase -path execScript_by_configJsonFile)
 # echo "======================${qbase_execScript_by_configJsonFile_scriptPath}======================"
-python3 $qbase_execScript_by_configJsonFile_scriptPath  $input_params_from_file_path
+python3 $qbase_execScript_by_configJsonFile_scriptPath -script-config-file $input_params_from_file_path
