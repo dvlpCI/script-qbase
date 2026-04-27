@@ -9,17 +9,25 @@
 ### 
 
 # 判断字符串 -a a -b b -c -d ，如果字符串是以-开头，则其下个字符串不能以-开头
-inputArgArray=($@)
+# 判断参数格式：不能有两个连续的短参数（以单个-开头）
+# 长参数（--开头）可以连续
+inputArgArray=("$@")  # 注意：要用括号和引号，避免参数中的空格被拆分
 # echo "inputArgArray=${inputArgArray[*]}, inputArgCount=${#inputArgArray[@]}"
 inputArgsErrorMessage=""
+
 for ((i = 0; i < ${#inputArgArray[@]}; i++)); do
     current_string=${inputArgArray[i]}
-    if [[ $current_string == -* ]]; then
+    
+    # 检查是否是短参数（以单个-开头，但不是--开头）
+    if [[ $current_string == -?* && $current_string != --* ]]; then
         next_index=$((i + 1))
-        if [[ $next_index -lt ${#inputArgArray[@]} && ${inputArgArray[next_index]} == -* ]]; then
+        if [[ $next_index -lt ${#inputArgArray[@]} ]]; then
             next_arg=${inputArgArray[next_index]}
-            inputArgsErrorMessage="您传入的参数不能存在两个连续的以-开头的字符串，请检查 ${current_string} 和 ${next_arg} 之间是不是少了空字符串。"
-            break
+            # 检查下一个参数是否是短参数
+            if [[ $next_arg == -?* && $next_arg != --* ]]; then
+                inputArgsErrorMessage="您传入的参数不能存在两个连续的短参数（以单个-开头），请检查 ${current_string} 和 ${next_arg} 之间是不是缺少参数值。"
+                break
+            fi
         fi
     fi
 done
