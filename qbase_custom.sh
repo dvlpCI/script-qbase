@@ -5,6 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-09 22:56:13
 # @Description: 执行自定义的命令菜单（若不存在会引导添加）
+# @Exampel: sh qbase_custom.sh
 ###
 
 # 定义颜色常量
@@ -16,6 +17,10 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+# 日志信息输出到终端（规范 2.2：日志输出用 >&2，保持返回值干净）
+log_info() {
+    printf "%b\n" "$1" >&2
+}
 
 # 检查jq是否安装
 if ! command -v jq &> /dev/null; then
@@ -160,47 +165,47 @@ setupEnvVar() {
 # 检查环境变量
 checkEnvValue() {
     if [ -z "${QBASE_CUSTOM_MENU}" ]; then
-        echo "${YELLOW}未检测到 QBASE_CUSTOM_MENU 环境变量${NC}"
-        echo ""
+        log_info "${YELLOW}未检测到 QBASE_CUSTOM_MENU 环境变量${NC}"
         showCustomMenuJsonExample
-        echo ""
-        echo "请选择操作："
-        echo ""
-        echo "  1. 复制示例文件到当前目录"
-        echo "     → 复制示例 custom_menu.json 到当前目录下"
-        echo "     → 后续询问是否自动设置 QBASE_CUSTOM_MENU 环境变量"
-        echo ""
-        echo "  2. 手动输入已有 json 文件路径"
-        echo "     → 输入你已准备好的 json 文件路径"
-        echo "     → 后续询问是否自动设置 QBASE_CUSTOM_MENU 环境变量"
-        echo ""
-        echo "  3. 退出"
-        echo "     → 不做任何操作，直接退出"
-        echo ""
+        log_info "$(cat <<EOF
+
+请选择操作：
+  1. 复制示例文件到当前目录（推荐）
+     操作说明：将示例 custom_menu.json 复制到当前目录下。
+     后续：询问是否自动设置 QBASE_CUSTOM_MENU 环境变量。
+  2. 手动输入已有 json 文件路径
+     操作说明：输入你已准备好的 json 文件路径。
+     后续：询问是否自动设置 QBASE_CUSTOM_MENU 环境变量。
+ 
+EOF
+)"
 
         while true; do
-            read -r -p "请输入选项 (1/2/3): " option
-            case $option in
-                1)
-                    handleCopyExampleToCurrentDir
-                    if [ $? -eq 0 ]; then
-                        return 0
-                    fi
-                    ;;
-                2)
-                    inputCustomJsonFilePath
-                    if [ -n "${QBASE_CUSTOM_MENU}" ]; then
-                        setupEnvVar "${QBASE_CUSTOM_MENU}"
-                        return 0
-                    fi
-                    ;;
-                3)
-                    exit 2
-                    ;;
-                *)
-                    echo "无效选项，请重新输入"
-                    ;;
-            esac
+            read -r -p "请输入选项 (1/2)（退出请输入 Q/q）: " option
+            if [ "${option}" == "q" ] || [ "${option}" == "Q" ]; then
+                exit 2
+            elif [ -z "${option}" ]; then
+                log_info "输入不能为空，请重新输入。"
+            else
+                case $option in
+                    1)
+                        handleCopyExampleToCurrentDir
+                        if [ $? -eq 0 ]; then
+                            return 0
+                        fi
+                        ;;
+                    2)
+                        inputCustomJsonFilePath
+                        if [ -n "${QBASE_CUSTOM_MENU}" ]; then
+                            setupEnvVar "${QBASE_CUSTOM_MENU}"
+                            return 0
+                        fi
+                        ;;
+                    *)
+                        log_info "无效选项，请重新输入"
+                        ;;
+                esac
+            fi
         done
     fi
 }
@@ -210,7 +215,6 @@ if [ $? -ne 0 ]; then
     echo "${result}"
     exit 2
 fi
-
 
 # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file \"${QBASE_CUSTOM_MENU}\" -categoryType custom -execChoosed "true"》"
 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${QBASE_CUSTOM_MENU}" -categoryType "custom" -execChoosed "true"
