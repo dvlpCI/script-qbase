@@ -27,13 +27,21 @@ ARCH=$(uname -m)
 echo "当前机器架构: $ARCH"
 
 # 检查 shc 命令是否安装
-if ! command -v shc &> /dev/null; then
+SHC_CMD=""
+for cmd in "shc" "/opt/homebrew/bin/shc" "/usr/local/bin/shc"; do
+    if command -v $cmd &> /dev/null; then
+        SHC_CMD=$cmd
+        break
+    fi
+done
+if [ -z "$SHC_CMD" ]; then
     echo "${RED}温馨提示：您当前的系统中未安装 shc 命令，正在为您自动安装，如安装失败，请使用《${BLUE} brew install shc ${RED}》命令在终端进行安装。${NC}"
     brew install shc
     exit 1
 fi
 
-shc -r -f ${qbase_HomeDir_Absolute}/qbase.sh #注意:要有-r选项, -f 后跟要加密的脚本名.
+# CFLAGS="-arch x86_64 -arch arm64" 使生成的二进制为通用(fat)二进制，同时支持 Intel 和 Apple Silicon
+CFLAGS="-arch x86_64 -arch arm64" ${SHC_CMD} -r -f ${qbase_HomeDir_Absolute}/qbase.sh #注意:要有-r选项, -f 后跟要加密的脚本名.
 if [ $? != 0 ]; then
     echo "${RED}Error：把shell脚本转换为一个可执行的二进制文件失败，请检查 。${NC}"
     exit 1
