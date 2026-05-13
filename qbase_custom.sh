@@ -112,11 +112,16 @@ handleCopyExampleToCurrentDir() {
         done
     fi
 
-    cp "${exampleFilePath}" "${targetFile}"
-    echo "${GREEN}已复制示例文件到 ${targetFile}${NC}"
-    echo "你可在此文件上修改自定义命令菜单"
-
-    setupEnvVar "${targetFile}"
+    if cp "${exampleFilePath}" "${targetFile}"; then
+        echo "${GREEN}已复制示例文件到 ${targetFile}${NC}"
+        echo "你可在此文件上修改自定义命令菜单"
+        setupEnvVar "${targetFile}"
+    else
+        echo "${RED}复制失败，请手动复制以下文件：${NC}"
+        echo "${exampleFilePath}"
+        echo "到当前目录并重命名为 custom_menu.json"
+        return 1
+    fi
 }
 
 # 设置环境变量 QBASE_CUSTOM_MENU
