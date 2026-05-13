@@ -176,7 +176,11 @@ if ! command -v realpath &> /dev/null; then
     exit 1
 fi
 
-CurrentScript_absolute_path=$(realpath "$0")
+if [[ "$0" == /* ]]; then
+    CurrentScript_absolute_path=$(realpath "$0")
+else
+    CurrentScript_absolute_path=$(command -v "$0")
+fi
 # echo "$0 🆚 ${CurrentScript_absolute_path}"
 
 if [ "$0" == "${CurrentScript_absolute_path}" ]; then
@@ -379,11 +383,10 @@ show_usage() {
 versionCmdStrings=("--version" "-version" "-v" "version")
 
 # 判断第一个参数是不是 help 参数
-shouldShowHelp=false
 case "${firstArg}" in
     --help|-help|-h|help)
-        shouldShowHelp=true
-        exit 0  # 这行会退出脚本！
+        show_usage
+        exit 0
         ;;
 esac
 # 判断去除第一个参数后，剩余的参数是不是 help 参数
@@ -399,9 +402,6 @@ done
 
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
-
-elif [ "$shouldShowHelp" = true ]; then
-    show_usage
 
 elif [ "${firstArg}" == "custom" ]; then
     sh $qbase_homedir_abspath/qbase_custom.sh
