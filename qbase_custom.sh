@@ -123,14 +123,14 @@ handleCopyExampleToCurrentDir() {
         done
     fi
 
+    chmod +w "${targetFile}" 2>/dev/null    # 解决拷贝只读文件失败
     if cp "${exampleFilePath}" "${targetFile}"; then
-        log_info "${GREEN}已复制示例文件到${BLUE} ${targetFile} ${NC}"
-        log_info "${GREEN}你可在此文件上修改自定义命令菜单${NC}"
+        log_info "${GREEN}成功复制示例到${BLUE} ${targetFile} ${GREEN}。你可在此文件上修改自定义命令菜单${NC}"
         setupEnvVar "${targetFile}"
     else
         log_info ""
-        log_info "${RED}复制失败，${exampleFilePath}${NC}"
-        log_info "${RED}请检查当前目录${BLUE} $(pwd) ${NC}是否有写入权限，或直接新建json文件并拷贝以上json示例${NC}"
+        # log_info "执行文件拷贝命令《 cp \"${exampleFilePath}\" \"${targetFile}\" 》失败"
+        log_info "${RED}复制示例文件到${BLUE} ${targetFile} ${RED}失败，请检查当前目录${BLUE} $(pwd) ${NC}是否有写入权限，或直接新建json文件并拷贝以上json示例${NC}"
         log_guide
         return 1
     fi
