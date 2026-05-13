@@ -44,6 +44,17 @@ showCustomMenuJsonExample() {
     log_info "${BLUE}$(cat ${jsonFileExamplePath})${NC}"
 }
 
+log_guide() {
+    log_info "$(cat <<EOF
+
+${GREEN}你可以稍后执行以下命令来手动设置：
+${BLUE} export QBASE_CUSTOM_MENU=${targetFile}
+${GREEN}也可将上述命令添加到 ~/.zshrc 中使其永久生效
+ ${NC}
+EOF
+)"
+}
+
 inputCustomJsonFilePath() {
     valid_option=false
     while [ "$valid_option" = false ]; do
@@ -54,26 +65,26 @@ inputCustomJsonFilePath() {
         fi
 
         if [ ! -f "${option}" ]; then
-            echo "${RED}您输入的文件${BLUE} ${option} ${RED}不存在，请重新输入${NC}"
+            log_info "${RED}您输入的文件${BLUE} ${option} ${RED}不存在，请重新输入${NC}"
             continue
         fi
 
         # 定义菜单选项
         jsonFileData=$(cat "$option" | jq ".")
         if [ -z "${jsonFileData}" ]; then
-            echo "${RED}您输入的文件${BLUE} ${option} ${RED}不是json文件或格式不正确，请检查或重新输入${NC}"
+            log_info "${RED}您输入的文件${BLUE} ${option} ${RED}不是json文件或格式不正确，请检查或重新输入${NC}"
             continue
         fi
 
         result=$(checkValueCanbeUse "${option}")
         if [ $? != 0 ]; then
-            echo "${result}"
+            log_info "${result}"
             showCustomMenuJsonExample
             continue
         fi
 
         QBASE_CUSTOM_MENU="${option}"
-        echo "${GREEN}您将使用输入的文件${BLUE} ${option} ${GREEN}作为自定义的命令菜单${NC}"
+        log_info "${GREEN}您将使用输入的文件${BLUE} ${option} ${GREEN}作为自定义的命令菜单${NC}"
         break
     done
 }
@@ -103,7 +114,7 @@ handleCopyExampleToCurrentDir() {
 
     if [ -f "${targetFile}" ]; then
         while true; do
-            read -r -p "当前目录下已存在 custom_menu.json，覆盖请输入 y，退出请输入 q: " yn
+            read -r -p "当前目录 $(pwd) 下已存在 custom_menu.json，覆盖请输入 y (退出请输入 Q/q): " yn
             case $yn in
                 y|Y) break ;;
                 q|Q) exit 2 ;;
@@ -113,13 +124,14 @@ handleCopyExampleToCurrentDir() {
     fi
 
     if cp "${exampleFilePath}" "${targetFile}"; then
-        echo "${GREEN}已复制示例文件到 ${targetFile}${NC}"
-        echo "你可在此文件上修改自定义命令菜单"
+        log_info "${GREEN}已复制示例文件到${BLUE} ${targetFile} ${NC}"
+        log_info "${GREEN}你可在此文件上修改自定义命令菜单${NC}"
         setupEnvVar "${targetFile}"
     else
-        echo "${RED}复制失败，请手动复制以下文件：${NC}"
-        echo "${exampleFilePath}"
-        echo "到当前目录并重命名为 custom_menu.json"
+        log_info ""
+        log_info "${RED}复制失败，${exampleFilePath}${NC}"
+        log_info "${RED}请检查当前目录${BLUE} $(pwd) ${NC}是否有写入权限，或直接新建json文件并拷贝以上json示例${NC}"
+        log_guide
         return 1
     fi
 }
@@ -153,14 +165,7 @@ setupEnvVar() {
                 return 0
                 ;;
             n|N)
-                log_info "$(cat <<EOF
-
-${GREEN}你可以稍后执行以下命令来手动设置：
-${BLUE} export QBASE_CUSTOM_MENU=${targetFile}
-${GREEN}也可将上述命令添加到 ~/.zshrc 中使其永久生效
- ${NC}
-EOF
-)"
+                log_guide
                 exit 2
                 ;;
             *)
@@ -179,7 +184,7 @@ checkEnvValue() {
         log_info "$(cat <<EOF
 
 请选择操作：
-  1. 复制示例到当前目录，生成 custom_menu.json（推荐）
+  1. 复制示例到当前目录${BLUE} $(pwd) ${NC}，生成 custom_menu.json（推荐）
   2. 手动输入已有 json 文件路径
  
 EOF
@@ -197,6 +202,8 @@ EOF
                         handleCopyExampleToCurrentDir
                         if [ $? -eq 0 ]; then
                             return 0
+                        else
+                            exit 2
                         fi
                         ;;
                     2)
