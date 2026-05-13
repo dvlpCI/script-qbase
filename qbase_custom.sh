@@ -97,6 +97,7 @@ checkEnvValue() {
     if [ -z "${QBASE_CUSTOM_MENU}" ]; then
         # 输入要添加的环境变量的值
         echo "${YELLOW}请先在环境变量中设置${BLUE} QBASE_CUSTOM_MENU ${YELLOW}变量，并为其指向你要执行的自定义命令菜单的json文件路径。${NC}"
+        showCustomMenuJsonExample
         inputCustomJsonFilePath
 
         # 添加环境变量 QBASE_CUSTOM_MENU
