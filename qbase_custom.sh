@@ -40,7 +40,8 @@ showCustomMenuJsonExample() {
 }
 
 inputCustomJsonFilePath() {
-    while true; do
+    valid_option=false
+    while [ "$valid_option" = false ]; do
         read -r -p "请输入您要用本脚本执行的自定义命令菜单的json文件路径(若要退出请输入Q|q) : " option
 
         if [ "${option}" == q ] || [ "${option}" == "Q" ]; then
@@ -52,9 +53,17 @@ inputCustomJsonFilePath() {
             continue
         fi
 
+        # 定义菜单选项
         jsonFileData=$(cat "$option" | jq ".")
         if [ -z "${jsonFileData}" ]; then
             echo "${RED}您输入的文件${BLUE} ${option} ${RED}不是json文件或格式不正确，请检查或重新输入${NC}"
+            continue
+        fi
+
+        result=$(checkValueCanbeUse "${option}")
+        if [ $? != 0 ]; then
+            echo "${result}"
+            showCustomMenuJsonExample
             continue
         fi
 
@@ -64,102 +73,47 @@ inputCustomJsonFilePath() {
     done
 }
 
-askToSetEnvVar() {
-    local targetFile="$1"
-    while true; do
-        read -r -p "是否设置 QBASE_CUSTOM_MENU 环境变量指向此文件？(y/n): " yn
-        case $yn in
-            y|Y)
-                QBASE_CUSTOM_MENU="${targetFile}"
-                sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "QBASE_CUSTOM_MENU" -envVariableValue "${QBASE_CUSTOM_MENU}"
-                if [ $? -ne 0 ]; then
-                    echo "${RED}设置环境变量 QBASE_CUSTOM_MENU 失败，请检查。${NC}"
-                    exit 2
-                fi
-                echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh ${NC}》"
-                sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh
-                if [ $? -ne 0 ]; then
-                    echo "${RED}生效所有环境变量失败，请检查。${NC}"
-                    exit 2
-                fi
-                return 0
-                ;;
-            n|N)
-                echo "你可以稍后执行以下命令来手动设置："
-                echo "  export QBASE_CUSTOM_MENU=${targetFile}"
-                exit 2
-                ;;
-            *)
-                echo "请输入 y 或 n"
-                ;;
-        esac
-    done
-}
+checkValueCanbeUse() {
+    try_use_menu_json_file="${1}"
 
-handleCopyExampleToCurrentDir() {
-    exampleFilePath="${qbase_homedir_abspath}/menu/example/custom_command_menu_example.json"
-    targetFile="$(pwd)/custom_menu.json"
-
-    if [ -f "${targetFile}" ]; then
-        while true; do
-            read -r -p "当前目录下已存在 custom_menu.json，是否覆盖？(y/n): " yn
-            case $yn in
-                y|Y) break ;;
-                n|N) return 1 ;;
-                *) echo "请输入 y 或 n" ;;
-            esac
-        done
+    if [ ! -f "${try_use_menu_json_file}" ]; then
+        echo "${RED}您输入的文件${BLUE} ${try_use_menu_json_file} ${RED}不存在，请重新输入${NC}"
+        return 1
     fi
 
-    cp "${exampleFilePath}" "${targetFile}"
-    echo "${GREEN}已复制示例文件到 ${targetFile}${NC}"
-    echo "你可在此文件上修改自定义命令菜单"
-    echo ""
-
-    askToSetEnvVar "${targetFile}"
+    # 定义菜单选项
+    jsonFileData=$(cat "$try_use_menu_json_file" | jq ".")
+    if [ -z "${jsonFileData}" ]; then
+        echo "${RED}您输入的文件${BLUE} ${try_use_menu_json_file} ${RED}不是有效的json文件，请重新输入${NC}"
+        return 1
+    fi
 }
 
-selectCustomMenuSource() {
-    echo ""
-    echo "请选择操作："
-    echo "  1. 复制示例文件到当前目录"
-    echo "  2. 手动输入已有 json 文件路径"
-    echo "  3. 退出"
-    echo ""
 
-    while true; do
-        read -r -p "请输入选项 (1/2/3): " option
-        case $option in
-            1)
-                handleCopyExampleToCurrentDir
-                if [ $? -eq 0 ]; then
-                    return 0
-                fi
-                ;;
-            2)
-                inputCustomJsonFilePath
-                if [ -n "${QBASE_CUSTOM_MENU}" ]; then
-                    askToSetEnvVar "${QBASE_CUSTOM_MENU}"
-                    return 0
-                fi
-                ;;
-            3)
-                exit 2
-                ;;
-            *)
-                echo "无效选项，请重新输入"
-                ;;
-        esac
-    done
-}
+
 
 # 检查环境变量
 checkEnvValue() {
     if [ -z "${QBASE_CUSTOM_MENU}" ]; then
-        echo "${YELLOW}未检测到 QBASE_CUSTOM_MENU 环境变量${NC}"
-        echo ""
+        # 输入要添加的环境变量的值
+        echo "${YELLOW}请先在环境变量中设置${BLUE} QBASE_CUSTOM_MENU ${YELLOW}变量，并为其指向你要执行的自定义命令菜单的json文件路径。${NC}"
         showCustomMenuJsonExample
-        selectCustomMenuSource
+        inputCustomJsonFilePath
+
+        # 添加环境变量 QBASE_CUSTOM_MENU
+        sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "QBASE_CUSTOM_MENU" -envVariableValue "${QBASE_CUSTOM_MENU}"
+        if [ $? -ne 0 ]; then
+            echo "设置环境变量 QBASE_CUSTOM_MENU 失败，请检查。"
+            exit 2
+        fi
+
+        # 生效所有环境变量
+        echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh ${NC}》"
+        sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh
+        if [ $? -ne 0 ]; then
+            echo "生效所有环境变量失败，请检查。"
+            exit 2
+        fi
     fi
 }
 
