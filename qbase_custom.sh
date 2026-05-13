@@ -179,7 +179,7 @@ setupEnvVar() {
 # 检查环境变量
 checkEnvValue() {
     if [ -z "${QBASE_CUSTOM_MENU}" ]; then
-        log_info "${YELLOW}未检测到 QBASE_CUSTOM_MENU 环境变量${NC}"
+        log_info "${YELLOW}未检测到 QBASE_CUSTOM_MENU 环境变量(请确保终端执行命令${BLUE} echo $QBASE_CUSTOM_MENU ${YELLOW}能有结果)${NC}"
         showCustomMenuJsonExample
         log_info "$(cat <<EOF
 
