@@ -18,9 +18,7 @@ PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
 # 日志信息输出到终端（规范 2.2：日志输出用 >&2，保持返回值干净）
-log_info() {
-    printf "%b\n" "$1" >&2
-}
+log_color_info() { printf "%b\n" "$1" >&2; }
 
 # 检查jq是否安装
 if ! command -v jq &> /dev/null; then
@@ -34,8 +32,14 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurrentDIR_Script_Absolute} # 使用 %/* 方法可以避免路径上有..
 
 # 快速检查是否已设置环境变量
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check.sh 》 "
-checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check.sh)
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check.sh --env-name QBASE_CUSTOM_MENU --env-var-placeholder "your_custom_menu_json_file" --example-json-file "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" --default-output-filename "custom_menu.json" --env-descript "自定义命令菜单" 》 "
+checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check.sh \
+    --env-name QBASE_CUSTOM_MENU \
+    --env-descript "自定义命令菜单" \
+    --env-var-placeholder "your_custom_menu_json_file" \
+    --example-json-file "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" \
+    --default-output-filename "custom_menu.json"
+)
 if [ $? -ne 0 ]; then
     echo "${checkResult}"
     exit 2
