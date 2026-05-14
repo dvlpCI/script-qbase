@@ -73,7 +73,7 @@ DEFAULT_OUTPUT_FILENAME="${DEFAULT_OUTPUT_FILENAME:-config.json}"
 ENV_DESCRIPT="${ENV_DESCRIPT:-${ENV_NAME}}"
 
 showCustomMenuJsonExample() {
-    log_color_info "您${ENV_DESCRIPT}json文件的内容参考如下："
+    log_color_info "以下提供一个您的环境变量 ${ENV_NAME} 表示的 ${ENV_DESCRIPT} 的json文件内容的参考结构："
     jsonFileExamplePath="${EXAMPLE_JSON_FILE}"
     log_color_info "${BLUE}$(cat ${jsonFileExamplePath})${NC}"
 }
@@ -181,14 +181,14 @@ setupEnvVar() {
         case $yn in
             y|Y)
                 # 添加环境变量
-                eval "${ENV_NAME}='${targetFile}'"
+                # 正确做法：让 env_var_add_or_update.sh 写入 .zshrc，然后通过 stdout 把路径传出去
                 sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "${ENV_NAME}" -envVariableValue "${targetFile}"
                 if [ $? -ne 0 ]; then
                     log_color_info "${RED}设置环境变量 ${ENV_NAME} 失败，请检查。${NC}"
                     exit 2
                 fi
 
-                # 生效所有环境变量
+                # 生效所有环境变量（subprocess 中 source，只影响子进程，不影响父 shell）
                 # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh ${NC}》"
                 sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh
                 if [ $? -ne 0 ]; then
@@ -196,6 +196,9 @@ setupEnvVar() {
                     exit 2
                 fi
                 log_color_info "${GREEN}环境变量 ${ENV_NAME} 已设置成功${NC}"
+                
+                # 关键：把设置的路径通过 stdout 传出去！供父进程捕获
+                echo "${targetFile}"
                 return 0
                 ;;
             n|N)
@@ -274,14 +277,15 @@ if [ "${status_type}" == "env_success" ]; then
 fi
 
 jsonData=$(printf "%s" "${checkResult}" | jq -r '.')
-log_color_info "${RED}${jsonData}${NC}"
+log_color_info "${YELLOW}${jsonData}${NC}"
 
 # 已经发现有错了，且发现该错误还不是文件不存在或者json问题，则不继续。如果是其他的则允许继续
+# 关键：捕获 show_guide_process_when_found_error 的 stdout，它包含 setupEnvVar 成功时 echo 的路径
 result=$(show_guide_process_when_found_error)
 if [ $? -ne 0 ]; then
     echo "${result}"
     exit 2
 fi
 
-# 将更新完的新环境变量值，输出给调用者。且调用者一定要使用此输出值，不然其一定是旧值。
-echo "${!ENV_NAME}"
+# 将更新完的新环境变量值，输出给调用者。直接用 result 即可，因为它包含了 setupEnvVar 成功时通过 stdout 传出的路径
+echo "${result}"
