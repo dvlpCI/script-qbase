@@ -4,6 +4,7 @@
 # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-09 22:56:13
+# @FilePath: env_variables/env_file_check_and_set.sh
 # @Description: 指向json文件的环境变量的检查工具。
 #   检查指定的环境变量是否已设置且指向存在的文件，
 #   若未设置则提供交互式引导（复制示例文件 / 手动输入路径）。
@@ -211,7 +212,6 @@ setupEnvVar() {
 
 # 在发现问题的时候展示引导流程
 show_guide_process_when_found_error() {
-    log_color_info "${YELLOW}未检测到 ${ENV_NAME} 环境变量(请确保终端执行命令${BLUE} echo \$${ENV_NAME} ${YELLOW}能有结果)${NC}"
     showCustomMenuJsonExample
     log_color_info "$(cat <<EOF
 
@@ -265,6 +265,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+
 status_type=$(echo "${checkResult}" | jq -r '.status_type')
 message=$(echo "${checkResult}" | jq -r '.message')
 if [ "${status_type}" == "env_success" ]; then
@@ -272,8 +273,10 @@ if [ "${status_type}" == "env_success" ]; then
     exit 0
 fi
 
+jsonData=$(printf "%s" "${checkResult}" | jq -r '.')
+log_color_info "${RED}${jsonData}${NC}"
+
 # 已经发现有错了，且发现该错误还不是文件不存在或者json问题，则不继续。如果是其他的则允许继续
-# log_color_info "${YELLOW}${message}${NC}"
 result=$(show_guide_process_when_found_error)
 if [ $? -ne 0 ]; then
     echo "${result}"

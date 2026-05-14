@@ -23,19 +23,27 @@ versionCmdStrings=("--version" "-version" "-v" "version")
 
 
 # shell 参数具名化
-show_usage="args: [-envVariableKey, -envVariableValue]\
-                                  [--environment-variable-key=, --environment-variable-value=]"
+show_usage="args: [-envVariableKey, -envVariableValue, -envFileAutoOpen]\
+                                  [--environment-variable-key=, --environment-variable-value=, --environment-file-auto-open]"
 
+ENVIRONMENT_AUTO_OPEN=true
 while [ -n "$1" ]
 do
         case "$1" in
                 -envVariableKey|--environment-variable-key) ENVIRONMENT_Variable_KEY=$2; shift 2;;
                 -envVariableValue|--environment-variable-value) ENVIRONMENT_Variable_VALUE=$2; shift 2;;
+                -envFileAutoOpen|--environment-file-auto-open) 
+                    ENVIRONMENT_AUTO_OPEN=$2; shift 2;; # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
                 --) break ;;
                 *) echo $1,$2,$show_usage; break ;;
         esac
 done
 
+if [ "ENVIRONMENT_AUTO_OPEN" != false ]; then
+    ENVIRONMENT_AUTO_OPEN=true
+fi
+
+log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 `\033` 等转义序列
 
 function updateEnvValueWithKey() {
     # 设置要添加或更新的环境变量
@@ -70,8 +78,12 @@ function updateEnvValueWithKey() {
     # 应用新的环境变量
     source "$envFile"
 
-    sleep 1 #延迟1秒，避免数据还没写完
-    open "$envFile"
+    # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
+    if [ "${ENVIRONMENT_AUTO_OPEN}" == true ]; then
+        sleep 1 #延迟1秒，避免数据还没写完
+        open "$envFile"
+        log_color_info "${NC}已为你自动打开 open ${envFile} ${NC}"
+    fi
 }
 
 updateEnvValueWithKey "${ENVIRONMENT_Variable_KEY}" "${ENVIRONMENT_Variable_VALUE}"
