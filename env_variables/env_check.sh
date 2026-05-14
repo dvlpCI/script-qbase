@@ -128,12 +128,24 @@ checkEnv() {
         open_sysenv_file "${ENV_NAME}"
         exit 1
     fi
-    if [ "${ENV_VAR_TYPE}" == "file" ] && [ ! -f "${choices_value}" ]; then
-        printf "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}\n"
-        printf "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量\n${NC}"
-        open_sysenv_file "${ENV_NAME}"
-        exit 1
+    if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
+        if [ ! -f "${choices_value}" ]; then
+            printf "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}\n"
+            printf "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量\n${NC}"
+            open_sysenv_file "${ENV_NAME}"
+            exit 1
+        fi
+        
+        if [ "${ENV_VAR_TYPE}" == "json-file" ]; then
+            jsonFileData=$(cat "$choices_value" | jq ".")
+            if [ -z "${jsonFileData}" ]; then
+                echo "${RED}您配置的环境变量指向的文件不是有效的json文件，请重新输入。${BLUE} ENV_NAME=${choices_value} ${RED}${NC}"
+                open_sysenv_file "${ENV_NAME}"
+                exit 1
+            fi
+        fi
     fi
+
     if [ "${ACTION}" == "check" ]; then
         exit 0
     fi

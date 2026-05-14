@@ -127,6 +127,12 @@
                     "example": "qbase -quick env_check --target-env QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --placeholder your_project_choices_json_file --action check"
                 },
                 {
+                    "key": "env_file_check",
+                    "des": "指向json文件的环境变量的检查(不存在能够输出json示例，并能够让你选择①复制示例到当前目录 或者 ②手动输入已有 json 文件路径。选择后会更新环境变量的值)",
+                    "rel_path": "./env_variables/env_file_check.sh",
+                    "example": "sh ./env_variables/env_file_check.sh"
+                },
+                {
                     "key": "env_file_change",
                     "des": "指向文件的环境变量的交互式切换(选择项目后更新环境变量)",
                     "rel_path": "./env_variables/env_file_change.sh",
