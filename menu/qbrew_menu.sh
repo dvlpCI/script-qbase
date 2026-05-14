@@ -155,6 +155,10 @@ tool_menu() {
     # catalog_count=$(jq ".${qbrew_categoryType} | length" "$qtool_menu_json_file_path")    # 使用 jq 提取动态字段的值
     catalogCount=$(printf "%s" "$categoryData" | jq "length")
     # echo "catalogCount=${catalogCount}"
+    if [ -z "${catalogCount}" ] || [ "${catalogCount}" == "0" ] || [ "${catalogCount}" == "null" ]; then
+        echo "${RED}Error: 无可用的菜单数据${NC}" >&2
+        exit 1
+    fi
     for ((i = 0; i < ${catalogCount}; i++)); do
         iCatalogMap=$(printf "%s" "$categoryData" | jq -r ".[${i}]") # 添加 jq -r 的-r以去掉双引号
         if [ $? != 0 ] || [ -z "${iCatalogMap}" ]; then
@@ -350,6 +354,10 @@ show_usage_for_choose() {
 relPath_baseDirPath=$(dirname "${qbrew_json_file_path}")
 
 # 读取 JSON 文件并提取指定部分的内容
+if [ ! -f "$qbrew_json_file_path" ]; then
+    echo "${RED}Error: 你的菜单数据json文件 ${qbrew_json_file_path} 不存在，请检查${NC}" >&2
+    exit 1
+fi
 categoryData=$(cat "$qbrew_json_file_path" | jq ".${qbrew_categoryType}")
 # categoryData=$(jq ".${qbrew_categoryType}" "$qtool_menu_json_file_path")
 

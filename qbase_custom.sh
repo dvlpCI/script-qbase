@@ -222,6 +222,19 @@ EOF
     fi
 }
 
+# 快速检查是否已设置环境变量
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_check.sh --env-name QBASE_CUSTOM_MENU --env-var-placeholder "your_custom_menu_json_file" --action check 》 "
+checkResult=$(sh $qbase_homedir_abspath/env_variables/env_check.sh \
+    --env-name QBASE_CUSTOM_MENU \
+    --env-var-placeholder "your_custom_menu_json_file" \
+    --env-var-type file \
+    --action check \
+    )
+if [ $? -ne 0 ]; then
+    echo "${checkResult}"
+    exit 2
+fi
+
 result=$(checkEnvValue)
 if [ $? -ne 0 ]; then
     echo "${result}"
