@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
  # @Description: 
-# @FilePath: env_variables/env_file_change.sh
+# @FilePath: sh env_variables/env_file_change.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-var-placeholder your_project_choices_json_file --action change --choices-env QTOOL_DEAL_PROJECT_CHOICES_PATH
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
@@ -20,16 +20,16 @@ ENV_VAR_PLACEHOLDER=""
 ACTION=""
 while [ $# -gt 0 ]; do
     case "$1" in
-        --choices-env)
-            CHOICES_ENV_VAR="$2"
-            shift 2
-            ;;
         --env-name)
             ENV_NAME="$2"
             shift 2
             ;;
         --env-var-placeholder)
             ENV_VAR_PLACEHOLDER="$2"
+            shift 2
+            ;;
+        --choices-env)
+            CHOICES_ENV_VAR="$2"
             shift 2
             ;;
         --action)

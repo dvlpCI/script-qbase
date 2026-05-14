@@ -159,10 +159,10 @@ if [ -z "${env_name}" ] || [ "${env_name}" == "${ENV_VAR_PLACEHOLDER}" ]; then
 fi
 if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
     if [ ! -f "${env_name}" ]; then
-        log_color_info "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${env_name} ${RED}文件不存在，请先检查并修改 ${NC}"
+        log_color_info "${RED}您配置的环境变量指向的文件不存在。即 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${env_name} ${RED}文件不存在，请先检查并修改 ${NC}"
         log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
         status_type="env_file_noexsit"
-        message="您配置的环境变量指向的文件不存在 ${ENV_NAME} 的值 ${env_name} 文件不存在"
+        message="您配置的环境变量指向的文件不存在。即 ${ENV_NAME} 的值 ${env_name} 文件不存在！"
         printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
         
         open_sysenv_file "${ENV_NAME}"

@@ -136,7 +136,7 @@
                     "key": "env_file_change",
                     "des": "指向文件的环境变量的交互式切换(选择项目后更新环境变量)",
                     "rel_path": "./env_variables/env_file_change.sh",
-                    "example": "qbase -quick env_file_change --target-env QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --placeholder your_project_choices_json_file --action change --choices-env QTOOL_DEAL_PROJECT_CHOICES_PATH"
+                    "example": "qbase -quick env_file_change --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-var-placeholder your_project_choices_json_file --action change --choices-env QTOOL_DEAL_PROJECT_CHOICES_PATH"
                 }
             ]
         },
