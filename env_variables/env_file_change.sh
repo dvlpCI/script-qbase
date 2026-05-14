@@ -183,8 +183,7 @@ validate_choices_json() {
 sh $qbase_homedir_abspath/env_variables/env_check.sh \
     --env-name "${CHOICES_ENV_VAR}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-    --env-var-type file \
-    --action "${ACTION}"
+    --env-var-type file
 
 if [ $? != 0 ]; then
     exit 1

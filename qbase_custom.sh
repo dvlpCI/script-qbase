@@ -32,8 +32,8 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurrentDIR_Script_Absolute} # 使用 %/* 方法可以避免路径上有..
 
 # 快速检查是否已设置环境变量
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check.sh --env-name QBASE_CUSTOM_MENU --env-var-placeholder "your_custom_menu_json_file" --example-json-file "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" --default-output-filename "custom_menu.json" --env-descript "自定义命令菜单" 》 "
-checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check.sh \
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-var-placeholder "your_custom_menu_json_file" --example-json-file "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" --default-output-filename "custom_menu.json" --env-descript "自定义命令菜单" 》 "
+checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh \
     --env-name QBASE_CUSTOM_MENU \
     --env-descript "自定义命令菜单" \
     --env-var-placeholder "your_custom_menu_json_file" \
@@ -44,6 +44,7 @@ if [ $? -ne 0 ]; then
     echo "${checkResult}"
     exit 2
 fi
+QBASE_CUSTOM_MENU=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
 
 
 # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file \"${QBASE_CUSTOM_MENU}\" -categoryType custom -execChoosed "true"》"

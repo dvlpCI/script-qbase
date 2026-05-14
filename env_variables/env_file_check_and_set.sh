@@ -8,7 +8,7 @@
 #   检查指定的环境变量是否已设置且指向存在的文件，
 #   若未设置则提供交互式引导（复制示例文件 / 手动输入路径）。
 #   调用方负责在设置完成后执行后续操作。
-# @Exampel: sh env_file_check.sh \
+# @Exampel: sh env_file_check_and_set.sh \
 #           --env-name QBASE_CUSTOM_MENU \
 #           --env-descript "自定义命令菜单" \
 #           --env-var-placeholder "your_custom_menu_json_file" \
@@ -254,29 +254,31 @@ EOF
 }
 
 # 快速检查是否已设置环境变量
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_check.sh --env-name ${ENV_NAME} --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --action check 》 "
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_check.sh --env-name ${ENV_NAME} --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" 》 "
 checkResult=$(sh $qbase_homedir_abspath/env_variables/env_check.sh \
     --env-name "${ENV_NAME}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-    --env-var-type file \
-    --action check \
+    --env-var-type file
     )
 if [ $? -ne 0 ]; then
-    status_type=$(echo "${checkResult}" | jq -r '.status_type')
-    message=$(echo "${checkResult}" | jq -r '.message')
-    # 已经发现有错了，且发现该错误还不是文件不存在或者json问题，则不继续。如果是其他的则允许继续
-    if [ "${status_type}" != "env_file_noexsit" ] && [ "${status_type}" != "env_file_not_json" ]; then
-        echo "${message}"
-        exit 2
-    fi
-
-    # log_color_info "${YELLOW}${message}${NC}"
-
-    result=$(show_guide_process_when_found_error)
-    if [ $? -ne 0 ]; then
-        echo "${result}"
-        exit 2
-    fi
+    echo "${checkResult}"
+    exit 1
 fi
 
+status_type=$(echo "${checkResult}" | jq -r '.status_type')
+message=$(echo "${checkResult}" | jq -r '.message')
+if [ "${status_type}" == "env_success" ]; then
+    echo "${!ENV_NAME}" # 这里还是得输出给外部，因为下文失败的时候需要将更新的值输出给外部，为了保证代码不会出错，这里也要给，不然外部不给的话，外部取这个脚本的返回值会得到空
+    exit 0
+fi
+
+# 已经发现有错了，且发现该错误还不是文件不存在或者json问题，则不继续。如果是其他的则允许继续
+# log_color_info "${YELLOW}${message}${NC}"
+result=$(show_guide_process_when_found_error)
+if [ $? -ne 0 ]; then
+    echo "${result}"
+    exit 2
+fi
+
+# 将更新完的新环境变量值，输出给调用者。且调用者一定要使用此输出值，不然其一定是旧值。
 echo "${!ENV_NAME}"

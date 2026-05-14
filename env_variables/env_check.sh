@@ -18,7 +18,6 @@ log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 
 ENV_NAME=""
 ENV_VAR_PLACEHOLDER=""
 ENV_VAR_TYPE=""
-ACTION=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --env-name)
@@ -33,18 +32,14 @@ while [ $# -gt 0 ]; do
             ENV_VAR_TYPE="$2"
             shift 2
             ;;
-        --action)
-            ACTION="$2"
-            shift 2
-            ;;
         *)
             echo "未知参数: $1" >&2
             exit 1
             ;;
     esac
 done
-if [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_PLACEHOLDER}" ] || [ -z "${ACTION}" ]; then
-    echo "错误: 缺少必要参数（--env-name --env-var-placeholder --action）" >&2
+if [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_PLACEHOLDER}" ]; then
+    echo "错误: 缺少必要参数（--env-name --env-var-placeholder" >&2
     exit 1
 fi
 
@@ -57,6 +52,18 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
+# 打开环境变量的那个文件（省去用户自己找）
+open_sysenv_file() {
+    local env=$1
+    # 生效所有环境变量
+    # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open ${NC}》"
+    sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open
+    if [ $? -ne 0 ]; then
+        log_color_info "${RED}生效所有环境变量失败，请检查。${NC}"
+        return 2
+    fi
+    log_color_info "${GREEN}环境变量 ${env} 已设置成功${NC}"
+}
 
 # 添加环境的占位符
 addEnvPlaceHolderForKey() {
@@ -121,71 +128,57 @@ function get_sysenvValueByKey() {
     return 0
 }
 
-checkEnv() {
-    choices_value="${!ENV_NAME}"
-    if [ -z "${choices_value}" ] || [ "${choices_value}" == "${ENV_VAR_PLACEHOLDER}" ]; then
-        if [ -z "${choices_value}" ]; then
-            status_type="env_not_set"
-            message="您还未添加环境变量 ${ENV_NAME}，请先补充。"
-        else
-            status_type="env_is_placeholder"
-            message="环境变量 ${ENV_NAME} 仍是占位值 ${ENV_VAR_PLACEHOLDER}，请替换为实际路径。"
-        fi
-        addEnvPlaceHolderForKey "${ENV_NAME}" "${ENV_VAR_PLACEHOLDER}"
-        open_sysenv_file "${ENV_NAME}"
-        printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
-        exit 1
-    fi
-    if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
-        if [ ! -f "${choices_value}" ]; then
-            log_color_info "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}"
-            log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
-            status_type="env_file_noexsit"
-            message="您配置的环境变量指向的文件不存在 ${ENV_NAME} 的值 ${choices_value} 文件不存在"
-            printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
-            open_sysenv_file "${ENV_NAME}"
-            exit 1
-        fi
-        
-        if [ "${ENV_VAR_TYPE}" == "json-file" ]; then
-            jsonFileData=$(cat "$choices_value" | jq ".")
-            if [ -z "${jsonFileData}" ]; then
-                log_color_info "${RED}您配置的环境变量指向的文件不是有效的json文件，请重新输入。${BLUE} ENV_NAME=${choices_value} ${RED}${NC}"
-                status_type="env_file_not_json"
-                message="您配置的环境变量指向的文件不是有效的json文件。ENV_NAME=${choices_value}"
-                printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
-                open_sysenv_file "${ENV_NAME}"
-                exit 1
-            fi
-        fi
-    fi
 
-    if [ "${ACTION}" == "check" ]; then
+choices_value="${!ENV_NAME}"
+if [ -z "${choices_value}" ] || [ "${choices_value}" == "${ENV_VAR_PLACEHOLDER}" ]; then
+    if [ -z "${choices_value}" ]; then
+        status_type="env_not_set"
+        message="您还未添加环境变量 ${ENV_NAME}，请先补充。"
+    else
+        status_type="env_is_placeholder"
+        message="环境变量 ${ENV_NAME} 仍是占位值 ${ENV_VAR_PLACEHOLDER}，请替换为实际路径。"
+    fi
+    addEnvPlaceHolderForKey "${ENV_NAME}" "${ENV_VAR_PLACEHOLDER}"
+    open_sysenv_file "${ENV_NAME}"
+    if [ $? == 2 ]; then
+        status_type="env_effective_failure"
+        message="生效所有环境变量失败，请检查。"
+        printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
         exit 0
     fi
-}
-
-open_sysenv_file() {
-    local env=$1
-    # 生效所有环境变量
-    # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open ${NC}》"
-    sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open
-    if [ $? -ne 0 ]; then
-        log_color_info "${RED}生效所有环境变量失败，请检查。${NC}"
-        exit 2
+    printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
+    exit 0
+fi
+if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
+    if [ ! -f "${choices_value}" ]; then
+        log_color_info "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}"
+        log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
+        status_type="env_file_noexsit"
+        message="您配置的环境变量指向的文件不存在 ${ENV_NAME} 的值 ${choices_value} 文件不存在"
+        printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
+        open_sysenv_file "${ENV_NAME}"
+        if [ $? == 2 ]; then
+            status_type="env_effective_failure"
+            message="生效所有环境变量失败，请检查。"
+            printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
+            exit 0
+        fi
+        exit 0
     fi
-    log_color_info "${GREEN}环境变量 ${env} 已设置成功${NC}"
-}
+    
+    if [ "${ENV_VAR_TYPE}" == "json-file" ]; then
+        jsonFileData=$(cat "$choices_value" | jq ".")
+        if [ -z "${jsonFileData}" ]; then
+            log_color_info "${RED}您配置的环境变量指向的文件不是有效的json文件，请重新输入。${BLUE} ENV_NAME=${choices_value} ${RED}${NC}"
+            status_type="env_file_not_json"
+            message="您配置的环境变量指向的文件不是有效的json文件。ENV_NAME=${choices_value}"
+            printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
+            open_sysenv_file "${ENV_NAME}"
+            exit 0
+        fi
+    fi
+fi
 
-checkEnv
-
-# if [ -z "${QTOOL_DEAL_PROJECT_CHOICES_PATH}" ]; then
-#     addEnvPlaceHolder
-#     if [ $? != 0 ]; then
-#         exit 1
-#     fi
-#     printf "${RED}请先按以上提示，完成添加修改，再继续!${NC}"
-#     exit 1
-# else
-#     checkFile
-# fi
+status_type="env_success"
+message="您配置的环境变量正确。ENV_NAME=${choices_value}"
+printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
