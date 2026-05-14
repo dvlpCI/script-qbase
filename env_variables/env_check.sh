@@ -65,17 +65,17 @@ addEnvPlaceHolderForKey() {
         printf "${RED} envKey 参数的值不能为空 ，请检查。${NC}"
         return 1
     fi
-    printf "${RED}您还未添加环境变量 ${envKey} ，请先补充。${NC}"
+    log_color_info "${RED}您还未添加环境变量 ${envKey} ，请先补充。${NC}"
 
     envPlaceHolder=$2
-    printf "${RED}补充方法如下：请将 ${BLUE}export ${envKey}=${envPlaceHolder}${RED} 中的 ${YELLOW}${envPlaceHolder} ${RED}替换成自己实际的路径)${NC}\n"
-    printf "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量\n${NC}"
+    log_color_info "${RED}补充方法如下：请将 ${BLUE}export ${envKey}=${envPlaceHolder}${RED} 中的 ${YELLOW}${envPlaceHolder} ${RED}替换成自己实际的路径)${NC}"
+    log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
 
     SHELL_TYPE=$(basename $SHELL)
     if [ "$SHELL_TYPE" = "bash" ]; then
-        printf "${NC}已为你自动打开 open ~/.bash_profile ${NC}\n"
+        log_color_info "${NC}已为你自动打开 open ~/.bash_profile ${NC}"
     elif [ "$SHELL_TYPE" = "zsh" ]; then
-        printf "${NC}已为你自动打开 open ~/.zshrc ${NC}\n"
+        log_color_info "${NC}已为你自动打开 open ~/.zshrc ${NC}"
     else
         echo "Unknown shell type: $SHELL_TYPE"
         return 1
@@ -91,7 +91,7 @@ addEnvPlaceHolderForKey() {
     # envKeyFromSys=$(eval echo \$$envKey)
     envKeyFromSys=$(get_sysenvValueByKey "$envKey")
     if [ -z "${envKeyFromSys}" ]; then
-        printf "${BLUE}补充结束后，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
+        log_color_info "${BLUE}补充结束后，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
     fi
 }
 
@@ -124,14 +124,25 @@ function get_sysenvValueByKey() {
 checkEnv() {
     choices_value="${!ENV_NAME}"
     if [ -z "${choices_value}" ] || [ "${choices_value}" == "${ENV_VAR_PLACEHOLDER}" ]; then
+        if [ -z "${choices_value}" ]; then
+            status_type="env_not_set"
+            message="您还未添加环境变量 ${ENV_NAME}，请先补充。"
+        else
+            status_type="env_is_placeholder"
+            message="环境变量 ${ENV_NAME} 仍是占位值 ${ENV_VAR_PLACEHOLDER}，请替换为实际路径。"
+        fi
         addEnvPlaceHolderForKey "${ENV_NAME}" "${ENV_VAR_PLACEHOLDER}"
         open_sysenv_file "${ENV_NAME}"
+        printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
         exit 1
     fi
     if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
         if [ ! -f "${choices_value}" ]; then
-            printf "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}\n"
-            printf "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量\n${NC}"
+            log_color_info "${RED}您配置的环境变量指向的文件不存在 ${YELLOW}${ENV_NAME} ${RED}的值 ${YELLOW}${choices_value} ${RED}文件不存在，请先检查并修改 ${NC}"
+            log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
+            status_type="env_file_noexsit"
+            message="您配置的环境变量指向的文件不存在 ${ENV_NAME} 的值 ${choices_value} 文件不存在"
+            printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
             open_sysenv_file "${ENV_NAME}"
             exit 1
         fi
@@ -139,7 +150,10 @@ checkEnv() {
         if [ "${ENV_VAR_TYPE}" == "json-file" ]; then
             jsonFileData=$(cat "$choices_value" | jq ".")
             if [ -z "${jsonFileData}" ]; then
-                echo "${RED}您配置的环境变量指向的文件不是有效的json文件，请重新输入。${BLUE} ENV_NAME=${choices_value} ${RED}${NC}"
+                log_color_info "${RED}您配置的环境变量指向的文件不是有效的json文件，请重新输入。${BLUE} ENV_NAME=${choices_value} ${RED}${NC}"
+                status_type="env_file_not_json"
+                message="您配置的环境变量指向的文件不是有效的json文件。ENV_NAME=${choices_value}"
+                printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
                 open_sysenv_file "${ENV_NAME}"
                 exit 1
             fi

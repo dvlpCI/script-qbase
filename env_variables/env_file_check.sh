@@ -209,12 +209,11 @@ setupEnvVar() {
 }
 
 
-# 检查环境变量
-checkEnvValue() {
-    if [ -z "${!ENV_NAME}" ]; then
-        log_color_info "${YELLOW}未检测到 ${ENV_NAME} 环境变量(请确保终端执行命令${BLUE} echo $${ENV_NAME} ${YELLOW}能有结果)${NC}"
-        showCustomMenuJsonExample
-        log_color_info "$(cat <<EOF
+# 在发现问题的时候展示引导流程
+show_guide_process_when_found_error() {
+    log_color_info "${YELLOW}未检测到 ${ENV_NAME} 环境变量(请确保终端执行命令${BLUE} echo \$${ENV_NAME} ${YELLOW}能有结果)${NC}"
+    showCustomMenuJsonExample
+    log_color_info "$(cat <<EOF
 
 请选择操作：
   1. 复制示例到当前目录${BLUE} $(pwd) ${NC}，生成 ${DEFAULT_OUTPUT_FILENAME}（推荐）
@@ -223,36 +222,35 @@ checkEnvValue() {
 EOF
 )"
 
-        while true; do
-            read -r -p "请输入选项 (1/2)（退出请输入 Q/q）: " option
-            if [ "${option}" == "q" ] || [ "${option}" == "Q" ]; then
-                exit 2
-            elif [ -z "${option}" ]; then
-                log_color_info "输入不能为空，请重新输入。"
-            else
-                case $option in
-                    1)
-                        handleCopyExampleToCurrentDir
-                        if [ $? -eq 0 ]; then
-                            return 0
-                        else
-                            exit 2
-                        fi
-                        ;;
-                    2)
-                        inputCustomJsonFilePath
-                        if [ -n "${!ENV_NAME}" ]; then
-                            setupEnvVar "${!ENV_NAME}"
-                            return 0
-                        fi
-                        ;;
-                    *)
-                        log_color_info "无效选项，请重新输入"
-                        ;;
-                esac
-            fi
-        done
-    fi
+    while true; do
+        read -r -p "请输入选项 (1/2)（退出请输入 Q/q）: " option
+        if [ "${option}" == "q" ] || [ "${option}" == "Q" ]; then
+            exit 2
+        elif [ -z "${option}" ]; then
+            log_color_info "输入不能为空，请重新输入。"
+        else
+            case $option in
+                1)
+                    handleCopyExampleToCurrentDir
+                    if [ $? -eq 0 ]; then
+                        return 0
+                    else
+                        exit 2
+                    fi
+                    ;;
+                2)
+                    inputCustomJsonFilePath
+                    if [ -n "${!ENV_NAME}" ]; then
+                        setupEnvVar "${!ENV_NAME}"
+                        return 0
+                    fi
+                    ;;
+                *)
+                    log_color_info "无效选项，请重新输入"
+                    ;;
+            esac
+        fi
+    done
 }
 
 # 快速检查是否已设置环境变量
@@ -264,12 +262,21 @@ checkResult=$(sh $qbase_homedir_abspath/env_variables/env_check.sh \
     --action check \
     )
 if [ $? -ne 0 ]; then
-    echo "${checkResult}"
-    exit 2
+    status_type=$(echo "${checkResult}" | jq -r '.status_type')
+    message=$(echo "${checkResult}" | jq -r '.message')
+    # 已经发现有错了，且发现该错误还不是文件不存在或者json问题，则不继续。如果是其他的则允许继续
+    if [ "${status_type}" != "env_file_noexsit" ] && [ "${status_type}" != "env_file_not_json" ]; then
+        echo "${message}"
+        exit 2
+    fi
+
+    # log_color_info "${YELLOW}${message}${NC}"
+
+    result=$(show_guide_process_when_found_error)
+    if [ $? -ne 0 ]; then
+        echo "${result}"
+        exit 2
+    fi
 fi
 
-result=$(checkEnvValue)
-if [ $? -ne 0 ]; then
-    echo "${result}"
-    exit 2
-fi
+echo "${!ENV_NAME}"
