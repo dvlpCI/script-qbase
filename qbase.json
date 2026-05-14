@@ -119,6 +119,18 @@
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
                     "rel_path": "./env_variables/env_var_add_or_update.sh",
                     "example": "qbase -quick env_var_add_or_update -envVariableKey TEST_KEY -envVariableValue test_value"
+                },
+                {
+                    "key": "env_check",
+                    "des": "环境变量的检查(变量是否设置、值指向的文件是否存在)",
+                    "rel_path": "./env_variables/env_check.sh",
+                    "example": "qbase -quick env_check --target-env QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --placeholder your_project_choices_json_file --action check"
+                },
+                {
+                    "key": "env_file_change",
+                    "des": "指向文件的环境变量的交互式切换(选择项目后更新环境变量)",
+                    "rel_path": "./env_variables/env_file_change.sh",
+                    "example": "qbase -quick env_file_change --target-env QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --placeholder your_project_choices_json_file --action change --choices-env QTOOL_DEAL_PROJECT_CHOICES_PATH"
                 }
             ]
         },
