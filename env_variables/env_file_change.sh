@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
  # @Description: 
-# @FilePath: sh env_variables/env_file_change.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-var-placeholder your_project_choices_json_file --action change --choices-env QTOOL_DEAL_PROJECT_CHOICES_PATH
+# @FilePath: sh env_variables/env_file_change.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-branch-json-file/test/tool_choice.json\" --default-output-filename qtool_project_choice.json --action change --choose-for-env-name QTOOL_DEAL_PROJECT_CHOICES_PATH
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
@@ -14,22 +14,30 @@ qbase_homedir_abspath=${CurrentDIR_Script_Absolute%/*} # 使用 %/* 方法可以
 log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 `\033` 等转义序列
 
 # 解析具名参数
-CHOICES_ENV_VAR=""
 ENV_NAME=""
+ENV_DESCRIPT=""
 ENV_VAR_PLACEHOLDER=""
+EXAMPLE_JSON_FILE=""
+DEFAULT_OUTPUT_FILENAME=""
+
 ACTION=""
+CHOOSE_FOR_ENV_NAME=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --env-name)
             ENV_NAME="$2"
             shift 2
             ;;
+        --env-descript) ENV_DESCRIPT="$2"; shift 2 ;;
         --env-var-placeholder)
             ENV_VAR_PLACEHOLDER="$2"
             shift 2
             ;;
-        --choices-env)
-            CHOICES_ENV_VAR="$2"
+        --example-json-file) EXAMPLE_JSON_FILE="$2"; shift 2 ;;
+        --default-output-filename) DEFAULT_OUTPUT_FILENAME="$2"; shift 2 ;;
+
+        --choose-for-env-name)
+            CHOOSE_FOR_ENV_NAME="$2"
             shift 2
             ;;
         --action)
@@ -42,8 +50,14 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
-if [ -z "${CHOICES_ENV_VAR}" ] || [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_PLACEHOLDER}" ] || [ -z "${ACTION}" ]; then
-    echo "错误: 缺少必要参数（--choices-env --env-name --env-var-placeholder --action）" >&2
+
+if [ -z "${ENV_NAME}" ] || [ -z "${EXAMPLE_JSON_FILE}" ]; then
+    echo "错误: 缺少必要参数（--env-name --example-json-file）" >&2
+    exit 1
+fi
+
+if [ -z "${ACTION}" ] || [ -z "${CHOOSE_FOR_ENV_NAME}" ]; then
+    echo "错误: 缺少必要参数（--action --choices-env）" >&2
     exit 1
 fi
 
@@ -124,7 +138,7 @@ updateToolDealProject() {
 update_env_vars() {
     project_tool_file_path=$(echo "$targetChoiceCountMap" | jq -r ".project_tool_file_path")
     if [ ! -f "${project_tool_file_path}" ]; then
-        printf "${RED}选择项目失败：您从 ${CHOICES_ENV_VAR} 中选择的 $targetChoiceCountMap 的 ${BLUE}project_tool_file_path ${RED}指向的文件 ${YELLOW}${project_tool_file_path}${RED} 文件不存在，无法完成选择，请先检查和修改后，重新执行选择。${NC}\n"
+        printf "${RED}选择项目失败：您从 ${ENV_NAME} 中选择的 $targetChoiceCountMap 的 ${BLUE}project_tool_file_path ${RED}指向的文件 ${YELLOW}${project_tool_file_path}${RED} 文件不存在，无法完成选择，请先检查和修改后，重新执行选择。${NC}\n"
         return 1
     fi
 
@@ -180,11 +194,28 @@ validate_choices_json() {
     done
 }
 
+
+# 快速检查是否已设置环境变量
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name \"${ENV_NAME}\" --env-descript \"${ENV_DESCRIPT}\" --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --example-json-file \"${EXAMPLE_JSON_FILE}\" --default-output-filename \"${DEFAULT_OUTPUT_FILENAME}\" 》 "
+checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh \
+    --env-name "${ENV_NAME}" \
+    --env-descript "${ENV_DESCRIPT}" \
+    --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
+    --example-json-file "${EXAMPLE_JSON_FILE}" \
+    --default-output-filename "${DEFAULT_OUTPUT_FILENAME}"
+)
+if [ $? -ne 0 ]; then
+    echo "${checkResult}"
+    exit 2
+fi
+ENV_NAME=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
+
+
+
 sh $qbase_homedir_abspath/env_variables/env_check.sh \
-    --env-name "${CHOICES_ENV_VAR}" \
+    --env-name "${ENV_NAME}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
     --env-var-type file
-
 if [ $? != 0 ]; then
     exit 1
 fi
@@ -193,9 +224,10 @@ if [ "${ACTION}" == "check" ]; then
     exit 0
 fi
 
-validate_choices_json "${!CHOICES_ENV_VAR}"
+echo "validate_choices_json \"${!ENV_NAME}\""
+validate_choices_json "${!ENV_NAME}"
 
-tool_choice_file_path="${!CHOICES_ENV_VAR}"
+tool_choice_file_path="${!ENV_NAME}"
 
 showProjectList "${tool_choice_file_path}"
 if [ $? != 0 ]; then
