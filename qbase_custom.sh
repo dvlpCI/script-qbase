@@ -44,11 +44,11 @@ if [ $? -ne 0 ]; then
     echo "${checkResult}"
     exit 2
 fi
-QBASE_CUSTOM_MENU=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
+QBASE_CUSTOM_MENU_VALUE=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
+# echo "您的环境变量值 QBASE_CUSTOM_MENU = \"${QBASE_CUSTOM_MENU_VALUE}\""  >&2
 
-
-# echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file \"${QBASE_CUSTOM_MENU}\" -categoryType custom -execChoosed "true"》"
-sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${QBASE_CUSTOM_MENU}" -categoryType "custom" -execChoosed "true"
+# echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file \"${QBASE_CUSTOM_MENU_VALUE}\" -categoryType custom -execChoosed "true"》"
+sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${QBASE_CUSTOM_MENU_VALUE}" -categoryType "custom" -execChoosed "true"
 
 
 
