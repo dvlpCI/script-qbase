@@ -52,6 +52,8 @@ ENV_VAR_PLACEHOLDER=""
 EXAMPLE_JSON_FILE=""
 DEFAULT_OUTPUT_FILENAME=""
 
+ENVIRONMENT_AUTO_OPEN=true
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --env-name) ENV_NAME="$2"; shift 2 ;;
@@ -59,6 +61,12 @@ while [ $# -gt 0 ]; do
         --env-var-placeholder) ENV_VAR_PLACEHOLDER="$2"; shift 2 ;;
         --example-json-file) EXAMPLE_JSON_FILE="$2"; shift 2 ;;
         --default-output-filename) DEFAULT_OUTPUT_FILENAME="$2"; shift 2 ;;
+        -envFileAutoOpen|--environment-file-auto-open) 
+            # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
+            # 如 env_variables/env_file_change.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
+            ENVIRONMENT_AUTO_OPEN=$2;
+            shift 2
+            ;;
         *) echo "未知参数: $1" >&2; exit 1 ;;
     esac
 done
@@ -66,6 +74,10 @@ done
 if [ -z "${ENV_NAME}" ] || [ -z "${EXAMPLE_JSON_FILE}" ]; then
     echo "错误: 缺少必要参数（--env-name --example-json-file）" >&2
     exit 1
+fi
+
+if [ "$ENVIRONMENT_AUTO_OPEN" != false ]; then
+    ENVIRONMENT_AUTO_OPEN=true
 fi
 
 ENV_VAR_PLACEHOLDER="${ENV_VAR_PLACEHOLDER:-your_${ENV_NAME}_value}"
@@ -257,11 +269,12 @@ EOF
 }
 
 # 快速检查是否已设置环境变量
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_check.sh --env-name ${ENV_NAME} --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" 》 "
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_check.sh --env-name ${ENV_NAME} --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --env-var-type file --environment-file-auto-open \"${ENVIRONMENT_AUTO_OPEN}\" 》 "
 checkResult=$(sh $qbase_homedir_abspath/env_variables/env_check.sh \
     --env-name "${ENV_NAME}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-    --env-var-type file
+    --env-var-type file \
+    --environment-file-auto-open "${ENVIRONMENT_AUTO_OPEN}"
     )
 if [ $? -ne 0 ]; then
     echo "${checkResult}"

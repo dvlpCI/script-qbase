@@ -34,7 +34,9 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         -envFileAutoOpen|--environment-file-auto-open) 
-            ENVIRONMENT_AUTO_OPEN=$2;   # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
+            # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
+            # 如 env_variables/env_file_change.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
+            ENVIRONMENT_AUTO_OPEN=$2;
             shift 2
             ;;
         *)
@@ -48,6 +50,10 @@ if [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_PLACEHOLDER}" ]; then
     exit 1
 fi
 
+if [ "$ENVIRONMENT_AUTO_OPEN" != false ]; then
+    ENVIRONMENT_AUTO_OPEN=true
+fi
+
 # 定义颜色常量
 NC='\033[0m' # No Color
 RED='\033[31m'
@@ -57,17 +63,10 @@ BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 
-# 打开环境变量的那个文件（省去用户自己找）
+# 打开环境变量的那个文件（本方法只负责打开，省去用户自己找）
 open_sysenv_file() {
-    local env=$1
-    # 生效所有环境变量
-    # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open ${NC}》"
+    # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open ${NC}》" >&2
     sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open
-    if [ $? -ne 0 ]; then
-        log_color_info "${RED}生效所有环境变量失败，请检查。${NC}"
-        return 2
-    fi
-    log_color_info "${GREEN}环境变量 ${env} 已设置成功${NC}"
 }
 
 # 添加环境的占位符
@@ -141,16 +140,14 @@ if [ -z "${env_name}" ] || [ "${env_name}" == "${ENV_VAR_PLACEHOLDER}" ]; then
         message="环境变量 ${ENV_NAME} 仍是占位值 ${ENV_VAR_PLACEHOLDER}，请替换为实际路径。"
     fi
     
-    envFileAutoOpen=true
-    addEnvPlaceHolderForKey "${ENV_NAME}" "${ENV_VAR_PLACEHOLDER}" "${envFileAutoOpen}"
+    # 通过 ENVIRONMENT_AUTO_OPEN 自动决定 addEnvPlaceHolderForKey 是否内部执行 open_sysenv_file
+    addEnvPlaceHolderForKey "${ENV_NAME}" "${ENV_VAR_PLACEHOLDER}" "${ENVIRONMENT_AUTO_OPEN}"
     if [ $? != 0 ]; then
         status_type="env_placeHolder_set_failure"
         message="设置环境变量 ${ENV_NAME} 失败，请检查。"
         printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
         exit 0
     fi
-
-    # open_sysenv_file "${ENV_NAME}"
 
     status_type="env_placeHolder_set_success"
     message="已自动为你设置环境变量 ${ENV_NAME} 及其占位值成功，请等下记得修改"
@@ -165,7 +162,7 @@ if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
         message="您配置的环境变量指向的文件不存在。即 ${ENV_NAME} 的值 ${env_name} 文件不存在！"
         printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
         
-        open_sysenv_file "${ENV_NAME}"
+        open_sysenv_file
         
         exit 0
     fi
@@ -178,7 +175,7 @@ if [ "${ENV_VAR_TYPE}" == "file" ] || [ "${ENV_VAR_TYPE}" == "json-file" ]; then
             message="您配置的环境变量指向的文件不是有效的json文件。ENV_NAME=${env_name}"
             printf "%s\n" "{\"status_type\":\"${status_type}\",\"message\":\"${message}\"}"
 
-            open_sysenv_file "${ENV_NAME}"
+            open_sysenv_file
 
             exit 0
         fi

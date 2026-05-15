@@ -4,7 +4,7 @@
  # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
- # @Description: 
+ # @Description: 添加环境变量前会先添加占位，然后才修改占位为指定的值
 # @FilePath: sh env_variables/env_file_change.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-branch-json-file/test/tool_choice.json\" --default-output-filename qtool_project_choice.json --action change --choose-for-env-name QTOOL_DEAL_PROJECT_CHOICES_PATH
 ### 
 
@@ -69,6 +69,19 @@ YELLOW='\033[33m'
 BLUE='\033[34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+
+# 打开环境变量的那个文件（本方法只负责打开，省去用户自己找）
+open_sysenv_file() {
+    # 获取调用者的信息
+    # local caller_func=${FUNCNAME[1]}  # 调用者的函数名
+    # local caller_script=${BASH_SOURCE[1]}   # 调用者的脚本路径
+    # local caller_name="${caller_script##*/}"  # 调用者的脚本名（不含路径）：删除最后一个 / 之前的所有内容
+    # local caller_line=${BASH_LINENO[0]}  # 调用行号
+    # echo "调用信息: 函数[$caller_func] 脚本[$caller_script] 行[$caller_line]" >&2
+
+    # echo "正在执行命令：《${BLUE} sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open ${NC}》" >&2
+    sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open
+}
 
 # 更新tool处理的项目
 showProjectList() {
@@ -142,17 +155,10 @@ update_env_vars() {
         return 1
     fi
 
-    update_env_var "${ENV_NAME}" "${project_tool_file_path}"
+    sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "${ENV_NAME}" -envVariableValue "${project_tool_file_path}" --environment-file-auto-open false
     if [ $? != 0 ]; then
         return 1
     fi
-}
-
-update_env_var() {
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        return 1
-    fi
-    sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "$1" -envVariableValue "$2"
 }
 
 validate_choices_json() {
@@ -195,32 +201,42 @@ validate_choices_json() {
 }
 
 
-# 快速检查是否已设置环境变量
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name \"${ENV_NAME}\" --env-descript \"${ENV_DESCRIPT}\" --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --example-json-file \"${EXAMPLE_JSON_FILE}\" --default-output-filename \"${DEFAULT_OUTPUT_FILENAME}\" 》 "
+# 快速检查是否已设置环境变量，未设置则添加并占位，之后我们还会去修改占位为指定的值
+# 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
+# 注意： env_file_change.sh 的逻辑是添加环境变量前会先添加占位，然后才修改占位为指定的值。
+#                          进行环境变量的检查和占位的时候，不要立即自动打开环境变量的文件。
+#                          因为等一下可以用户还会选择修改环境变量的值。所以应该等到你决定完是否将环境变量的占位符更新为指定的值后才去打开。
+#                          否则如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
+# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name \"${ENV_NAME}\" --env-descript \"${ENV_DESCRIPT}\" --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --example-json-file \"${EXAMPLE_JSON_FILE}\" --default-output-filename \"${DEFAULT_OUTPUT_FILENAME}\" --environment-file-auto-open false 》 "
 checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh \
     --env-name "${ENV_NAME}" \
     --env-descript "${ENV_DESCRIPT}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
     --example-json-file "${EXAMPLE_JSON_FILE}" \
-    --default-output-filename "${DEFAULT_OUTPUT_FILENAME}"
+    --default-output-filename "${DEFAULT_OUTPUT_FILENAME}" \
+    --environment-file-auto-open false
 )
 if [ $? -ne 0 ]; then
     echo "${checkResult}"
+    open_sysenv_file
     exit 2
 fi
+# echo "${checkResult}" >&2   # 注释调试代码，用于查看调试信息
 ENV_NAME=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
-
 
 
 sh $qbase_homedir_abspath/env_variables/env_check.sh \
     --env-name "${ENV_NAME}" \
     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-    --env-var-type file
+    --env-var-type file \
+    --environment-file-auto-open false
 if [ $? != 0 ]; then
+    open_sysenv_file
     exit 1
 fi
 
 if [ "${ACTION}" == "check" ]; then
+    open_sysenv_file
     exit 0
 fi
 
@@ -231,12 +247,15 @@ tool_choice_file_path="${!ENV_NAME}"
 
 showProjectList "${tool_choice_file_path}"
 if [ $? != 0 ]; then
+    open_sysenv_file
     exit 1
 fi
 
 updateToolDealProject "${tool_choice_file_path}"
 if [ $? != 0 ]; then
+    open_sysenv_file
     exit 1
 fi
 
+open_sysenv_file
 sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh effective
