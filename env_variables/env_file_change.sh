@@ -223,27 +223,15 @@ if [ $? -ne 0 ]; then
 fi
 # echo "${checkResult}" >&2   # 注释调试代码，用于查看调试信息
 ENV_NAME=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
-
-
-sh $qbase_homedir_abspath/env_variables/env_check.sh \
-    --env-name "${ENV_NAME}" \
-    --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-    --env-var-type file \
-    --environment-file-auto-open false
-if [ $? != 0 ]; then
-    open_sysenv_file
-    exit 1
-fi
+tool_choice_file_path="${ENV_NAME}"
 
 if [ "${ACTION}" == "check" ]; then
     open_sysenv_file
     exit 0
 fi
 
-echo "validate_choices_json \"${!ENV_NAME}\""
-validate_choices_json "${!ENV_NAME}"
-
-tool_choice_file_path="${!ENV_NAME}"
+echo "validate_choices_json \"${tool_choice_file_path}\""
+validate_choices_json "${tool_choice_file_path}"
 
 showProjectList "${tool_choice_file_path}"
 if [ $? != 0 ]; then
