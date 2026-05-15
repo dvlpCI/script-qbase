@@ -97,10 +97,18 @@ showProjectList() {
 
         
         iChoiceProjectToolFilePath=$(echo "$iChoiceMap" | jq -r ".project_tool_file_path")
-        iChoiceProjectDirPath_rel_toolFile_dir=$(cat "${iChoiceProjectToolFilePath}" | jq -r ".project_path.home_path_rel_this_dir")
-        iChoiceProjectDirPath=$(sh $qbase_homedir_abspath/path_util/get_dirpath_by_relpath.sh --file_or_dir_path "${iChoiceProjectToolFilePath}" --rel_path "${iChoiceProjectDirPath_rel_toolFile_dir}")
+        #echo "iChoiceProjectToolFilePath=${iChoiceProjectToolFilePath}" >&2
 
+        if [ ! -f "${iChoiceProjectToolFilePath}" ]; then
+            iChoiceProjectDirPath="该项目指向的开启的菜单json文件不存在"
+        else
+            iChoiceProjectDirPath_rel_toolFile_dir=$(cat "${iChoiceProjectToolFilePath}" | jq -r ".project_path.home_path_rel_this_dir")
+            iChoiceProjectDirPath=$(sh $qbase_homedir_abspath/path_util/get_dirpath_by_relpath.sh --file_or_dir_path "${iChoiceProjectToolFilePath}" --rel_path "${iChoiceProjectDirPath_rel_toolFile_dir}")
+        fi
+        #echo "iChoiceProjectDirPath========${iChoiceProjectDirPath}" >&2
+        
         printf "${GREEN}%-2s%-20s(路径为 ${YELLOW}%s)${NC}\n" "${iChoiceOptionId}" "${iChoiceName}" "${iChoiceProjectDirPath}"
+        printf "${NC}                          %s${NC}\n" "${iChoiceProjectToolFilePath}"
     done
 }
 
@@ -155,7 +163,7 @@ update_env_vars() {
         return 1
     fi
 
-    sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "${ENV_NAME}" -envVariableValue "${project_tool_file_path}" --environment-file-auto-open false
+    sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "${CHOOSE_FOR_ENV_NAME}" -envVariableValue "${project_tool_file_path}" --environment-file-auto-open false
     if [ $? != 0 ]; then
         return 1
     fi
