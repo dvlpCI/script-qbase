@@ -24,7 +24,9 @@ log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 
 
 # 解析具名参数
 ENV_NAME=""
-ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE=""   # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
+
+ENV_VAR_REFERENCE_TPYE=""               # 可选：环境变量的类型：普通数值 / file:普通文件 / json-file:json文件
+ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE=""  # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
 
 CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
 while [ $# -gt 0 ]; do
@@ -45,6 +47,18 @@ while [ $# -gt 0 ]; do
                 shift 1  # 只消费当前参数
             else
                 CHOOSE_FROM_ENV_KEYS_FILE_PATH="$2"
+                shift 2
+            fi
+            ;;
+        --env-reference-type)
+            # 可选：环境变量的类型：普通数值 / file:普通文件 / json-file:json文件
+            # 允许空值或者不传：检查下一个参数是否为空或者是选项（以 - 开头）
+            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
+                # 没有提供值，或者下一个参数是选项，则设置为空
+                ENV_VAR_REFERENCE_TPYE=""
+                shift 1  # 只消费当前参数
+            else
+                ENV_VAR_REFERENCE_TPYE="$2"
                 shift 2
             fi
             ;;
@@ -80,6 +94,14 @@ if [ -n "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ] && [ ! -f "${CHOOSE_FROM_ENV_KEYS_
     exit 1
 fi
 
+if [ "${ENV_VAR_REFERENCE_TPYE}" == "json-file" ]; then
+    if [ -z "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
+        log_color_info "为json-file的时候建议传递有效的 --env-reference-json-file-example 参数值让用户知道该文件的参考结构"
+    fi
+fi
+
+    
+
 selected_env_key=""
 
 # 打开环境变量的那个文件（本方法只负责打开，省去用户自己找）
@@ -96,6 +118,14 @@ open_sysenv_file() {
 }
 
 showCustomMenuJsonExample() {
+    if [ "${ENV_VAR_REFERENCE_TPYE}" != "json-file" ]; then
+        return
+    fi
+
+    if [ -z "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
+        return
+    fi
+
     # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
     log_color_info "以下提供一个您的环境变量 ${ENV_NAME} 代表的json文件内容的参考结构："
     log_color_info "${BLUE}$(cat ${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE})${NC}"
@@ -420,9 +450,7 @@ else
     env_keys_file_path="${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
     validate_envs_choices_json "${env_keys_file_path}"
     if [ $? != 0 ]; then
-        if [ -n "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
-            showCustomMenuJsonExample
-        fi
+        showCustomMenuJsonExample
     fi
 
     get_selected_env_value_ForKeyOrChoose "${env_keys_file_path}" "${ENV_NAME}"
@@ -431,6 +459,18 @@ else
         exit 1
     fi
 fi
+
+log_color_info "${PURPLE}\n============== 对为环境变量 key 选中的值，进行结构检查 ==================${NC}"
+validate_envs_choices_json "${selected_value}"
+if [ $? != 0 ]; then
+    showCustomMenuJsonExample
+
+    log_color_info "${RED}你所有选择的${BLUE} ${selected_value} ${RED}不符合要求。如果是json文件则可能原因为该文件内的数据结构不对。${NC}"
+
+    open_sysenv_file
+    exit 1
+fi
+
 
 log_color_info "${PURPLE}\n============== 对为环境变量 key 选中的值，进行更新 ==================${NC}"
 # log_color_info "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey \"${selected_env_key}\" -envVariableValue \"${selected_value}\" --environment-file-auto-open false 》"
