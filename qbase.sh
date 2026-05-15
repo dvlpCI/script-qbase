@@ -436,19 +436,19 @@ elif [ "${firstArg}" == "check-version" ]; then
     done
     printf "\n"
 
-    # echo "正在执行命令...《 sh $package_remote_version_script -p \"${packageName}\" 》"
+    qian_log "正在执行命令...《 sh $package_remote_version_script -p \"${packageName}\" 》"
     sh "${package_remote_version_script}" -p "${packageName}"
 
 elif [ "${firstArg}" == "-path-eg" ]; then     # 查看快捷命令
     passwordStrings=("qian" "chaoqian" "lichaoqian")
     if ! printf "%s\n" "${passwordStrings[@]}" | grep -wq "$1"; then    # 检查是否不包含，另前面已执行 shift 1  去除前一个参数，所以当前的第二个参数是 $1
-        echo "${RED}查看${BLUE} -path-eg ${RED}需要在命令中携带正确的密码${NC}"
+        log_color_info "${RED}查看${BLUE} -path-eg ${RED}需要在命令中携带正确的密码${NC}"
         exit 1
     fi
 
     # categoryData=$(cat "$qpackageJsonF" | jq ".support_script_path")
     # qpackage_homedir_abspath=$(dirname "${qpackageJsonF}")
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType support_script_path 》"
+    qian_log "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType support_script_path 》"
     sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file "${qpackageJsonF}" -categoryType "support_script_path"
     # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData \"${categoryData}\" -relPath-baseDirPath \"${qpackage_homedir_abspath}\" 》"
     # sh $qbase_homedir_abspath/menu/qbrew_menu.sh -categoryData "${categoryData}" -relPath-baseDirPath "${qpackage_homedir_abspath}"
@@ -457,15 +457,15 @@ elif [ "${firstArg}" == "-path" ]; then
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg getPath $allArgsExceptFirstArg
 
 elif [ "${firstArg}" == "-quick-eg" ]; then     # 查看快捷命令
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType quickCmd 》"
+    qian_log "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType quickCmd 》"
     sh $qbase_homedir_abspath/menu/qbrew_menu.sh -file ${qpackageJsonF} -categoryType "quickCmd"
 
 elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     inputArgsErrorMessage=$(sh $qbase_homedir_abspath/foundation/checkInputArgsValid.sh $allArgsExceptFirstArg)
     if [ $? != 0 ]; then
-        echo "🚗🚗🚗🚗🚗🚗 如若后续执行发生错误，可能原因为: ${inputArgsErrorMessage}" >&2  # 使用>&2将echo输出重定向到标准错误，作为日志
+        log_color_info "🚗🚗🚗🚗🚗🚗 如若后续执行发生错误，可能原因为: ${inputArgsErrorMessage}"
     fi
-    # echo "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
+    qian_log "正在通过qbase调用快捷命令...《 sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg 》"
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 
 else
