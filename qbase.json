@@ -136,7 +136,7 @@
                     "key": "env_var_add_or_update_by_manual",
                     "des": "通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）",
                     "rel_path": "./env_variables/env_var_add_or_update_by_manual.sh",
-                    "example": "qbase -quick env_var_add_or_update_by_manual --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-qbase/example_env_keys_menu.json\" --default-output-filename example_env_keys_menu.json --action change --env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json"
+                    "example": "qbase -quick env_var_add_or_update_by_manual --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json"
                 },
                 {
                     "key": "env_check",

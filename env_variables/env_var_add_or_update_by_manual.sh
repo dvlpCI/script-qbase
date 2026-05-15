@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
  # @Description: 通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）
-# @FilePath: sh env_variables/env_var_add_or_update_by_manual.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH -choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json
+# @FilePath: sh env_variables/env_var_add_or_update_by_manual.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
@@ -38,13 +38,16 @@ while [ $# -gt 0 ]; do
             ENV_NAME="$2"
             shift 2
             ;;
-        --env-keys-file-path)
+        --choose-from-env-keys-file-path)
+            # 允许空值或者不传：检查下一个参数是否为空或者是选项（以 - 开头）
             if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --env-keys-file-path 需要指定一个文件路径" >&2
-                exit 1
+                # 没有提供值，或者下一个参数是选项，则设置为空
+                CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
+                shift 1  # 只消费当前参数
+            else
+                CHOOSE_FROM_ENV_KEYS_FILE_PATH="$2"
+                shift 2
             fi
-            CHOOSE_FROM_ENV_KEYS_FILE_PATH="$2"
-            shift 2
             ;;
         *)
             echo "未知参数: $1" >&2
@@ -54,15 +57,15 @@ while [ $# -gt 0 ]; do
 done
 
 # 检查必需参数
-if [ -z "${ENV_NAME}" ] || [ -z "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
-    echo "错误: 缺少必要参数（--env-name --choose-from-env-keys-file-path）" >&2
+if [ -z "${ENV_NAME}" ]; then
+    log_color_info "错误: 缺少必要参数（--env-name）"
     exit 1
 fi
 
 # CHOOSE_FROM_ENV_KEYS_FILE_PATH 允许为空，所以不检查是否为空
 # 但如果传了值且不是空字符串，则需要验证文件是否存在
 if [ -n "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ] && [ ! -f "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
-    echo "错误: CHOOSE_FROM_ENV_KEYS_FILE_PATH 不是有效文件: ${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" >&2
+    log_color_info "错误: CHOOSE_FROM_ENV_KEYS_FILE_PATH 不是有效文件: ${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
     exit 1
 fi
 
@@ -399,7 +402,6 @@ if [ -z "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
 else
     # 验证envkey文件是否符合结构
     env_keys_file_path="${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
-    echo "----------${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
     validate_envs_choices_json "${env_keys_file_path}"
 
     get_selected_env_value_ForKeyOrChoose "${env_keys_file_path}" "${ENV_NAME}"
