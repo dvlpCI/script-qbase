@@ -297,17 +297,12 @@ showEnvKeyList() {
 function get_selected_env_value_for_selected_env_key() {
     showEnvChoices "$json_file" "$selected_env_key"
     
-    local valid_option=false
-    while [ "$valid_option" = false ]; do        
-        selected_value=$(_selectEnvValueForKey "$json_file" "$selected_env_key")
-        if [ $? -ne 0 ] || [ -z "$selected_value" ]; then
-            log_color_info "未获取到有效的值，请重新选择。"
-        else
-            log_color_info "${PURPLE}为${BLUE} ${selected_env_key} ${PURPLE}选中的环境变量值为${BLUE} ${selected_value} ${PURPLE}。${NC}"
-            valid_option=true
-            break
-        fi
-    done
+    selected_value=$(_selectEnvValueForKey "$json_file" "$selected_env_key")
+    if [ $? -ne 0 ] || [ -z "$selected_value" ]; then
+        return 1
+    fi
+    
+    log_color_info "${PURPLE}为${BLUE} ${selected_env_key} ${PURPLE}选中的环境变量值为${BLUE} ${selected_value} ${PURPLE}。${NC}"
 }
 
 # 列出指定 env_key 的所有可选值
