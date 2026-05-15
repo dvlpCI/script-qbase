@@ -62,8 +62,8 @@ while [ $# -gt 0 ]; do
         --example-json-file) EXAMPLE_JSON_FILE="$2"; shift 2 ;;
         --default-output-filename) DEFAULT_OUTPUT_FILENAME="$2"; shift 2 ;;
         -envFileAutoOpen|--environment-file-auto-open) 
+            # 请避免多次打开同一文件（如环境变量文件）。因为在打开之后进行的修改，无法通过再次打开文件来才看到最新的内容，只能是之前没打开，然后编辑后打开才能看到最新的内容。
             # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
-            # 如 env_variables/env_file_change.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
             ENVIRONMENT_AUTO_OPEN=$2;
             shift 2
             ;;

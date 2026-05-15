@@ -6,7 +6,8 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-09 23:01:35
 # @FilePath: env_variables/env_var_effective_or_open.sh
-# @Description: 环境变量文件的操作(生效环境变量文件、打开环境变量文件)
+# @Description: 环境变量文件的操作(生效环境变量文件、打开环境变量文件) 
+# @Note:        请避免多次打开同一文件（如环境变量文件）。因为在打开之后进行的修改，无法通过再次打开文件来才看到最新的内容，只能是之前没打开，然后编辑后打开才能看到最新的内容。
 ###
 
 # 定义颜色常量
@@ -60,6 +61,7 @@ function effectiveEnvironmentVariables() {
         open_env_file "${envFile}"
     elif [ "${env_file_action}" == "effective_open" ]; then
         # 生效所有环境变量（subprocess 中 source，只影响子进程，不影响父 shell）
+        # 请避免多次打开同一文件（如环境变量文件）。因为在打开之后进行的修改，无法通过再次打开文件来才看到最新的内容，只能是之前没打开，然后编辑后打开才能看到最新的内容。
         source "${envFile}"
         open_env_file "${envFile}"
     elif [ "${env_file_action}" == "only_show_source_command" ]; then

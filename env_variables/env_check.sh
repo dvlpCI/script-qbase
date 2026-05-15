@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
             ;;
         -envFileAutoOpen|--environment-file-auto-open) 
             # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
-            # 如 env_variables/env_file_change.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
+            # 如 env_variables/env_var_add_or_update_by_manual.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
             ENVIRONMENT_AUTO_OPEN=$2;
             shift 2
             ;;

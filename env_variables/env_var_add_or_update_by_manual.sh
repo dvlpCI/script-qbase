@@ -4,8 +4,8 @@
  # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
- # @Description: 对指定环境变量进行设置(设置时候，先添加环境变量及其占位值，然后通过①从文件中选择[如果有传文件的话]或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）
-# @FilePath: sh env_variables/env_file_change.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-branch-json-file/test/tool_choice.json\" --default-output-filename example_env_keys_menu.json --action change --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json
+ # @Description: 通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）
+# @FilePath: sh env_variables/env_var_add_or_update_by_manual.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH -choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
@@ -24,12 +24,9 @@ log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 
 
 # 解析具名参数
 ENV_NAME=""
-ENV_DESCRIPT=""
 ENV_VAR_PLACEHOLDER=""
-EXAMPLE_JSON_FILE=""
 DEFAULT_OUTPUT_FILENAME=""
 
-ACTION=""
 CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -41,52 +38,12 @@ while [ $# -gt 0 ]; do
             ENV_NAME="$2"
             shift 2
             ;;
-        --env-descript)
+        --env-keys-file-path)
             if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --env-descript 需要指定一个值" >&2
-                exit 1
-            fi
-            ENV_DESCRIPT="$2"
-            shift 2
-            ;;
-        --env-var-placeholder)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --env-var-placeholder 需要指定一个值" >&2
-                exit 1
-            fi
-            ENV_VAR_PLACEHOLDER="$2"
-            shift 2
-            ;;
-        --example-json-file)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --example-json-file 需要指定一个文件路径" >&2
-                exit 1
-            fi
-            EXAMPLE_JSON_FILE="$2"
-            shift 2
-            ;;
-        --default-output-filename)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --default-output-filename 需要指定一个文件名" >&2
-                exit 1
-            fi
-            DEFAULT_OUTPUT_FILENAME="$2"
-            shift 2
-            ;;
-        --choose-from-env-keys-file-path)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --choose-from-env-keys-file-path 需要指定一个文件路径" >&2
+                echo "错误: --env-keys-file-path 需要指定一个文件路径" >&2
                 exit 1
             fi
             CHOOSE_FROM_ENV_KEYS_FILE_PATH="$2"
-            shift 2
-            ;;
-        --action)
-            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
-                echo "错误: --action 需要指定一个值" >&2
-                exit 1
-            fi
-            ACTION="$2"
             shift 2
             ;;
         *)
@@ -97,13 +54,8 @@ while [ $# -gt 0 ]; do
 done
 
 # 检查必需参数
-if [ -z "${ENV_NAME}" ] || [ -z "${EXAMPLE_JSON_FILE}" ]; then
-    echo "错误: 缺少必要参数（--env-name --example-json-file）" >&2
-    exit 1
-fi
-
-if [ -z "${ACTION}" ]; then
-    echo "错误: 缺少必要参数（--action）" >&2
+if [ -z "${ENV_NAME}" ] || [ -z "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
+    echo "错误: 缺少必要参数（--env-name --choose-from-env-keys-file-path）" >&2
     exit 1
 fi
 
@@ -431,35 +383,6 @@ _selectEnvValueForKey() {
     fi
 }
 
-# 快速检查是否已设置环境变量，未设置则添加并占位，之后我们还会去修改占位为指定的值
-# 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
-# 注意： env_file_change.sh 的逻辑是添加环境变量前会先添加占位，然后才修改占位为指定的值。
-#                          进行环境变量的检查和占位的时候，不要立即自动打开环境变量的文件。
-#                          因为等一下可以用户还会选择修改环境变量的值。所以应该等到你决定完是否将环境变量的占位符更新为指定的值后才去打开。
-#                          否则如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
-# echo "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name \"${ENV_NAME}\" --env-descript \"${ENV_DESCRIPT}\" --env-var-placeholder \"${ENV_VAR_PLACEHOLDER}\" --example-json-file \"${EXAMPLE_JSON_FILE}\" --default-output-filename \"${DEFAULT_OUTPUT_FILENAME}\" --environment-file-auto-open false 》 "
-# checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh \
-#     --env-name "${ENV_NAME}" \
-#     --env-descript "${ENV_DESCRIPT}" \
-#     --env-var-placeholder "${ENV_VAR_PLACEHOLDER}" \
-#     --example-json-file "${EXAMPLE_JSON_FILE}" \
-#     --default-output-filename "${DEFAULT_OUTPUT_FILENAME}" \
-#     --environment-file-auto-open false
-# )
-# if [ $? -ne 0 ]; then
-#     echo "${checkResult}"
-#     open_sysenv_file
-#     exit 2
-# fi
-# # echo "${checkResult}" >&2   # 注释调试代码，用于查看调试信息
-# ENV_NAME_VALUE=${checkResult} # 注意：此处一定要获取更新后的值，不然一定是执行 env_file_check_and_set.sh 前的旧值
-# log_color_info "您的环境变量值 ${ENV_NAME}=\"${ENV_NAME_VALUE}\""
-
-if [ "${ACTION}" == "check" ]; then
-    open_sysenv_file
-    exit 0
-fi
-
 # 如果没有提供文件来选择，则使用让用户手动输入的方式
 if [ -z "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
     selected_env_key=${ENV_NAME}
@@ -468,11 +391,11 @@ if [ -z "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
     if [ $? != 0 ]; then
         log_color_info "${inputResult}"
         open_sysenv_file
-        exit
+        exit 1
     fi
     
     selected_value=${inputResult}
-    log_color_info "${GREEN}您将使用输入的文件[${BLUE} ${inputResult} ${GREEN}]作为${BLUE} ${ENV_DESCRIPT} ${ENV_NAME} ${NC}的值${NC}"
+    log_color_info "${GREEN}您将使用输入的文件[${BLUE} ${inputResult} ${GREEN}]作为${BLUE} ${ENV_NAME} ${NC}的值${NC}"
 else
     # 验证envkey文件是否符合结构
     env_keys_file_path="${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
