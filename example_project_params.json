@@ -1,0 +1,75 @@
+{
+  "version": "package unknow version",
+  "buildNumber": "package unknow buildNumber",
+  "website": {
+    "doc_home": "http://wiki.xxx.com/zh/app/home",
+    "doc_version_plan": "https://www.baidu.com",
+    "doc_work_plan": "https://www.sina.com",
+    "doc_todo_bug": "https://www.weibo.com"
+  },
+  "local_website_service": {
+    "local_dir_path": "/Library/WebServer/Documents/",
+    "local_ip_address": "http://192.168.72.202/"
+  },
+  "project_path": {
+    "home_path_rel_this_dir": "../",
+    "other_path_rel_home": {
+      "code_home": "./beyond/",
+      "app_info_file": "./bulidScript/app_info.json",
+      "images": "/tsdemo/images/",
+      "code": "/tsdemo/lib/"
+    },
+    "pack_path_rel_home": {
+      "android_waitSignApk": {
+        "android_waitSignApkVersions_dir_RELATIVE_HOME": "../all_ipa_output/channel/",
+        "android_waitSignApkVersion_dir_RELATIVE_SELECTED_VERSION_DIR": "./jiagu/",
+        "android_resultSignApkVersion_dir_RELATIVE_SELECTED_VERSION_DIR": "./jiagu/signed",
+        "android_resultSignApkVersion_dir_backup_ABSOLUTE_PATH": "/Library/WebServer/Documents/channelApk/",
+        "android_resultSignApkVersionBackup_website_home": "http://192.168.72.202/channelApk/"
+      },
+      "android_sign_script": {
+        "android_sign_script_file_RELATIVE_HOME": "./bulidScript/sign_apk.sh",
+        "android_sign_properties_files_RELATIVE_HOME": [
+          "./bulidScript/sign_apk.properties",
+          "./bulidScript/sign_apk.properties"
+        ],
+        "keystore_file_RELATIVE_HOME": "./wish/android/bojue.jks",
+        "keystore_password": "bojue123456",
+        "key_alias": "key0",
+        "key_password": "bojue123456"
+      }
+    }
+  },
+  "branchJsonFile": {
+    "BRANCH_JSON_FILE_DIR_RELATIVE_PATH": "./example/featureBrances/"
+  },
+  "rebase": {
+    "rebaseFrom": "origin/main"
+  },
+  "jenkins": {
+    "jenkins_base": {
+      "JENKINS_BASE_URL": "http://192.168.72.202:8080",
+      "JENKINS_USER": "lichaoqian",
+      "JENKINS_API_TOKEN": "114a967bff5f8cc3a4803aea747f2ddec4"
+    },
+    "jenkins_input_option_param": [
+      {
+        "test": {
+          "PackageNetworkType": "测试",
+          "NotificatePeople": "all",
+          "MultiChannel": "false",
+          "UseDoKit": "true"
+        }
+      },
+      {
+        "dev_product": {
+          "BRANCH": "dev_publish_in",
+          "CHANGE_LOG": "版本更新",
+          "PgyerUploadUrlType": "先上传到临时地址，通过后再添加到最终地址",
+          "ShouldBackupToCos": "false",
+          "NotificatePeople": "all"
+        }
+      }
+    ]
+  }
+}

@@ -85,6 +85,8 @@ function updateEnvValueWithKey() {
                 echo "" >> "$envFile"
             fi
         fi
+        echo "" >> "$envFile"
+        echo "# ============== qbase 插入的环境变量 =============" >> "$envFile"
         
         # 添加新的环境变量
         # echo "正在执行命令(添加环境变量值):《 echo \"export $var_name=\"$var_value\"\" >> \"$envFile\" 》"

@@ -62,6 +62,9 @@ function effectiveEnvironmentVariables() {
         # 生效所有环境变量（subprocess 中 source，只影响子进程，不影响父 shell）
         source "${envFile}"
         open_env_file "${envFile}"
+    elif [ "${env_file_action}" == "only_show_source_command" ]; then
+        echo "source \"${envFile}\""
+        log_color_info "${YELLOW}温馨提示：请关闭当前终端窗口后，在终端执行《${BLUE} source \"${envFile}\" ${YELLOW}》使得环境变量生效。${NC}"
     else
         # 生效所有环境变量（subprocess 中 source，只影响子进程，不影响父 shell）
         source "${envFile}"

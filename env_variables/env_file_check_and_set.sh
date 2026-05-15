@@ -5,7 +5,7 @@
  # @LastEditors: dvlproad
  # @LastEditTime: 2024-12-09 22:56:13
 # @FilePath: env_variables/env_file_check_and_set.sh
-# @Description: 指向json文件的环境变量的检查工具。
+# @Description: 对指向json文件的环境变量进行检查和设置(设置时候，先添加环境变量及其占位值，然后通过①复制示例文件或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）。
 #   检查指定的环境变量是否已设置且指向存在的文件，
 #   若未设置则提供交互式引导（复制示例文件 / 手动输入路径）。
 #   调用方负责在设置完成后执行后续操作。
@@ -130,7 +130,7 @@ inputCustomJsonFilePath() {
         fi
 
         eval "${ENV_NAME}='${option}'"
-        log_color_info "${GREEN}您将使用输入的文件${BLUE} ${option} ${GREEN}作为${ENV_DESCRIPT}${NC}"
+        log_color_info "${GREEN}您将使用输入的文件[${BLUE} ${option} ${GREEN}]作为${BLUE} ${ENV_DESCRIPT} ${ENV_NAME} ${NC}的值${NC}"
         break
     done
 }

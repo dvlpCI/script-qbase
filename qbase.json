@@ -21,6 +21,18 @@
     ],
     "support_script_path": [
         {
+            "type": "value_create",
+            "des": "值的创建、获取、修改",
+            "values": [
+                {
+                    "des": "进行输入并获取输入的值（能够对输入值进行json等基本检查）",
+                    "key": "value_create_by_input",
+                    "rel_path": "./value_create/value_create_by_input.sh",
+                    "example": "qbase -quick value_create_by_input --input-descript 自定义命令菜单 --input-for json-file"
+                }
+            ]
+        },
+        {
             "type": "menu",
             "des": "json 菜单的值获取",
             "values": [
@@ -128,15 +140,15 @@
                 },
                 {
                     "key": "env_file_check_and_set",
-                    "des": "指向json文件的环境变量的检查及设置工具(不存在能够输出json示例，并能够让你选择①复制示例到当前目录 或者 ②手动输入已有 json 文件路径。选择后会更新环境变量的值)",
+                    "des": "对指向json文件的环境变量进行检查和设置(设置时候，先添加环境变量及其占位值，然后通过①复制示例文件或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）。(不存在能够输出json示例，并能够让你选择①复制示例到当前目录 或者 ②手动输入已有 json 文件路径。选择后会更新环境变量的值)",
                     "rel_path": "./env_variables/env_file_check_and_set.sh",
-                    "example": "sh ./env_variables/env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript 自定义命令菜单 --env-var-placeholder your_custom_menu_json_file --example-json-file ./menu/example/custom_command_menu_example.json --default-output-filename qbase_custom_menu.json"
+                    "example": "qbase -quick env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript 自定义命令菜单 --env-var-placeholder your_custom_menu_json_file --example-json-file ./menu/example/custom_command_menu_example.json --default-output-filename qbase_custom_menu.json"
                 },
                 {
                     "key": "env_file_change",
-                    "des": "指向文件的环境变量的交互式切换(添加环境变量前会先添加占位，然后才修改占位为指定的值)",
+                    "des": "对指定环境变量进行设置(设置时候，先添加环境变量及其占位值，然后通过①从文件中选择[如果有传文件的话]或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）",
                     "rel_path": "./env_variables/env_file_change.sh",
-                    "example": "qbase -quick env_file_change --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-branch-json-file/test/tool_choice.json\" --default-output-filename qtool_project_choice.json --action change --choose-for-env-name QTOOL_DEAL_PROJECT_CHOICES_PATH"
+                    "example": "qbase -quick env_file_change --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-qbase/example_env_keys_menu.json\" --default-output-filename example_env_keys_menu.json --action change --choose-from-env-keys-file-path $QTOOL_DEAL_PROJECT_CHOICES_PATH"
                 }
             ]
         },
