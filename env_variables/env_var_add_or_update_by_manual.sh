@@ -4,8 +4,8 @@
  # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
- # @Description: 通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）
-# @FilePath: sh env_variables/env_var_add_or_update_by_manual.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json
+ # @Description: 通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）。还可以给参考值，比如：如果是json-file的环境变量还可以指定 --env-reference-json-file-example
+# @FilePath: sh env_variables/env_var_add_or_update_by_manual.sh --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json --env-reference-type json-file --env-reference-json-file-example /Users/qian/Project/Github/script-qbase/example_project_params.json
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
