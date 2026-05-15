@@ -465,7 +465,7 @@ validate_envs_choices_json "${selected_value}"
 if [ $? != 0 ]; then
     showCustomMenuJsonExample
 
-    log_color_info "${RED}你所有选择的${BLUE} ${selected_value} ${RED}不符合要求。如果是json文件则可能原因为该文件内的数据结构不对。${NC}"
+    log_color_info "${RED}你所有选择的${BLUE} ${selected_value} ${RED}不符合要求，将不会对其更新为环境变量值。如要设置，请对其修复后再重新执行。附失败原因：如果是json文件则可能原因为该文件内的数据结构不对。${NC}"
 
     open_sysenv_file
     exit 1
