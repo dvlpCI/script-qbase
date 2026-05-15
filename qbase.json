@@ -148,7 +148,7 @@
                     "key": "env_file_change",
                     "des": "对指定环境变量进行设置(设置时候，先添加环境变量及其占位值，然后通过①从文件中选择[如果有传文件的话]或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）",
                     "rel_path": "./env_variables/env_file_change.sh",
-                    "example": "qbase -quick env_file_change --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-qbase/example_env_keys_menu.json\" --default-output-filename example_env_keys_menu.json --action change --choose-from-env-keys-file-path $QTOOL_DEAL_PROJECT_CHOICES_PATH"
+                    "example": "qbase -quick env_file_change --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-descript qtool可操作的项目操作列表 --env-var-placeholder your_project_choices_json_file --example-json-file \"/Users/qian/Project/Github/script-qbase/example_env_keys_menu.json\" --default-output-filename example_env_keys_menu.json --action change --choose-from-env-keys-file-path /Users/qian/Project/Github/script-qbase/example_env_keys_menu.json"
                 }
             ]
         },
