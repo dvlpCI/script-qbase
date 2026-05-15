@@ -140,15 +140,15 @@
                 },
                 {
                     "key": "env_check",
-                    "des": "环境变量的检查(变量是否设置、值指向的文件是否存在)",
+                    "des": "对任意环境变量进行检查和占位设置(不存在的时候，进行设置，添加环境变量及其占位值）环境变量的检查(变量是否设置、值指向的文件是否存在)",
                     "rel_path": "./env_variables/env_check.sh",
-                    "example": "qbase -quick env_check --target-env QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --placeholder your_project_choices_json_file"
+                    "example": "qbase -quick env_check --env-name QBASE_CUSTOM_MENU --env-var-placeholder your_qbase_custom_menu_json_file --env-var-type json-file --environment-file-auto-open true"
                 },
                 {
                     "key": "env_file_check_and_set",
                     "des": "对指向json文件的环境变量进行检查和设置(设置时候，先添加环境变量及其占位值，然后通过①复制示例文件或者②终端输入来指定占位值要修改为的指定值。终端输入也会有示例的演示输入）。(不存在能够输出json示例，并能够让你选择①复制示例到当前目录 或者 ②手动输入已有 json 文件路径。选择后会更新环境变量的值)",
                     "rel_path": "./env_variables/env_file_check_and_set.sh",
-                    "example": "qbase -quick env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript 自定义命令菜单 --env-var-placeholder your_custom_menu_json_file --example-json-file ./menu/example/custom_command_menu_example.json --default-output-filename qbase_custom_menu.json"
+                    "example": "qbase -quick env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript 自定义命令菜单 --env-var-placeholder your_custom_menu_json_file --env-reference-json-file-example ./menu/example/custom_command_menu_example.json --output-filename-if-copy qbase_custom_menu.json"
                 }
             ]
         },

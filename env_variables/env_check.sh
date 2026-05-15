@@ -4,8 +4,9 @@
  # @Date: 2023-04-23 13:18:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:45:11
- # @Description: 
+ # @Description: 对任意环境变量进行检查和占位设置(不存在的时候，进行设置，添加环境变量及其占位值）
 # @FilePath: env_variables/env_check.sh
+# @Example: sh env_variables/env_check.sh --env-name QBASE_CUSTOM_MENU --env-var-placeholder your_qbase_custom_menu_json_file --env-var-type json-file --environment-file-auto-open true
 ### 
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"

@@ -13,8 +13,8 @@
 #           --env-name QBASE_CUSTOM_MENU \
 #           --env-descript "自定义命令菜单" \
 #           --env-var-placeholder "your_custom_menu_json_file" \
-#           --example-json-file "./menu/example/custom_command_menu_example.json" \
-#           --default-output-filename "custom_menu.json"
+#           --env-reference-json-file-example "./menu/example/custom_command_menu_example.json" \
+#           --output-filename-if-copy "custom_menu.json"
 ###
 
 # 定义颜色常量
@@ -49,7 +49,7 @@ helpCmdStrings=("-help" "help")
 ENV_NAME=""
 ENV_DESCRIPT=""
 ENV_VAR_PLACEHOLDER=""
-EXAMPLE_JSON_FILE=""
+ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE=""
 DEFAULT_OUTPUT_FILENAME=""
 
 ENVIRONMENT_AUTO_OPEN=true
@@ -59,8 +59,8 @@ while [ $# -gt 0 ]; do
         --env-name) ENV_NAME="$2"; shift 2 ;;
         --env-descript) ENV_DESCRIPT="$2"; shift 2 ;;
         --env-var-placeholder) ENV_VAR_PLACEHOLDER="$2"; shift 2 ;;
-        --example-json-file) EXAMPLE_JSON_FILE="$2"; shift 2 ;;
-        --default-output-filename) DEFAULT_OUTPUT_FILENAME="$2"; shift 2 ;;
+        --env-reference-json-file-example) ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE="$2"; shift 2 ;;
+        --output-filename-if-copy) DEFAULT_OUTPUT_FILENAME="$2"; shift 2 ;;
         -envFileAutoOpen|--environment-file-auto-open) 
             # 请避免多次打开同一文件（如环境变量文件）。因为在打开之后进行的修改，无法通过再次打开文件来才看到最新的内容，只能是之前没打开，然后编辑后打开才能看到最新的内容。
             # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
@@ -71,7 +71,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "${ENV_NAME}" ] || [ -z "${EXAMPLE_JSON_FILE}" ]; then
+if [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
     echo "错误: 缺少必要参数（--env-name --example-json-file）" >&2
     exit 1
 fi
@@ -86,7 +86,7 @@ ENV_DESCRIPT="${ENV_DESCRIPT:-${ENV_NAME}}"
 
 showCustomMenuJsonExample() {
     log_color_info "以下提供一个您的环境变量 ${ENV_NAME} 表示的 ${ENV_DESCRIPT} 的json文件内容的参考结构："
-    jsonFileExamplePath="${EXAMPLE_JSON_FILE}"
+    jsonFileExamplePath="${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}"
     log_color_info "${BLUE}$(cat ${jsonFileExamplePath})${NC}"
 }
 
@@ -155,7 +155,7 @@ checkValueCanbeUse() {
 
 # 复制示例文件到当前目录
 handleCopyExampleToCurrentDir() {
-    exampleFilePath="${EXAMPLE_JSON_FILE}"
+    exampleFilePath="${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}"
     targetFile="$(pwd)/${DEFAULT_OUTPUT_FILENAME}"
 
     if [ -f "${targetFile}" ]; then

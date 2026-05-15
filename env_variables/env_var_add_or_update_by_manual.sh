@@ -24,8 +24,7 @@ log_color_info() { printf "%b\n" "$1" >&2; }	# 日志含颜色：`%b` 会解释 
 
 # 解析具名参数
 ENV_NAME=""
-ENV_VAR_PLACEHOLDER=""
-DEFAULT_OUTPUT_FILENAME=""
+ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE=""   # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
 
 CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
 while [ $# -gt 0 ]; do
@@ -49,6 +48,18 @@ while [ $# -gt 0 ]; do
                 shift 2
             fi
             ;;
+        --env-reference-json-file-example)
+            # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
+            # 允许空值或者不传：检查下一个参数是否为空或者是选项（以 - 开头）
+            if [ -z "$2" ] || [[ "$2" =~ ^- ]]; then
+                # 没有提供值，或者下一个参数是选项，则设置为空
+                ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE=""
+                shift 1  # 只消费当前参数
+            else
+                ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE="$2"
+                shift 2
+            fi
+            ;;
         *)
             echo "未知参数: $1" >&2
             exit 1
@@ -65,7 +76,7 @@ fi
 # CHOOSE_FROM_ENV_KEYS_FILE_PATH 允许为空，所以不检查是否为空
 # 但如果传了值且不是空字符串，则需要验证文件是否存在
 if [ -n "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ] && [ ! -f "${CHOOSE_FROM_ENV_KEYS_FILE_PATH}" ]; then
-    log_color_info "错误: CHOOSE_FROM_ENV_KEYS_FILE_PATH 不是有效文件: ${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
+    log_color_info "错误: --choose-from-env-keys-file-path 的参数值不是有效文件: ${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
     exit 1
 fi
 
@@ -84,6 +95,11 @@ open_sysenv_file() {
     sh $qbase_homedir_abspath/env_variables/env_var_effective_or_open.sh open
 }
 
+showCustomMenuJsonExample() {
+    # 可选：环境变量是json文件才有用。代表json文件内容的的参考示例
+    log_color_info "以下提供一个您的环境变量 ${ENV_NAME} 代表的json文件内容的参考结构："
+    log_color_info "${BLUE}$(cat ${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE})${NC}"
+}
 
 # 验证 envs_choices 的 JSON 格式（验证顶层结构）
 validate_envs_choices_json() {
@@ -92,14 +108,14 @@ validate_envs_choices_json() {
     # 检查文件是否存在
     if [ ! -f "$file_path" ]; then
         printf "${RED} ${file_path} 文件不存在，请检查。${NC}\n"
-        exit 1
+        return 1
     fi
 
     # 验证是否为有效的 JSON 格式
     jq '.' "$file_path" > /dev/null 2>&1
     if [ $? != 0 ]; then
         printf "${RED}${file_path} 不是有效的 JSON 格式，请检查。${NC}\n"
-        exit 1
+        return 1
     fi
 
     # 检查是否有 envs_choices 字段且为数组
@@ -107,7 +123,7 @@ validate_envs_choices_json() {
     has_envs_choices=$(jq 'if (.envs_choices? | type) == "array" then true else false end' "$file_path")
     if [ "${has_envs_choices}" != "true" ]; then
         printf "${RED}${file_path} 中缺少 .envs_choices 字段或不是数组格式，请检查。${NC}\n"
-        exit 1
+        return 1
     fi
 
     # 检查 envs_choices 数组是否为空
@@ -115,7 +131,7 @@ validate_envs_choices_json() {
     envs_choices_count=$(jq '.envs_choices | length' "$file_path")
     if [ "${envs_choices_count}" -eq 0 ]; then
         printf "${RED}${file_path} 中的 .envs_choices 数组为空，请添加环境变量配置后再试。${NC}\n"
-        exit 1
+        return 1
     fi
 
     # 遍历验证每个 envs_choices 项
@@ -125,7 +141,7 @@ validate_envs_choices_json() {
         env_key=$(jq -r ".envs_choices[${i}].env_key" "$file_path")
         if [ -z "${env_key}" ] || [ "${env_key}" == "null" ]; then
             printf "${RED}${file_path} 格式错误：第 $((i+1)) 条缺少 env_key 字段${NC}\n"
-            exit 1
+            return 1
         fi
 
         # 检查是否有 env_choices（可选，如果有则验证其格式）
@@ -138,7 +154,7 @@ validate_envs_choices_json() {
             is_array=$(jq "if (.envs_choices[${i}].env_choices | type) == \"array\" then true else false end" "$file_path")
             if [ "${is_array}" != "true" ]; then
                 printf "${RED}${file_path} 格式错误：env_key '${env_key}' 的 .env_choices 不是数组格式${NC}\n"
-                exit 1
+                return 1
             fi
             
             # 可选：检查 env_choices 数组是否为空（只警告，不退出）
@@ -403,6 +419,11 @@ else
     # 验证envkey文件是否符合结构
     env_keys_file_path="${CHOOSE_FROM_ENV_KEYS_FILE_PATH}"
     validate_envs_choices_json "${env_keys_file_path}"
+    if [ $? != 0 ]; then
+        if [ -n "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
+            showCustomMenuJsonExample
+        fi
+    fi
 
     get_selected_env_value_ForKeyOrChoose "${env_keys_file_path}" "${ENV_NAME}"
     if [ $? != 0 ]; then
