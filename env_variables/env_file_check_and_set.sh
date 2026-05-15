@@ -193,8 +193,8 @@ setupEnvVar() {
         case $yn in
             y|Y)
                 # 添加环境变量
-                # 正确做法：让 env_var_add_or_update.sh 写入 .zshrc，然后通过 stdout 把路径传出去
-                sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey "${ENV_NAME}" -envVariableValue "${targetFile}"
+                # 正确做法：让 env_var_2add_or_update.sh 写入 .zshrc，然后通过 stdout 把路径传出去
+                sh $qbase_homedir_abspath/env_variables/env_var_2add_or_update.sh -envVariableKey "${ENV_NAME}" -envVariableValue "${targetFile}"
                 if [ $? -ne 0 ]; then
                     log_color_info "${RED}设置环境变量 ${ENV_NAME} 失败，请检查。${NC}"
                     exit 2

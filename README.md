@@ -47,6 +47,140 @@ brew upgrade qbase
 答案见：[https://dvlproad.github.io/代码管理/库管理/homebrew](https://dvlproad.github.io/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86/%E5%BA%93%E7%AE%A1%E7%90%86/homebrew)
 
 
+
+## 二、必须了解的数据结构
+
+### 1、环境变量集合/菜单 [example_env_keys_menu.json](example_env_keys_menu.json)
+
+```json
+{
+  "using_choice_id": "此字段暂时无用",
+  "envs_choices": [
+    {
+      "id": "default",
+      "env_key": "QTOOL_DEAL_PROJECT_CHOICES_PATH"
+    },
+    {
+      "env_key": "QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH",
+      "env_des": "操作项目时候使用的项目配置信息用哪个/你想操作哪个项目",
+      "env_choices": [
+        {
+          "env_des": "qtool的工程",
+          "env_value": "/Users/lichaoqian/Project/CQCI/script-branch-json-file/test/tool_input.json"
+        },
+        {
+          "env_name": "获取分支信息的工程",
+          "env_value": "/Users/lichaoqian/Project/CQCI/AutoPackage-CommitInfo/test/tool_input.json"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 2、命令集合/菜单 [custom_command_menu_example.json](menu/example/custom_command_menu_example.json)
+
+详见：[menu/qbrew_menu.md](menu/qbrew_menu.md) 中的介绍
+
+```json
+{
+    "custom": [
+        {
+            "type": "command",
+            "des": "自定义命令的操作",
+            "values": [
+                {
+                    "des": "增加自定义的命令",
+                    "key": "add custom command",
+                    "command": "open $QBASE_CUSTOM_MENU"
+                }
+            ]
+        },
+        {
+            "type": "normal",
+            "des": "自定义要执行的普通脚本",
+            "values": [
+                {
+                    "des": "输出当前目录下的文件",
+                    "key": "ls",
+                    "command": "ls"
+                },
+                {
+                    "des": "查看 ~/.ssh 文件夹",
+                    "key": "open ~/.ssh",
+                    "command": "open ~/.ssh"
+                },
+                {
+                    "des": "查看 homebrew 的 Taps 文件夹",
+                    "key": "open /opt/homebrew/Library",
+                    "command": "open /opt/homebrew/Library"
+                }
+            ]
+        },
+        {
+            "type": "usual",
+            "des": "自定义要执行的日常脚本",
+            "values": [
+                {
+                    "des": "打开上传包的网站(pgyer)",
+                    "key": "打开上传包的网站(pgyer)",
+                    "command": "open https://www.pgyer.com/"
+                }
+            ]
+        }
+    ]
+}
+```
+
+### 3、命令事项的演示 [qbrew_menu_example.json](menu/example/qbrew_menu_example.json)
+
+详见：[menu/qbrew_menu.md](menu/qbrew_menu.md) 中的介绍
+
+```json
+{
+    "action_sript_file_rel_this_dir": "../qbrew_menu.sh",
+    "action_sript_file_des": "打印json文件里的指定的分类为菜单，供用户选择，并在用户选择后了分类里的事项后，立即执行该事项command字段指定的命令",
+    "actions_envs_des": "要打印的菜单分类",
+    "actions_envs_values": [
+        {
+            "env_id": "menu_category",
+            "env_name": "",
+            "env_action_ids": [
+                "-file",
+                "-categoryType",
+                "-execChoosed"
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "-file",
+            "des": "对哪个json文件进行操作",
+            "actionType": "fixed",
+            "resultForParam": "-file",
+            "fixedType": "file-path-rel-this-file",
+            "fixedValue": "./custom_command_menu_example.json"
+        },
+        {
+            "id": "-categoryType",
+            "des": "可选?：对该文件的哪个分类进行操作",
+            "actionType": "fixed",
+            "resultForParam": "-categoryType",
+            "fixedType": "fixed-value",
+            "fixedValue": "custom"
+        },
+        {
+            "id": "-execChoosed",
+            "des": "可选：是否直接执行选中的命令，true:是",
+            "actionType": "fixed",
+            "resultForParam": "-execChoosed",
+            "fixedType": "fixed-value",
+            "fixedValue": "true"
+        }
+    ]
+}
+```
+
 ## 三、命令用法
 
 | 命令 | 说明 |

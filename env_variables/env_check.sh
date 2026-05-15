@@ -36,7 +36,7 @@ while [ $# -gt 0 ]; do
             ;;
         -envFileAutoOpen|--environment-file-auto-open) 
             # 抑制 open（打开编辑器）：避免多次打开的时候，看不到最后一次的最新内容，而是第一次打开时候的内容
-            # 如 env_variables/env_var_add_or_update_by_manual.sh 前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
+            # 如添加前会先添加占位，然后才修改占位，如果占位时候就打开，则修改完占位后打开的看到还是旧值，因为根本没再打开
             ENVIRONMENT_AUTO_OPEN=$2;
             shift 2
             ;;
@@ -84,8 +84,8 @@ addEnvPlaceHolderForKey() {
     log_color_info "${BLUE}温馨提示：如果已修改却未生效，请手动在终端执行 source 命令来生效所修改的环境变量${NC}"
 
     envFileAutoOpen=$3
-    # echo "正在执行命令(更新环境变量):《 sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh -envVariableKey \"${envKey}\" -envVariableValue \"${envPlaceHolder}\" -envFileAutoOpen ${envFileAutoOpen} 》"
-    sh $qbase_homedir_abspath/env_variables/env_var_add_or_update.sh \
+    # echo "正在执行命令(更新环境变量):《 sh $qbase_homedir_abspath/env_variables/env_var_2add_or_update.sh -envVariableKey \"${envKey}\" -envVariableValue \"${envPlaceHolder}\" -envFileAutoOpen ${envFileAutoOpen} 》"
+    sh $qbase_homedir_abspath/env_variables/env_var_2add_or_update.sh \
         -envVariableKey "${envKey}" \
         -envVariableValue "${envPlaceHolder}" \
         -envFileAutoOpen ${envFileAutoOpen}
