@@ -71,8 +71,13 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "${ENV_NAME}" ] || [ -z "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
-    echo "错误: 缺少必要参数（--env-name --example-json-file）" >&2
+if [ -z "${ENV_NAME}" ]; then
+    echo "错误: 缺少必要参数（--env-name）" >&2
+    exit 1
+fi
+
+if [ -z "${ENV_VAR_REFERENCE_JSON_FILE_EXAMPLE}" ]; then
+    echo "错误: 缺少必要参数（--example-json-file）" >&2
     exit 1
 fi
 

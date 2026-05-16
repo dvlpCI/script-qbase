@@ -4,7 +4,7 @@
  # @Date: 2023-04-23 13:19:33
  # @LastEditors: dvlproad
  # @LastEditTime: 2023-06-14 10:48:11
- # @Description: 通过人工交互方式对指定环境变量进行修改(方式 ①从文件中选择[如果有传文件的话]或者 ②从终端输入）
+ # @Description: 示例
 ### 
 
 # 定义颜色常量
