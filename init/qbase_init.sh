@@ -205,7 +205,7 @@ copy_example_file() {
             local bak_path="${dest_path}.bak.${timestamp}"
             cp "${dest_path}" "${bak_path}"
             log_info "📦 旧文件已备份: ${bak_path}"
-            log_info "   可打开对照数据结构变化： diff ${bak_path} ${dest_path}"
+            # 可打开对照数据结构变化： diff ${bak_path} ${dest_path}
         fi
 
         cp "${src_path}" "${dest_path}"
@@ -258,7 +258,7 @@ if [ "${examples_count}" -gt 0 ]; then
 fi
 
 log_color_info ""
-log_info "📝 后续可扩展 init_manifest.json 来声明更多示例文件"
+# 📝 后续可扩展 init_manifest.json 来声明更多示例文件
 
 write_version_file
 
