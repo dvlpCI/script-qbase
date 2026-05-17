@@ -133,12 +133,6 @@
                     "example": "qbase -quick env_var_get_by_manual --env-name QTOOL_DEAL_PROJECT_PARAMS_FILE_PATH --env-keys-file init/env_keys_menu.json"
                 },
                 {
-                    "key": "config_env_keys_menu",
-                    "des": "环境变量集合/菜单的示例文件路径（只读 ~/.qbase/config/ 本地副本，不存在则提示先执行 qbase init）",
-                    "rel_path": "./init/env_keys_menu.json",
-                    "example": "qbase -path config_env_keys_menu"
-                },
-                {
                     "key": "env_var_add_or_update",
                     "des": "环境变量值的更新(没有该key则创建，已有该key则是更新，来避免重复多行)",
                     "rel_path": "./env_variables/env_var_2add_or_update.sh",

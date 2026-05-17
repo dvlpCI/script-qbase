@@ -357,16 +357,16 @@ if [ "${packagePathAction}" == "execCmd" ]; then
         sh ${quickCmd_script_path} ${argsString}
     fi
 else
-    # init/ 目录下的文件是用户配置文件，只返回 ~/.qbase/config/ 的本地副本
+    # init/ 目录下的文件是用户配置文件，只返回 ~/.${packageArg}/config/ 的本地副本
     # 用户可用 qbase -path config_env_keys_menu 获取配置文件路径
     if [[ "$quickCmd_script_path" == *"/init/"* ]]; then
         local_filename=$(basename "$quickCmd_script_path")
-        local_path="${HOME}/.qbase/config/${local_filename}"
+        local_path="${HOME}/.${packageArg}/config/${local_filename}"
         if [ -f "${local_path}" ]; then
             echo "$local_path"
             exit 0
         fi
-        echo "${RED}Error: 未找到本地配置文件 ${local_path}，请先执行 ${BLUE}qbase init${RED} 初始化本地配置。${NC}" >&2
+        echo "${RED}Error: 未找到本地配置文件 ${local_path}，请先执行 ${BLUE}${packageArg} init${RED} 初始化本地配置。${NC}" >&2
         exit 1
     fi
     echo "$quickCmd_script_path"

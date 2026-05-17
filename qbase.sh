@@ -363,7 +363,8 @@ show_usage() {
     # printf "\n"
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     printf "%-20s %s\n" "Commands:" ""
-    printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ init" "初始化本地工作目录（~/.qbase/），用户配置/数据/缓存/临时文件均存放于此，避免被 brew upgrade 覆盖"
+    # init 命令保留但不在 help 中展示，仅供上层工具（如 qtool）内部调用
+    # printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ init" "初始化本地工作目录（~/.qbase/），用户配置/数据/缓存/临时文件均存放于此，避免被 brew upgrade 覆盖"
     printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ custom" "执行自定义的命令菜单（若不存在会引导添加）"
     printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ check-version" "检查/更新 qbase 的远程版本"
     printf "\n"
@@ -480,11 +481,8 @@ elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
     sh $qbase_homedir_abspath/qbase_quickcmd.sh ${qtarget_homedir_abspath} $packageArg execCmd $allArgsExceptFirstArg
 
 else
+    # qbase 是基础库，自身不需要 init（init 是给依赖 qbase 的上层工具如 qtool 使用的）
     echo "${qbase_latest_version}"
-    if [ ! -d "${HOME}/.qbase" ]; then
-        echo ""
-        echo "${GREEN}💡 首次使用？运行 ${BLUE}qbase init${GREEN} 初始化本地工作目录（~/.qbase/），用户配置/数据/缓存/临时文件均存放于此，避免被 brew upgrade 覆盖。${NC}"
-    fi
 fi
 
 
