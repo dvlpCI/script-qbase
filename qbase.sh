@@ -21,6 +21,9 @@ BOLD='\033[1m'
 UNDERLINE='\033[4m'
 RESET='\033[0m'
 
+# 用户本地数据目录（XDG 更标准，但 macOS 下不太常用，~/.qbase/ 更符合 macOS 用户的直觉）
+QBASE_USER_HOME_DEFAULT="${HOME}/.qbase"
+
 # 获取脚本自身目录（用于后续其他命令）
 CurrentDIR_Script_Absolute="$(cd "$(dirname "$0")" && pwd)"
 # 获取项目根目录（脚本所在目录）
@@ -360,6 +363,7 @@ show_usage() {
     # printf "\n"
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     printf "%-20s %s\n" "Commands:" ""
+    printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ init" "初始化本地工作目录（~/.qbase/），用户配置/数据/缓存/临时文件均存放于此，避免被 brew upgrade 覆盖"
     printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ custom" "执行自定义的命令菜单（若不存在会引导添加）"
     printf "${INDENT}${GREEN}%-20s ${NC}%s\n" "+ check-version" "检查/更新 qbase 的远程版本"
     printf "\n"
@@ -402,6 +406,13 @@ done
 
 if echo "${versionCmdStrings[@]}" | grep -wq "${firstArg}" &>/dev/null; then
     echo "${qbase_latest_version}"
+
+elif [ "${firstArg}" == "init" ]; then
+    sh "${qbase_homedir_abspath}/init/qbase_init.sh" \
+        --project-name "qbase" \
+        --version "${qbase_latest_version}" \
+        --manifest "${qbase_homedir_abspath}/init/init_manifest.json" \
+        ${allArgsExceptFirstArg}
 
 elif [ "${firstArg}" == "custom" ]; then
     sh $qbase_homedir_abspath/qbase_custom.sh
@@ -470,6 +481,10 @@ elif [ "${firstArg}" == "-quick" ]; then        # 使用快捷命令
 
 else
     echo "${qbase_latest_version}"
+    if [ ! -d "${HOME}/.qbase" ]; then
+        echo ""
+        echo "${GREEN}💡 首次使用？运行 ${BLUE}qbase init${GREEN} 初始化本地工作目录（~/.qbase/），用户配置/数据/缓存/临时文件均存放于此，避免被 brew upgrade 覆盖。${NC}"
+    fi
 fi
 
 

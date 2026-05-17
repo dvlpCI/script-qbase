@@ -1,0 +1,13 @@
+{
+    "project_name": "qbase",
+    "description": "qbase 基础库的初始化配置",
+    "dirs": ["config", "data", "cache", "tmp"],
+    "examples": [
+        {
+            "source": "env_keys_menu.json",
+            "target_subdir": "config",
+            "description": "环境变量集合/菜单的示例文件"
+        }
+    ],
+    "note": "init/ 目录下不再嵌套子目录，示例文件和清单放在同一层。后续若单项目示例文件超过 10 个，可考虑增设 data/ 子目录"
+}

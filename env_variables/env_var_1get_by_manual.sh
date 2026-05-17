@@ -31,7 +31,8 @@ log_color_info2() {
 ENV_NAME=""
 CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
 
-ENV_KEYS_JSON_FILE_EXAMPLE=${qbase_homedir_abspath}/example_env_keys_menu.json
+# 本脚本的 --env-keys-file 参数应传 qbase -path config_env_keys_menu 的结果：
+ENV_KEYS_JSON_FILE_EXAMPLE="${HOME}/.qbase/config/env_keys_menu.json"
 
 CHOOSE_FROM_ENV_KEYS_FILE_PATH=""
 while [ $# -gt 0 ]; do

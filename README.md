@@ -48,9 +48,24 @@ brew upgrade qbase
 
 
 
-## 二、必须了解的数据结构
+## 二、本地文件存放约定
 
-### 1、环境变量集合/菜单 [example_env_keys_menu.json](example_env_keys_menu.json)
+脚本执行过程中产生的用户数据文件统一存放在 `~/.qbase/` 目录下，按类型划分子目录：
+
+| 目录 | 用途 | 特性 |
+|------|------|------|
+| `~/.qbase/config/` | 用户配置文件（如 `qbase_custom_menu.json`、项目参数等） | 用户手动创建/修改，持久保留 |
+| `~/.qbase/data/` | 脚本运行产生的数据文件（如 branchMaps json） | 由脚本自动创建，可长期保留 |
+| `~/.qbase/cache/` | 可丢弃的缓存文件 | 删除后脚本会自动重新生成 |
+| `~/.qbase/tmp/` | 临时文件 | 脚本运行中产生的中间文件，可随时清理 |
+
+> 备注：XDG Base Directory（`~/.config/`、`~/.local/share/`、`~/.cache/`）是更标准的方案，但 macOS 下不常用，`~/.qbase/` 更符合 macOS 用户的直觉。各脚本也可通过环境变量覆盖默认路径。
+>
+> 执行 `qbase --help` 或直接输入 `qbase` 可查看 init 提示。
+
+## 三、必须了解的数据结构
+
+### 1、环境变量集合/菜单 [init/env_keys_menu.json](init/env_keys_menu.json)
 
 ```json
 {
