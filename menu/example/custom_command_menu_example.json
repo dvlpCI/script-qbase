@@ -12,6 +12,28 @@
             ]
         },
         {
+            "type": "daily_use",
+            "des": "日常使用的操作",
+            "values": [
+                {
+                    "des": "打开 dvlproadHexo(自动开终端并激活窗口到最前)",
+                    "key": "打开 dvlproadHexo",
+                    "command": "cd /Users/qian/Project/dvlproadHexo && hexo new post --path AI/AIGC/反推 \"反推\"",
+                    "openInNewTab": "type"
+                },
+                {
+                    "des": "修改 cc-connect 的项目",
+                    "key": "修改 cc-connect 的项目",
+                    "command": "open ~/.cc-connect/config.toml"
+                },
+                {
+                    "des": "打开 open design 及其使用手册(自动开终端并激活窗口到最前)",
+                    "key": "打开 open design 及其使用手册",
+                    "command": "open https://dvlproad.github.io/AI/AI-%E2%91%A1Open%20Design/ && osascript -e 'tell application \"Terminal\" to do script \"cd ~/Project/AI/open-design && pnpm tools-dev run web\"' -e 'tell application \"Terminal\" to activate'"
+                }
+            ]
+        },
+        {
             "type": "normal",
             "des": "自定义要执行的普通脚本",
             "values": [
@@ -41,14 +63,9 @@
                     "command": "open ~/Project/"
                 },
                 {
-                    "des": "查看 pp 文件(路径的斜杠，通过将整个路径包在\"\"中)",
-                    "key": "goPP(方法1)",
-                    "command": "open \"~/Library/MobileDevice/Provisioning Profiles/\""
-                },
-                {
-                    "des": "查看 pp 文件(路径的斜杠，通过再加个斜杠来转义)",
-                    "key": "goPP(方法2)",
-                    "command": "open ~/Library/MobileDevice/Provisioning\\ Profiles/"
+                    "des": "查看 pp 文件(路径有空格，所以将整个路径包在\"\"中)",
+                    "key": "go Provisioning Profiles",
+                    "command": "open \"~/Library/Developer/Xcode/UserData/Provisioning Profiles/\""
                 },
                 {
                     "des": "查看压缩包结构，避免使用系统解压工具导致被默认解压到与压缩包同名的文件夹内，而导致看不到原本内容是对文件夹内的进行压缩，还是对文件夹进行压缩",

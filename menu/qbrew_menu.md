@@ -22,6 +22,8 @@ sh xxx.sh -file qbase.json -categoryType support_script_path -execChoosed true
 | `-categoryType` | 对该文件的哪个分类进行操作 | ❌ |
 | `-execChoosed` | 是否直接执行选中的命令，true:是 | ❌ |
 
+> 关于 `-execChoosed` 后命令在何处执行（当前终端 / 新标签页 / 可编辑），详见 [new_terminal_tab_approaches.md](new_terminal_tab_approaches.md)
+
 
 
 ## 一、认识菜单的结构及两种用途

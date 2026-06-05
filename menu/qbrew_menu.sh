@@ -147,6 +147,44 @@ versionCmdStrings=("--version" "-version" "-v" "version")
 qtoolQuickCmdStrings=("cz") # qtool 支持的快捷命令
 
 
+# 在 Terminal.app 的新标签页中直接执行命令
+execute_in_new_terminal_tab() {
+    local command="$1"
+    local escaped="${command//\\/\\\\}"
+    escaped="${escaped//\"/\\\"}"
+
+    osascript \
+        -e 'tell application "Terminal"' \
+        -e '    activate' \
+        -e '    if (count of windows) is 0 then' \
+        -e "        do script \"${escaped}\"" \
+        -e '    else' \
+        -e "        do script \"${escaped}\" in window 1" \
+        -e '    end if' \
+        -e 'end tell' > /dev/null
+}
+
+# 在 Terminal.app 的新标签页中输入命令（print -z），用户编辑后按 Enter 执行，无需 Ctrl+C 取消
+type_in_new_terminal_tab() {
+    local command="$1"
+    local tmpfile
+    tmpfile=$(mktemp /tmp/qbase_XXXXXXXX) || return 1
+    printf '%s' "$command" > "$tmpfile"
+
+    osascript \
+        -e 'tell application "Terminal"' \
+        -e '    activate' \
+        -e "    set cmd to do shell script \"cat ${tmpfile}; rm ${tmpfile}\"" \
+        -e '    set fullCmd to "print -z " & quoted form of cmd' \
+        -e '    if (count of windows) is 0 then' \
+        -e '        do script fullCmd' \
+        -e '    else' \
+        -e '        do script fullCmd in window 1' \
+        -e '    end if' \
+        -e 'end tell' > /dev/null
+}
+
+
 # 工具选项
 tool_menu() {
     categoryData=$1
@@ -242,7 +280,19 @@ deal_for_choose() {
     if [ -n "${execChoosed}" ] && [ "${execChoosed}" == "true" ]; then
         tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
-        eval "${tCatalogOutlineCommand}"
+
+        tCatalogOutlineOpenInNewTab=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".openInNewTab")
+        if [ "${tCatalogOutlineOpenInNewTab}" == "type" ]; then
+            type_in_new_terminal_tab "${tCatalogOutlineCommand}"
+        elif [ "${tCatalogOutlineOpenInNewTab}" == "execute" ] || [ "${tCatalogOutlineOpenInNewTab}" == "true" ]; then
+            execute_in_new_terminal_tab "${tCatalogOutlineCommand}"
+        else
+            if [[ "$tCatalogOutlineCommand" =~ (^|[;|&])[[:space:]]*echo[[:space:]]+ ]]; then
+                # 如果 command 字段中包含 echo，则额外提示需要用户在终端手动输入
+                echo "${PURPLE}温馨提示要实现此功能，需要您自行处理一下内容：${NC}"
+            fi
+            eval "${tCatalogOutlineCommand}"
+        fi
     else
         result=$(show_usage_for_choose >&2)
         if [ $? != 0 ]; then
