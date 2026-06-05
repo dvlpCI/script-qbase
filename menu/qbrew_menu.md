@@ -6,6 +6,8 @@
 
 - 2、再在用户选择后了分类里的事项后，通过 -execChoosed 的参数值决定如何处理。
   - 情况①true:立即执行该事项command字段指定的命令 ；
+    - 可通过 `execMode` 控制命令在当前终端/新标签页中执行或输入
+    - 可通过 `quitAfterExec` 控制执行后是否自动退出菜单
   - 情况②false:则查看所选事项指定的脚本的使用帮助和执行其演示示例
 
 ## 使用方法
@@ -71,6 +73,16 @@ JSON 文件有两种用途：
 }
 ```
 
+###### values 中的可选字段：
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `command` | string | — | **必填**。要执行的命令 |
+| `execMode` | string | 无 | 执行模式：<br/>`"edit"`（当前终端编辑后执行）<br>`"inNewTabExec"`（新标签页自动执行）<br/>`"inNewTabEdit"`（新标签页输入，按 Enter 执行）；<br/>其他值或者不设置则默认直接执行 |
+| `quitAfterExec` | bool | `false` | 执行后自动退出菜单循环 |
+
+> `execMode` 各模式详细介绍见 [new_terminal_tab_approaches.md](new_terminal_tab_approaches.md)
+
 使用方式：
 
 ```bash
@@ -80,9 +92,20 @@ sh qbrew_menu.sh -file custom_command_menu_example.json -categoryType custom -ex
 ##### 实际内部核心：
 
 ```bash
-# 自定义命令菜单：qbrew_menu.sh 内部直接 eval 执行 JSON 中的 command
-tCatalogOutlineCommand=$(jq -r ".command" "$tCatalogOutlineMap")
-eval "${tCatalogOutlineCommand}"
+# 自定义命令菜单：qbrew_menu.sh 根据 JSON 字段决定执行方式
+tCatalogOutlineCommand=$(jq -r ".command")
+tCatalogOutlineExecMode=$(jq -r ".execMode")
+
+if [ "${tCatalogOutlineExecMode}" == "inNewTabEdit" ]; then
+    type_in_new_terminal_tab "${tCatalogOutlineCommand}"       # 新标签页输入，编辑后按 Enter
+elif [ "${tCatalogOutlineExecMode}" == "inNewTabExec" ]; then
+    execute_in_new_terminal_tab "${tCatalogOutlineCommand}"    # 新标签页自动执行
+elif [ "${tCatalogOutlineExecMode}" == "edit" ]; then
+    # vared 预填编辑后执行 (实际实现见 qbrew_menu.sh)
+    vared_impl
+else
+    eval "${tCatalogOutlineCommand}"                          # 默认: 当前终端直接执行
+fi
 ```
 
 #### 结构二：显示脚本帮助
@@ -307,7 +330,13 @@ qbase_custom.sh
             ↓
 qbrew_menu.sh -file "${QBASE_CUSTOM_MENU}" -categoryType custom -execChoosed true
     → 渲染菜单（categoryType=custom）
-    → 用户选择后直接执行 JSON 中的 command（不经过 dealScript_by_scriptConfig.py）
+    → 用户选择后根据 JSON 字段决定执行方式：
+        · execMode="inNewTabEdit" → 新标签页输入
+        · execMode="inNewTabExec"  → 新标签页自动执行
+        · execMode="edit"         → 当前终端编辑后执行
+        · 其他值（或不设置）       → 当前终端直接执行
+    → 若 JSON 中 quitAfterExec=true，则执行后自动退出菜单
+    （不经过 dealScript_by_scriptConfig.py）
 ```
 
 ### 设置 QBASE_CUSTOM_MENU

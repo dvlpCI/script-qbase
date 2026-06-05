@@ -1,20 +1,21 @@
-# 在 Terminal.app 新标签页中执行/输入命令的三种方式
+# 命令执行模式
 
 ## 概述
 
-`qbrew_menu.sh` 的 `deal_for_choose()` 根据 JSON 菜单项中的 `openInNewTab` 字段，决定命令在何处以及如何执行：
+`qbrew_menu.sh` 的 `deal_for_choose()` 根据 JSON 菜单项中的 `execMode` 字段，决定命令在何处以及如何执行：
 
-| `openInNewTab` 值 | 行为 | 是否需权限 |
+| `execMode` 值 | 行为 | 是否需权限 |
 |---|---|---|
-| `"type"` | 新标签页，**输入命令但不执行**，用户可编辑后按 Enter 执行 | ❌ 无 |
-| `"execute"` / `"true"` | 新标签页，**自动执行** | ❌ 无 |
-| 不设置 / 其他 | **当前终端**直接 `eval` | ❌ 无 |
+| 其他值（或不设置） | **当前终端直接执行** (`eval`) | ❌ 无 |
+| `"edit"` | **当前终端**，zsh vared 编辑后执行 | ❌ 无 |
+| `"inNewTabExec"` | 新标签页，**自动执行** | ❌ 无 |
+| `"inNewTabEdit"` | 新标签页，**输入命令但不执行**，用户可编辑后按 Enter 执行 | ❌ 无 |
 
 ---
 
 ## 方式一：`eval`（当前终端执行）
 
-**触发条件**：JSON 菜单项未设置 `openInNewTab`，或值非 `"type"`/`"execute"`/`"true"`。
+**触发条件**：JSON 菜单项未设置 `execMode`，或值非有效模式。
 
 ```bash
 eval "${command}"
@@ -28,7 +29,7 @@ eval "${command}"
 
 ## 方式二：`execute_in_new_terminal_tab`（新标签页自动执行）
 
-**触发条件**：JSON 菜单项中 `"openInNewTab": "execute"` 或 `"openInNewTab": "true"`。
+**触发条件**：JSON 菜单项中 `"execMode": "inNewTabExec"`。
 
 ```bash
 execute_in_new_terminal_tab() {
@@ -62,7 +63,7 @@ execute_in_new_terminal_tab() {
 
 ## 方式三：`type_in_new_terminal_tab`（新标签页输入，用户按 Enter 执行）
 
-**触发条件**：JSON 菜单项中 `"openInNewTab": "type"`。
+**触发条件**：JSON 菜单项中 `"execMode": "inNewTabEdit"`。
 
 ```bash
 type_in_new_terminal_tab() {

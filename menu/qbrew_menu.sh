@@ -272,7 +272,7 @@ evalActionByInput() {
         done
 
         deal_for_choose ""
-        
+        [ $? -eq 2 ] && break
     done
 }
 
@@ -281,17 +281,46 @@ deal_for_choose() {
         tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
 
-        tCatalogOutlineOpenInNewTab=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".openInNewTab")
-        if [ "${tCatalogOutlineOpenInNewTab}" == "type" ]; then
+        tCatalogOutlineExecMode=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execMode")
+        if [ "${tCatalogOutlineExecMode}" == "inNewTabEdit" ]; then
             type_in_new_terminal_tab "${tCatalogOutlineCommand}"
-        elif [ "${tCatalogOutlineOpenInNewTab}" == "execute" ] || [ "${tCatalogOutlineOpenInNewTab}" == "true" ]; then
+        elif [ "${tCatalogOutlineExecMode}" == "inNewTabExec" ]; then
             execute_in_new_terminal_tab "${tCatalogOutlineCommand}"
+        elif [ "${tCatalogOutlineExecMode}" == "edit" ]; then
+            echo
+            local _vared_tmpfile=$(mktemp /tmp/qb_vared_cmd.XXXXXX)
+            local _vared_script=$(mktemp /tmp/qb_vared_sh.XXXXXX)
+            printf '%s' "$tCatalogOutlineCommand" > "$_vared_tmpfile"
+            cat > "$_vared_script" << 'ZV'
+cmd=$(<"$1")
+vared -p "编辑后按 Enter 执行: " cmd
+printf "%s" "$cmd" > "$1"
+ZV
+            # eval 加 2>/dev/null 静默原生错误，并改为自定义的错误输出格式
+            if zsh -i "$_vared_script" "$_vared_tmpfile" < /dev/tty 2>/dev/null; then
+                local _vared_result=$(<"$_vared_tmpfile")
+                if ! eval "$_vared_result" 2>/dev/null; then
+                    echo "${RED}命令执行失败: ${_vared_result}${NC}" >&2
+                    _exec_failed=true
+                fi
+            fi
+            rm -f "$_vared_tmpfile" "$_vared_script"
         else
             if [[ "$tCatalogOutlineCommand" =~ (^|[;|&])[[:space:]]*echo[[:space:]]+ ]]; then
                 # 如果 command 字段中包含 echo，则额外提示需要用户在终端手动输入
                 echo "${PURPLE}温馨提示要实现此功能，需要您自行处理一下内容：${NC}"
             fi
-            eval "${tCatalogOutlineCommand}"
+            if ! eval "${tCatalogOutlineCommand}" 2>/dev/null; then
+                echo "${RED}命令执行失败: ${tCatalogOutlineCommand}${NC}" >&2
+                _exec_failed=true
+            fi
+        fi
+
+        if [ "${_exec_failed}" != "true" ]; then
+            tCatalogOutlineQuitAfterExec=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".quitAfterExec")
+            if [ "${tCatalogOutlineQuitAfterExec}" == "true" ]; then
+                return 2
+            fi
         fi
     else
         result=$(show_usage_for_choose >&2)

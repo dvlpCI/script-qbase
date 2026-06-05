@@ -16,20 +16,28 @@
             "des": "日常使用的操作",
             "values": [
                 {
-                    "des": "打开 dvlproadHexo(自动开终端并激活窗口到最前)",
-                    "key": "打开 dvlproadHexo",
+                    "des": "新建 dvlproadHexo 页面(\"execMode\": \"edit\")",
+                    "key": "新建 dvlproadHexo 页面",
                     "command": "cd /Users/qian/Project/dvlproadHexo && hexo new post --path AI/AIGC/反推 \"反推\"",
-                    "openInNewTab": "type"
+                    "execMode": "edit",
+                    "quitAfterExec": true
                 },
                 {
-                    "des": "修改 cc-connect 的项目",
+                    "des": "修改 cc-connect 的项目(quitAfterExec)",
                     "key": "修改 cc-connect 的项目",
-                    "command": "open ~/.cc-connect/config.toml"
+                    "command": "open ~/.cc-connect/config.toml",
+                    "quitAfterExec": true
                 },
                 {
-                    "des": "打开 open design 及其使用手册(自动开终端并激活窗口到最前)",
+                    "des": "打开 open design 及其使用手册(自动开终端并激活窗口到最前 使用 osascript -e )",
                     "key": "打开 open design 及其使用手册",
                     "command": "open https://dvlproad.github.io/AI/AI-%E2%91%A1Open%20Design/ && osascript -e 'tell application \"Terminal\" to do script \"cd ~/Project/AI/open-design && pnpm tools-dev run web\"' -e 'tell application \"Terminal\" to activate'"
+                },
+                {
+                    "des": "打开 ComfyUI(自动开终端并激活窗口到最前 使用 \"execMode\": \"inNewTabEdit\")",
+                    "key": "打开 ComfyUI",
+                    "command": "source ~/Project/AI/comfy_env/bin/activate && cd ~/Project/ComfyUI && python3.12 main.py --enable-manager",
+                    "execMode": "inNewTabEdit"
                 }
             ]
         },
