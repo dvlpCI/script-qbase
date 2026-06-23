@@ -7,6 +7,7 @@
  # @LastEditTime: 2024-12-08 22:01:11
 # @FilePath: qbrew_menu.sh
 # @Description: 1、先打印出 JSON文件指定分类为菜单(如qbrew 库中 qbase.json 、 qtool.json 的 support_script_path )，供用户选择。2、再在用户选择后了分类里的事项后，通过 -execChoosed 的参数值决定如何处理。情况①true:立即执行该事项command字段指定的命令 ；情况②false:则查看所选事项指定的脚本的使用帮助和执行其演示示例
+# @Example: 见 show_usage() 里的 使用示例1 和 使用示例2
 ###
 
 # 定义颜色常量
@@ -23,7 +24,8 @@ CYAN="\033[0;36m"
 show_usage() {
     printf "${BLUE}%s${NC}\n" "对指定文件中的脚本进行选择,进行案例输出或者直接执行。"
     printf "${BLUE}%s${NC}\n" "使用场景: ①系统脚本的示例演示; ②自定义菜单中的命令的直接执行。"
-    printf "${BLUE}%s${BLUE}\n" "使用示例: sh xxx.sh -file qbase.json -categoryType support_script_path -execChoosed true"
+    printf "${BLUE}%s${BLUE}\n" "使用示例1: sh qbrew_menu.sh -file qbase.json -categoryType support_script_path -execChoosed true"
+    printf "${BLUE}%s${NC}\n" "使用示例2: sh qbrew_menu.sh -file example/qbase_menu_example.json -categoryType custom -execChoosed true"
     # printf "%-20s %s\n" "Usage:" "$0 [options] [arguments]" # 本脚本路径
     # printf "%-20s %s\n" "Options:" ""
     # printf "%-50s %s\n" "-v|--verbose" "Enable verbose mode"
@@ -60,9 +62,6 @@ handle_error() {
     exit 1
 }
 
-
-# qbrew_json_file_path=$1
-# qbrew_categoryType=$2         # 动态指定字段名  "quickCmd" 
 
 # 处理具名参数
 while [ "$#" -gt 0 ]; do
@@ -277,8 +276,28 @@ evalActionByInput() {
 }
 
 deal_for_choose() {
-    if [ -n "${execChoosed}" ] && [ "${execChoosed}" == "true" ]; then
+    if [ -z "${execChoosed}" ] || [ "${execChoosed}" != "true" ]; then
+        result=$(show_usage_for_choose >&2)
+        return $result
+    fi
+
+        # execChoosed == "true" 的时候
         tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
+        if [ -z "${tCatalogOutlineCommand}" ] || [ "${tCatalogOutlineCommand}" == "null" ]; then
+            tCatalogOutlineCommandScriptPathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptPathGetter")
+            if [ -z "${tCatalogOutlineCommandScriptPathGetter}" ] || [ "${tCatalogOutlineCommandScriptPathGetter}" == "null" ]; then
+                echo "${RED}Error: 菜单项缺少 .command 或 .commandScriptPathGetter 字段${NC}" >&2
+                return 0
+            fi
+
+            tCatalogOutlineCommandScriptArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptArgs")
+            scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
+            if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
+                echo "${RED}Error: commandPath '${tCatalogOutlineCommandScriptPathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
+                return 0
+            fi
+            tCatalogOutlineCommand="${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+        fi
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
 
         tCatalogOutlineExecMode=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execMode")
@@ -321,14 +340,7 @@ ZV
             if [ "${tCatalogOutlineQuitAfterExec}" == "true" ]; then
                 return 2
             fi
-        fi
-    else
-        result=$(show_usage_for_choose >&2)
-        if [ $? != 0 ]; then
-            return $result
-        fi
-    fi
-   
+        fi   
 }
 
 # 显示选中的脚本的使用方法

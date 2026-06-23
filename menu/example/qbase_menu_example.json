@@ -101,6 +101,12 @@
                     "des": "打开上传包的网站(pgyer)",
                     "key": "打开上传包的网站(pgyer)",
                     "command": "open https://www.pgyer.com/"
+                },
+                {
+                    "des": "获取给app的版本号和build号",
+                    "key": "获取给app的版本号和build号",
+                    "commandScriptPathGetter": "qbase -path getAppVersionAndBuildNumber",
+                    "commandScriptArgs": ""
                 }
             ]
         }
