@@ -275,35 +275,66 @@ evalActionByInput() {
     done
 }
 
+_get_deal_command() {
+    # 使用 .command 时候
+    tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
+    if [ -n "${tCatalogOutlineCommand}" ] && [ "${tCatalogOutlineCommand}" != "null" ]; then
+        return 0
+    fi
+
+
+    # 使用 .commandScriptPathGetter 时候
+    tCatalogOutlineCommandScriptPathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptPathGetter")
+    if [ -n "${tCatalogOutlineCommandScriptPathGetter}" ] && [ "${tCatalogOutlineCommandScriptPathGetter}" != "null" ]; then
+        tCatalogOutlineCommandScriptArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptArgs")
+        scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
+        if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
+            echo "${RED}Error: commandPath '${tCatalogOutlineCommandScriptPathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
+            return 1
+        fi
+        if [[ "$scriptPath" == *.py ]]; then
+            tCatalogOutlineCommand="python3 ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+        elif [[ "$scriptPath" == *.sh ]]; then
+            tCatalogOutlineCommand="sh ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+        else
+            tCatalogOutlineCommand="${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+        fi
+        return 0
+    fi
+
+    # 使用 .execSourcePathGetter 时候
+    tExecSourcePathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execSourcePathGetter")
+    if [ -n "${tExecSourcePathGetter}" ] && [ "${tExecSourcePathGetter}" != "null" ]; then
+        tExecSourceFunAndArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execSourceFunAndArgs")
+        if [ -z "${tExecSourcePathGetter}" ] || [ "${tExecSourcePathGetter}" == "null" ] || [ -z "${tExecSourceFunAndArgs}" ] || [ "${tExecSourceFunAndArgs}" == "null" ]; then
+            echo "${RED}Error: 菜单项缺少 .command 或 .commandScriptPathGetter 或 .execSourcePathGetter+.execSourceFunAndArgs 字段${NC}" >&2
+            return 1
+        fi
+
+        scriptPath=$(eval "${tExecSourcePathGetter}")
+        if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
+            echo "${RED}Error: execSourcePathGetter '${tExecSourcePathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
+            return 1
+        fi
+        tCatalogOutlineCommand="source \"${scriptPath}\" && ${tExecSourceFunAndArgs}"
+        return 0
+    fi
+}
+
 deal_for_choose() {
+    _exec_failed=false
+
     if [ -z "${execChoosed}" ] || [ "${execChoosed}" != "true" ]; then
         result=$(show_usage_for_choose >&2)
         return $result
     fi
 
         # execChoosed == "true" 的时候
-        tCatalogOutlineCommand=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".command")
-        if [ -z "${tCatalogOutlineCommand}" ] || [ "${tCatalogOutlineCommand}" == "null" ]; then
-            tCatalogOutlineCommandScriptPathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptPathGetter")
-            if [ -z "${tCatalogOutlineCommandScriptPathGetter}" ] || [ "${tCatalogOutlineCommandScriptPathGetter}" == "null" ]; then
-                echo "${RED}Error: 菜单项缺少 .command 或 .commandScriptPathGetter 字段${NC}" >&2
-                return 0
-            fi
-
-            tCatalogOutlineCommandScriptArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptArgs")
-            scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
-            if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
-                echo "${RED}Error: commandPath '${tCatalogOutlineCommandScriptPathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
-                return 0
-            fi
-            if [[ "$scriptPath" == *.py ]]; then
-                tCatalogOutlineCommand="python3 ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
-            elif [[ "$scriptPath" == *.sh ]]; then
-                tCatalogOutlineCommand="sh ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
-            else
-                tCatalogOutlineCommand="${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
-            fi
+        _get_deal_command
+        if [ $? != 0 ]; then
+            return $?
         fi
+        
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
 
         tCatalogOutlineExecMode=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execMode")

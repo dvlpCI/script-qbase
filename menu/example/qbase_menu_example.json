@@ -12,6 +12,29 @@
             ]
         },
         {
+            "type": "test",
+            "des": "测试执行命令的三种方式",
+            "values": [
+                {
+                    "key": "测试执行命令的第一种方式[command]",
+                    "des": "打开上传包的网站(pgyer)",
+                    "command": "open https://www.pgyer.com/"
+                },
+                {
+                    "key": "测试执行命令的第二种方式[commandScriptPathGetter]",
+                    "des": "获取给app的版本号和build号",
+                    "commandScriptPathGetter": "qbase -path getAppVersionAndBuildNumber",
+                    "commandScriptArgs": ""
+                },
+                {
+                    "key": "测试执行命令的第三种方式[execSourcePathGetter]",
+                    "des": "打印结果到控制台",
+                    "execSourcePathGetter": "qbase -path function_log_msg",
+                    "execSourceFunAndArgs": "logResultValueToConsole \"helloworld\""
+                }
+            ]
+        },
+        {
             "type": "daily_use",
             "des": "日常使用的操作",
             "values": [
@@ -101,12 +124,6 @@
                     "des": "打开上传包的网站(pgyer)",
                     "key": "打开上传包的网站(pgyer)",
                     "command": "open https://www.pgyer.com/"
-                },
-                {
-                    "des": "获取给app的版本号和build号",
-                    "key": "获取给app的版本号和build号",
-                    "commandScriptPathGetter": "qbase -path getAppVersionAndBuildNumber",
-                    "commandScriptArgs": ""
                 }
             ]
         }

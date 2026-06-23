@@ -77,13 +77,15 @@ JSON 文件有两种用途：
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `command` | string | — | 要执行的命令。与下面两个二选一 |
-| `commandScriptPathGetter` | string | — | 输出脚本绝对路径的命令（如 `"qbase -path xxx"`），配合 `commandScriptArgs` 使用。与 `command` 二选一 |
+| `command` | string | — | 要执行的命令。与下面的字段三选一 |
+| `commandScriptPathGetter` | string | — | 输出脚本绝对路径的命令（如 `"qbase -path xxx"`），配合 `commandScriptArgs` 使用。自动识别 `.py`/`.sh` 加前缀执行 |
 | `commandScriptArgs` | string | — | 传给 `commandScriptPathGetter` 解析出的脚本的参数 |
+| `execSourcePathGetter` | string | — | 输出脚本绝对路径的命令（如 `"qtool -path qtool_menu.sh"`），配合 `execSourceFunAndArgs` 使用。会对脚本执行 `source` |
+| `execSourceFunAndArgs` | string | — | source 后调用的函数名及参数 |
 | `execMode` | string | 无 | 执行模式：<br/>`"edit"`（当前终端编辑后执行）<br>`"inNewTabExec"`（新标签页自动执行）<br/>`"inNewTabEdit"`（新标签页输入，按 Enter 执行）；<br/>其他值或者不设置则默认直接执行 |
 | `quitAfterExec` | bool | `false` | 执行后自动退出菜单循环 |
 
-> 优先级：`command` > `commandScriptPathGetter` + `commandScriptArgs`。两者都没有则报错。
+> 优先级：`command` > `commandScriptPathGetter` + `commandScriptArgs` > `execSourcePathGetter` + `execSourceFunAndArgs`。三者都没有则报错。
 
 > `execMode` 各模式详细介绍见 [new_terminal_tab_approaches.md](new_terminal_tab_approaches.md)
 
