@@ -55,7 +55,7 @@ JSON 文件有两种用途：
 
 | 场景        | 自定义命令                         | 脚本帮助                        |
 | ----------- | ---------------------------------- | ------------------------------- |
-| JSON示例    | `custom_command_menu_example.json` | `qbase.json` / `qtool.json`     |
+| JSON示例    | `qbase_menu_example.json` | `qbase.json` / `qtool.json`     |
 | execChoosed | `true`                             | `false`（默认）                 |
 | 针对的字段  | `values[].command`                 | `values[].rel_path`             |
 | 选中后      | 直接执行 command                   | 获取脚本，执行 `脚本.sh --help` |
@@ -63,7 +63,7 @@ JSON 文件有两种用途：
 
 #### 结构一：执行命令
 
-示例： 打印`custom_command_menu_example.json`的 `custom` 分类为菜单后，选择其中的如下选项
+示例： 打印`qbase_menu_example.json`的 `custom` 分类为菜单后，选择其中的如下选项
 
 ```json
 {
@@ -86,7 +86,7 @@ JSON 文件有两种用途：
 使用方式：
 
 ```bash
-sh qbrew_menu.sh -file custom_command_menu_example.json -categoryType custom -execChoosed true
+sh qbrew_menu.sh -file qbase_menu_example.json -categoryType custom -execChoosed true
 ```
 
 ##### 实际内部核心：
@@ -194,7 +194,7 @@ sh qbrew_menu.sh -file xxx -categoryType yyy -execChoosed true
             "actionType": "fixed",
             "resultForParam": "-file",
             "fixedType": "file-path-rel-this-file",
-            "fixedValue": "./custom_command_menu_example.json"
+            "fixedValue": "./qbase_menu_example.json"
         },
         {
             "id": "-categoryType",

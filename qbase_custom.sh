@@ -32,12 +32,12 @@ CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurrentDIR_Script_Absolute} # 使用 %/* 方法可以避免路径上有..
 
 # 快速检查是否已设置环境变量
-# log_color_info "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript "自定义命令菜单" --env-var-placeholder "your_custom_menu_json_file" --env-reference-json-file-example "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" --output-filename-if-copy "qbase_custom_menu.json" 》 "
+# log_color_info "正在执行命令《 sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh --env-name QBASE_CUSTOM_MENU --env-descript "自定义命令菜单" --env-var-placeholder "your_custom_menu_json_file" --env-reference-json-file-example "$qbase_homedir_abspath/menu/example/qbase_menu_example.json" --output-filename-if-copy "qbase_custom_menu.json" 》 "
 checkResult=$(sh $qbase_homedir_abspath/env_variables/env_file_check_and_set.sh \
     --env-name QBASE_CUSTOM_MENU \
     --env-descript "自定义命令菜单" \
     --env-var-placeholder "your_custom_menu_json_file" \
-    --env-reference-json-file-example "$qbase_homedir_abspath/menu/example/custom_command_menu_example.json" \
+    --env-reference-json-file-example "$qbase_homedir_abspath/menu/example/qbase_menu_example.json" \
     --output-filename-if-copy "qbase_custom_menu.json"
 )
 if [ $? -ne 0 ]; then

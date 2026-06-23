@@ -13,7 +13,7 @@
 #           --env-name QBASE_CUSTOM_MENU \
 #           --env-descript "自定义命令菜单" \
 #           --env-var-placeholder "your_custom_menu_json_file" \
-#           --env-reference-json-file-example "./menu/example/custom_command_menu_example.json" \
+#           --env-reference-json-file-example "./menu/example/qbase_menu_example.json" \
 #           --output-filename-if-copy "custom_menu.json"
 ###
 

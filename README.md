@@ -93,7 +93,7 @@ brew upgrade qbase
 }
 ```
 
-### 2、命令集合/菜单 [custom_command_menu_example.json](menu/example/custom_command_menu_example.json)
+### 2、命令集合/菜单 [qbase_menu_example.json](menu/example/qbase_menu_example.json)
 
 详见：[menu/qbrew_menu.md](menu/qbrew_menu.md) 中的介绍
 
@@ -174,7 +174,7 @@ brew upgrade qbase
             "actionType": "fixed",
             "resultForParam": "-file",
             "fixedType": "file-path-rel-this-file",
-            "fixedValue": "./custom_command_menu_example.json"
+            "fixedValue": "./qbase_menu_example.json"
         },
         {
             "id": "-categoryType",
