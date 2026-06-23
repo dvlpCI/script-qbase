@@ -296,7 +296,13 @@ deal_for_choose() {
                 echo "${RED}Error: commandPath '${tCatalogOutlineCommandScriptPathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
                 return 0
             fi
-            tCatalogOutlineCommand="${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+            if [[ "$scriptPath" == *.py ]]; then
+                tCatalogOutlineCommand="python3 ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+            elif [[ "$scriptPath" == *.sh ]]; then
+                tCatalogOutlineCommand="sh ${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+            else
+                tCatalogOutlineCommand="${scriptPath} ${tCatalogOutlineCommandScriptArgs}"
+            fi
         fi
         echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
 
