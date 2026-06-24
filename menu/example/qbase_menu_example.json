@@ -58,6 +58,16 @@
                     "quitAfterExec": true
                 },
                 {
+                    "des": "打开 总目录.html(本地所有)",
+                    "key": "打开 总目录.html(本地所有)",
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/总目录 && echo 'window.DATA = ' > data/catalog_with_ratings.js && cat data/catalog_with_ratings.json >> data/catalog_with_ratings.js && open 总目录.html"
+                },
+                {
+                    "des": "打开 项目列表.html(本地所有)",
+                    "key": "打开 项目列表.html(本地所有)",
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/管理相关/项目列表/dvlproad项目列表 && echo 'window.DATA = ' > data/repos_with_pods.js && cat data/repos_with_pods.json >> data/repos_with_pods.js && open dvlproad项目列表.html"
+                },
+                {
                     "des": "修改 cc-connect 的项目(quitAfterExec)",
                     "key": "修改 cc-connect 的项目",
                     "command": "open ~/.cc-connect/config.toml",
