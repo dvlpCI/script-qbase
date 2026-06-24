@@ -22,6 +22,14 @@ CYAN="\033[0;36m"
 # 日志信息输出到终端（规范 2.2：日志输出用 >&2，保持返回值干净）
 log_color_info() { printf "%b\n" "$1" >&2; }
 
+function qian_log() {
+    # 只有定义 --qian 的时候才打印这个log
+    if [ "$DEFINE_QIAN" = true ]; then
+        echo "$1" >&2   # 使用 echo 信息里的颜色才能正常显示出来
+        # printf "%s\n" "$1" >&2
+    fi
+}
+
 # 使用说明函数
 show_usage() {
     printf "${BLUE}%s${NC}\n" "对指定文件中的脚本进行选择,进行案例输出或者直接执行。"
@@ -233,6 +241,7 @@ tool_menu() {
 }
 
 evalActionByInput() {
+    qian_log "${GREEN}正在等待你选择...${NC}"
     categoryData=$1
 
     # 读取用户输入的选项，并根据选项执行相应操作
@@ -279,7 +288,7 @@ evalActionByInput() {
             continue
         fi
 
-        deal_for_choose ""
+        deal_for_choose "${option}"
         [ $? -eq 2 ] && break
     done
 }
@@ -343,6 +352,8 @@ _get_deal_command() {
 }
 
 deal_for_choose() {
+    input_option=$1
+
     _exec_failed=false
 
     if [ -z "${execChoosed}" ] || [ "${execChoosed}" != "true" ]; then
@@ -356,7 +367,7 @@ deal_for_choose() {
             return $?
         fi
         
-        echo "${RED}您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${RED}】<<<<<<<<<<<<<${NC}"
+        log_color_info "${GREEN}根据你选中的菜单${BLUE} ${input_option} ${GREEN}，您正在终端直接执行以下完整命令>>>>>>>>>>>【${BLUE} ${tCatalogOutlineCommand} ${GREEN}】<<<<<<<<<<<<<${NC}"
 
         tCatalogOutlineExecMode=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execMode")
         if [ "${tCatalogOutlineExecMode}" == "inNewTabEdit" ]; then
@@ -510,8 +521,9 @@ fi
 categoryData=$(cat "$qbrew_json_file_path" | jq ".${qbrew_categoryType}")
 # categoryData=$(jq ".${qbrew_categoryType}" "$qtool_menu_json_file_path")
 
-
+qian_log "${GREEN}菜单构建中...${NC}"
 tool_menu "${categoryData}"
+qian_log "${GREEN}菜单显示完毕${NC}"
 
 # 开始选择
 evalActionByInput "${categoryData}"
