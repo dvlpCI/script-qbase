@@ -239,6 +239,7 @@ evalActionByInput() {
     valid_option=false
     moreActionStrings=("qian" "chaoqian" "lichaoqian") # 输入哪些字符串算是想要退出
     while [ "$valid_option" = false ]; do
+        printf "\n"
         read -r -p "请选择您想要查看的操作编号或id(若要退出请输入Q|q) : " option
 
         if [ "${option}" == q ] || [ "${option}" == "Q" ]; then
@@ -272,6 +273,11 @@ evalActionByInput() {
                 break
             fi
         done
+
+        if [ ${hasFound} != true ]; then
+            echo "无此选项，请重新输入。"
+            continue
+        fi
 
         deal_for_choose ""
         [ $? -eq 2 ] && break
