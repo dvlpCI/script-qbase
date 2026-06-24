@@ -19,6 +19,8 @@ BLUE="\033[34m"
 PURPLE="\033[0;35m"
 CYAN="\033[0;36m"
 
+# 日志信息输出到终端（规范 2.2：日志输出用 >&2，保持返回值干净）
+log_color_info() { printf "%b\n" "$1" >&2; }
 
 # 使用说明函数
 show_usage() {
@@ -125,6 +127,7 @@ done
 # exit 0
 
 
+log_color_info "${GREEN}您当前显示的菜单来源于 : \"${qbrew_json_file_path}\" 中的 \"${qbrew_categoryType}\" 字段 ${NC}"
 
 CurrentDIR_Script_Absolute="$( cd "$( dirname "$0" )" && pwd )"
 qbase_homedir_abspath=${CurrentDIR_Script_Absolute%/*} # 使用 %/* 方法可以避免路径上有..
@@ -283,11 +286,15 @@ _get_deal_command() {
     fi
 
 
-    # 使用 .commandScriptPathGetter 时候
+    # 使用 .commandScriptPathGetter 时候。支持直接用绝对路径（以 / 开头，常用于测试）
     tCatalogOutlineCommandScriptPathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptPathGetter")
     if [ -n "${tCatalogOutlineCommandScriptPathGetter}" ] && [ "${tCatalogOutlineCommandScriptPathGetter}" != "null" ]; then
         tCatalogOutlineCommandScriptArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptArgs")
-        scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
+        if [[ "${tCatalogOutlineCommandScriptPathGetter}" == /* ]]; then
+            scriptPath="${tCatalogOutlineCommandScriptPathGetter}"
+        else
+            scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
+        fi
         if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
             echo "${RED}Error: commandPath '${tCatalogOutlineCommandScriptPathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
             return 1
@@ -302,7 +309,7 @@ _get_deal_command() {
         return 0
     fi
 
-    # 使用 .execSourcePathGetter 时候
+    # 使用 .execSourcePathGetter 时候。支持直接用绝对路径（以 / 开头，常用于测试）
     tExecSourcePathGetter=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execSourcePathGetter")
     if [ -n "${tExecSourcePathGetter}" ] && [ "${tExecSourcePathGetter}" != "null" ]; then
         tExecSourceFunAndArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".execSourceFunAndArgs")
@@ -311,7 +318,11 @@ _get_deal_command() {
             return 1
         fi
 
-        scriptPath=$(eval "${tExecSourcePathGetter}")
+        if [[ "${tExecSourcePathGetter}" == /* ]]; then
+            scriptPath="${tExecSourcePathGetter}"
+        else
+            scriptPath=$(eval "${tExecSourcePathGetter}")
+        fi
         if [ -z "${scriptPath}" ] || [ ! -f "${scriptPath}" ]; then
             echo "${RED}Error: execSourcePathGetter '${tExecSourcePathGetter}' 解析得到的路径 '${scriptPath}' 不是有效文件${NC}" >&2
             return 1
