@@ -292,6 +292,8 @@ _get_deal_command() {
         tCatalogOutlineCommandScriptArgs=$(printf "%s" "$tCatalogOutlineMap" | jq -r ".commandScriptArgs")
         if [[ "${tCatalogOutlineCommandScriptPathGetter}" == /* ]]; then
             scriptPath="${tCatalogOutlineCommandScriptPathGetter}"
+        elif [[ "${tCatalogOutlineCommandScriptPathGetter}" == ~/* ]]; then
+            scriptPath="${HOME}${tCatalogOutlineCommandScriptPathGetter:1}"
         else
             scriptPath=$(eval "${tCatalogOutlineCommandScriptPathGetter}")
         fi
@@ -320,6 +322,8 @@ _get_deal_command() {
 
         if [[ "${tExecSourcePathGetter}" == /* ]]; then
             scriptPath="${tExecSourcePathGetter}"
+        elif [[ "${tExecSourcePathGetter}" == ~/* ]]; then
+            scriptPath="${HOME}${tExecSourcePathGetter:1}"
         else
             scriptPath=$(eval "${tExecSourcePathGetter}")
         fi

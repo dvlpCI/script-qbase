@@ -27,9 +27,21 @@
                     "commandScriptArgs": ""
                 },
                 {
+                    "key": "测试执行命令的第二种方式[commandScriptPathGetter]",
+                    "des": "获取给app的版本号和build号",
+                    "commandScriptPathGetter": "~/Project/Github/script-qbase/value_create/value_create_app_version_and_build.sh",
+                    "commandScriptArgs": ""
+                },
+                {
                     "key": "测试执行命令的第三种方式[execSourcePathGetter]",
                     "des": "打印结果到控制台",
                     "execSourcePathGetter": "qbase -path function_log_msg",
+                    "execSourceFunAndArgs": "logResultValueToConsole \"helloworld\""
+                },
+                {
+                    "key": "测试执行命令的第三种方式[execSourcePathGetter]",
+                    "des": "打印结果到控制台",
+                    "execSourcePathGetter": "/Users/qian/Project/Github/script-qbase/log/function_log_msg.sh",
                     "execSourceFunAndArgs": "logResultValueToConsole \"helloworld\""
                 }
             ]
