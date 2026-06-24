@@ -112,13 +112,13 @@
                 },
                 {
                     "des": "查看 Project 文件",
-                    "key": "goProject",
+                    "key": "go Project",
                     "command": "open ~/Project/"
                 },
                 {
-                    "des": "查看 pp 文件(路径有空格，所以将整个路径包在\"\"中)",
+                    "des": "查看 pp 文件(路径有空格)",
                     "key": "go Provisioning Profiles",
-                    "command": "open \"~/Library/Developer/Xcode/UserData/Provisioning Profiles/\""
+                    "command": "open ~/Library/Developer/Xcode/UserData/Provisioning\\ Profiles/"
                 },
                 {
                     "des": "查看压缩包结构，避免使用系统解压工具导致被默认解压到与压缩包同名的文件夹内，而导致看不到原本内容是对文件夹内的进行压缩，还是对文件夹进行压缩",
