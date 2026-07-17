@@ -53,12 +53,12 @@
                 {
                     "des": "打开 总目录.html(本地所有)",
                     "key": "打开 总目录.html(本地所有)",
-                    "command": "cd ~/Project/dvlproadHexo/source/_posts/总目录 && echo 'window.DATA = ' > data/catalog_with_ratings.js && cat data/catalog_with_ratings.json >> data/catalog_with_ratings.js && open 总目录.html"
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/总目录 && echo 'window.DATA = ' > data/catalog_with_ratings.js && cat data/catalog_with_ratings.json >> data/catalog_with_ratings.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/总目录.html?showAll=true\""
                 },
                 {
                     "des": "打开 项目列表.html(本地所有)",
                     "key": "打开 项目列表.html(本地所有)",
-                    "command": "cd ~/Project/dvlproadHexo/source/_posts/管理相关/项目列表/dvlproad项目列表 && echo 'window.DATA = ' > data/repos_with_pods.js && cat data/repos_with_pods.json >> data/repos_with_pods.js && open dvlproad项目列表.html"
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/管理相关/项目列表/dvlproad项目列表 && echo 'window.DATA = ' > data/repos_with_pods.js && cat data/repos_with_pods.json >> data/repos_with_pods.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/dvlproad项目列表.html?showAll=true\""
                 }
             ]
         },
