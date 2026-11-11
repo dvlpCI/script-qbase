@@ -53,12 +53,17 @@
                 {
                     "des": "打开 总目录.html(本地所有)",
                     "key": "打开 总目录.html(本地所有)",
-                    "command": "cd ~/Project/dvlproadHexo/source/_posts/总目录 && echo 'window.DATA = ' > data/catalog_with_ratings.js && cat data/catalog_with_ratings.json >> data/catalog_with_ratings.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/总目录.html?showAll=true\""
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/总目录 && echo 'window.DATA = ' > data/catalog_with_ratings.js && cat 'data/catalog_with_ratings.json' >> data/catalog_with_ratings.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/总目录.html?showAll=true\""
                 },
                 {
                     "des": "打开 项目列表.html(本地所有)",
                     "key": "打开 项目列表.html(本地所有)",
-                    "command": "cd ~/Project/dvlproadHexo/source/_posts/管理相关/项目列表/dvlproad项目列表 && echo 'window.DATA = ' > data/repos_with_pods.js && cat data/repos_with_pods.json >> data/repos_with_pods.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/dvlproad项目列表.html?showAll=true\""
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/管理相关/项目列表/dvlproad项目列表 && echo 'window.DATA = ' > data/repos_with_pods.js && cat 'data/repos_with_pods.json' >> data/repos_with_pods.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/dvlproad项目列表.html?showAll=true\""
+                },
+                {
+                    "des": "查看 剩余的AI token(siliconflow & lojings)",
+                    "key": "查看 剩余的AI token(siliconflow & lojings)",
+                    "command": "open https://cloud.siliconflow.cn/me/expensebill && open https://token.lojings.com/dashboard"
                 }
             ]
         },
@@ -168,6 +173,17 @@
                     "des": "打开上传包的网站(pgyer)",
                     "key": "打开上传包的网站(pgyer)",
                     "command": "open https://www.pgyer.com/"
+                }
+            ]
+        },
+        {
+            "type": "tool",
+            "des": "工具",
+            "values": [
+                {
+                    "des": "打开 旅游攻略助手.html",
+                    "key": "打开 旅游攻略助手.html",
+                    "command": "cd ~/Project/dvlproadHexo/source/_posts/Architecture架构/通用业务规范 && echo 'window.DATA = ' > data/trip-data.js && cat '行程安排(11.01-11.06).json' >> data/trip-data.js && /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \"file://$(pwd)/旅游攻略助手.html?showAll=true\""
                 }
             ]
         }
